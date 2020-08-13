@@ -1,0 +1,33 @@
+/*
+Place your custom CSS here
+*/
+.widget-container {
+    position: relative;
+}
+
+.widget-row {
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap:wrap;
+    -webkit-flex-wrap: wrap;
+}
+
+.widget-cell {
+    position: relative;
+}
+
+/* .widget-cell-content-container {
+
+} */
+
+/* .widget-cell-content-container-item {
+
+} */
+
+.draggableItem {
+    cursor: move;
+}
+
+.clickableItem {
+    cursor: pointer;
+}

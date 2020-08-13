@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="itvisors.mendixreactdnd.MendixReactDnD" pluginWidget="true" needsEntityContext="true" offlineCapable="true"
+        supportedPlatform="Web"
+        xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
+    <name>Drag-drop container</name>
+    <description>Wrapper for react-dnd</description>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAi0lEQVRYw+2WwQ7AIAhDreH/f7k7mRijk2AIZoOTh1UfWHAgyRIYtQRHAiSAtAUA0watiSx6khdVYMxoF6uMNfpe+00TAlB7wrUCGggXgN4HOwg5zWD8ZqYBsDTnfW2obamW6TiIZoPpbZ/qbb7dXHC9As1QkqiD7zWh9VW06sMrgPwrToAESIDfAzwsEC9SZeBQXwAAAABJRU5ErkJggg==</icon>
+    <properties>
+
+        <propertyGroup caption="Containers">
+            <property key="containerList" type="object" isList="true">
+                <caption>Datasource containers</caption>
+                <description></description>
+                <properties>
+                    <propertyGroup caption="Container">
+                        <property key="containerID" type="expression">
+                            <caption>Container ID</caption>
+                            <description>Set a key value of the enumeration used for the Clicked container ID</description>
+                            <returnType type="String" />
+                        </property>
+                        <property key="rowNumber" type="expression">
+                            <caption>Row number</caption>
+                            <description>Row number, starts at 1</description>
+                            <returnType type="Integer" />
+                        </property>
+                        <property key="columnNumber" type="expression">
+                            <caption>Column number</caption>
+                            <description>Column number, starts at 1, widget does not create components for gaps in the column numbers</description>
+                            <returnType type="Integer" />
+                        </property>
+                        <property key="allowDragging" type="expression">
+                            <caption>Allow dragging</caption>
+                            <description></description>
+                            <returnType type="Boolean" />
+                        </property>
+                        <property key="returnOnClick" type="expression">
+                            <caption>Return OnClick</caption>
+                            <description>Whether OnClick events should be returned for the container. Useful for positioning items on the container. Does not make sense when dragging items from this container.</description>
+                            <returnType type="Boolean" />
+                        </property>
+                        <property key="ds" type="datasource" isList="true" required="false">
+                            <caption>Data source</caption>
+                            <description></description>
+                        </property>
+                        <property key="dsContent" type="widgets" dataSource="ds" required="false">
+                            <caption>Content for datasource</caption>
+                            <description></description>
+                        </property>
+                        <property key="containerClass" type="expression" required="false">
+                            <caption>Container class</caption>
+                            <description>Class to place on the container</description>
+                            <returnType type="String" />
+                        </property>
+                    </propertyGroup>
+                </properties>
+            </property>
+        </propertyGroup>
+
+        <propertyGroup caption="Events">
+            <property key="eventContainerID" type="attribute">
+                <caption>Container ID</caption>
+                <description></description>
+                <attributeTypes>
+                    <attributeType name="Enum" />
+                </attributeTypes>
+            </property>
+            <property key="eventClientX" type="attribute" required="false">
+                <caption>Client X</caption>
+                <description>Client X position for the event.</description>
+                <attributeTypes>
+                    <attributeType name="Integer" />
+                </attributeTypes>
+            </property>
+            <property key="eventClientY" type="attribute" required="false">
+                <caption>Client Y</caption>
+                <description>Client Y position for the event.</description>
+                <attributeTypes>
+                    <attributeType name="Integer" />
+                </attributeTypes>
+            </property>
+            <property key="eventOffsetX" type="attribute" required="false">
+                <caption>Offset X</caption>
+                <description>Offset X position for the event. Relative from the element</description>
+                <attributeTypes>
+                    <attributeType name="Integer" />
+                </attributeTypes>
+            </property>
+            <property key="eventOffsetY" type="attribute" required="false">
+                <caption>Offset Y</caption>
+                <description>Offset Y position for the event. Relative from the element</description>
+                <attributeTypes>
+                    <attributeType name="Integer" />
+                </attributeTypes>
+            </property>
+            <property key="eventGuid" type="attribute">
+                <caption>Object GUID</caption>
+                <description>When an object was clicked or dragged, contains the GUID of that object</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+            <property key="dropTargetContainerID" type="attribute" required="false">
+                <caption>Drop target ID</caption>
+                <description>When an object was dragged onto another object, contains the container ID of the drop target</description>
+                <attributeTypes>
+                    <attributeType name="Enum" />
+                </attributeTypes>
+            </property>
+            <property key="dropTargetGuid" type="attribute" required="false">
+                <caption>GUID of drop target</caption>
+                <description>When an object was dragged onto another object, contains the GUID of the drop target</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+            <property key="onClickAction" type="action" required="false">
+                <caption>On click action</caption>
+                <description></description>
+            </property>
+            <property key="onDropAction" type="action" required="false">
+                <caption>On drop action</caption>
+                <description></description>
+            </property>
+        </propertyGroup>
+    </properties>
+</widget>
