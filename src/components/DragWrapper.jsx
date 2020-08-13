@@ -2,11 +2,10 @@ import { DatasourceItem } from "./DatasourceItem";
 import { createElement } from "react";
 import { useDrag } from "react-dnd";
 
-export function DragDropWrapper(props) {
-    const { item, cellContainer } = props;
+export function DragWrapper({ cellContainer, children }) {
     const { containerID } = cellContainer;
 
-    const [{ isDragging }, itemRef] = useDrag({
+    const [{ isDragging }, drag] = useDrag({
         item: { type: containerID.value },
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
@@ -15,16 +14,12 @@ export function DragDropWrapper(props) {
 
     return (
         <div
-            ref={itemRef}
+            ref={drag}
             style={{
                 opacity: isDragging ? 0.5 : 1
             }}
         >
-            <DatasourceItem
-                cellContainer={cellContainer}
-                item={item}
-                onClick={(evt, offsetX, offsetY) => props.onClick(evt, offsetX, offsetY)}
-            />
+            {children}
         </div>
     );
 }

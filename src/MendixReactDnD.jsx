@@ -1,6 +1,6 @@
 import { Component, createElement } from "react";
 import { DatasourceItem } from "./components/DatasourceItem";
-import { DragDropWrapper } from "./components/DragDropWrapper";
+import { DragWrapper } from "./components/DragWrapper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -134,23 +134,28 @@ export default class MendixReactDnD extends Component {
         const allowDragging = cellContainer.allowDragging && cellContainer.allowDragging.value;
         if (allowDragging) {
             return (
-                <DragDropWrapper
+                <DragWrapper
                     key={item.id}
                     cellContainer={cellContainer}
                     item={item}
-                    onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
-                />
+                >
+                    {this.renderDatasourceItem(cellContainer, item)}
+                </DragWrapper>
             );
         } else {
-            return (
-                <DatasourceItem
-                    key={item.id}
-                    cellContainer={cellContainer}
-                    item={item}
-                    onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
-                />
-            );
+            return this.renderDatasourceItem(cellContainer, item);
         }
+    }
+
+    renderDatasourceItem(cellContainer, item) {
+        return (
+            <DatasourceItem
+                key={item.id}
+                cellContainer={cellContainer}
+                item={item}
+                onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
+            />
+        );
     }
 
     handleClick(container, item, evt, offsetX, offsetY) {
