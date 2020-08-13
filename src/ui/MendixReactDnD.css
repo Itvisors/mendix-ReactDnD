@@ -31,3 +31,7 @@ Place your custom CSS here
 .clickableItem {
     cursor: pointer;
 }
+
+.dragging-container {
+    opacity: 0.5;
+}

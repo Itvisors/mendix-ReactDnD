@@ -12,12 +12,12 @@ export function DragWrapper({ cellContainer, children }) {
         })
     });
 
+    const className = isDragging ? "draggable-container dragging-container" : "draggable-container";
+
     return (
         <div
             ref={drag}
-            style={{
-                opacity: isDragging ? 0.5 : 1
-            }}
+            className={className}
         >
             {children}
         </div>
