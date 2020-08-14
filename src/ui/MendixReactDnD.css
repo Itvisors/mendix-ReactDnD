@@ -35,3 +35,17 @@ Place your custom CSS here
 .dragging-container {
     opacity: 0.5;
 }
+
+div.droptarget-container {
+    padding: 2px;
+}
+
+div.droptarget-container.droptarget-candrop {
+    padding: 0;
+    border: 2px solid lime;
+}
+
+div.droptarget-container.droptarget-invalid {
+    padding: 0;
+    border: 2px solid tomato;
+}

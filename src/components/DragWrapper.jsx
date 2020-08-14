@@ -1,18 +1,17 @@
-import { DatasourceItem } from "./DatasourceItem";
 import { createElement } from "react";
 import { useDrag } from "react-dnd";
 
-export function DragWrapper({ cellContainer, children }) {
-    const { containerID } = cellContainer;
+export function DragWrapper({ cellContainer, item, children }) {
+    const { containerID, draggableClass, draggingClass } = cellContainer;
 
     const [{ isDragging }, drag] = useDrag({
-        item: { type: containerID.value },
+        item: { type: containerID.value, id: item.id },
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
     });
 
-    const className = isDragging ? "draggable-container dragging-container" : "draggable-container";
+    const className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
 
     return (
         <div

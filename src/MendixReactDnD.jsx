@@ -1,6 +1,7 @@
 import { Component, createElement } from "react";
 import { DatasourceItem } from "./components/DatasourceItem";
 import { DragWrapper } from "./components/DragWrapper";
+import { DropWrapper } from "./components/DropWrapper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -131,20 +132,79 @@ export default class MendixReactDnD extends Component {
     }
 
     renderCellItem(cellContainer, item) {
-        const allowDragging = cellContainer.allowDragging && cellContainer.allowDragging.value;
-        if (allowDragging) {
-            return (
-                <DragWrapper
-                    key={item.id}
-                    cellContainer={cellContainer}
-                    item={item}
-                >
-                    {this.renderDatasourceItem(cellContainer, item)}
-                </DragWrapper>
-            );
-        } else {
-            return this.renderDatasourceItem(cellContainer, item);
+        const { dragDropType } = cellContainer;
+        switch (dragDropType) {
+            case "drag":
+                return (
+                    <DragWrapper
+                        key={item.id}
+                        cellContainer={cellContainer}
+                        item={item}
+                    >
+                        {this.renderDatasourceItem(cellContainer, item)}
+                    </DragWrapper>
+                );
+
+            case "drop":
+                return (
+                    <DropWrapper
+                        key={item.id}
+                        cellContainer={cellContainer}
+                        item={item}
+                        onDrop={(droppedItem) => this.handleDrop(droppedItem, cellContainer, item)}
+                    >
+                        {this.renderDatasourceItem(cellContainer, item)}
+                    </DropWrapper>
+                );
+        
+                case "both":
+                    return (
+                        <DropWrapper
+                            key={item.id}
+                            cellContainer={cellContainer}
+                            item={item}
+                            onDrop={(droppedItem) => this.handleDrop(droppedItem, cellContainer, item)}
+                        >
+                            <DragWrapper
+                                key={item.id}
+                                cellContainer={cellContainer}
+                                item={item}
+                            >
+                                {this.renderDatasourceItem(cellContainer, item)}
+                            </DragWrapper>
+                        </DropWrapper>
+                    );
+            default:
+                return this.renderDatasourceItem(cellContainer, item);
         }
+    }
+
+    handleDrop(droppedItem, cellContainer, item) {
+        console.info("handleDrop: Dropped container ID: " + droppedItem.type + ", item ID: " + droppedItem.id + " on item ID: " + item.id);
+        const { eventContainerID, eventGuid, dropTargetContainerID, dropTargetGuid, onDropAction } = this.props;
+        const { containerID } = cellContainer;
+
+        eventContainerID.setValue(droppedItem.type);
+        eventGuid.setTextValue(droppedItem.id);
+        dropTargetContainerID.setValue(containerID.value);
+        dropTargetGuid.setTextValue(item.id);
+        //TODO Can we capture the screen/client position of a drop?
+        // if (eventClientX) {
+        //     eventClientX.setTextValue("" + evt.clientX);
+        // }
+        // if (eventClientY) {
+        //     eventClientY.setTextValue("" + evt.clientY);
+        // }
+        // if (eventOffsetX) {
+        //     eventOffsetX.setTextValue("" + offsetX);
+        // }
+        // if (eventOffsetY) {
+        //     eventOffsetY.setTextValue("" + offsetY);
+        // }
+        if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
+            onDropAction.execute();
+        }
+
     }
 
     renderDatasourceItem(cellContainer, item) {

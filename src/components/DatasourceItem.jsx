@@ -10,21 +10,23 @@ export class DatasourceItem extends Component {
 
     render() {
         const { cellContainer, item } = this.props;
-        const { dsContent } = cellContainer;
+        const { dsContent, dragDropType } = cellContainer;
 
         // Convert Mendix properties to form that is easier to use.
-        const allowDragging = cellContainer.allowDragging && cellContainer.allowDragging.value;
         const returnOnClick = cellContainer.returnOnClick && cellContainer.returnOnClick.value;
 
         // Set the class name(s).
         let className = "widget-cell-content-container-item";
-        if (allowDragging) {
+        if (dragDropType === "drag" || dragDropType === "both") {
             className += " draggableItem";
+        }
+        if (dragDropType === "drop" || dragDropType === "both") {
+            className += " dropTarget";
         }
         if (returnOnClick) {
             className += " clickableItem";
         }
-        console.info("DatasourceItem: ID: " + item.id);
+        // console.info("DatasourceItem: ID: " + item.id);
         return (
             <div key={item.id} ref={this.itemDivRef} className={className} onClick={this.onClick}>
                 {dsContent(item)}
