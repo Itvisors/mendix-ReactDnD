@@ -1,17 +1,23 @@
 import { createElement } from "react";
 import { useDrop } from "react-dnd";
+import React, { useRef } from 'react'
 
 export function DropWrapper({ cellContainer, onDrop, children }) {
     const { acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
     const acceptArray = acceptsContainerIDs.value.split(",");
+    const ref = useRef(null);
 
-    const [{ canDrop, isOver, clientOffset }, drop] = useDrop({
+    const handleDrop = (droppedItem, monitor) => {
+        const clientOffset = monitor.getClientOffset();
+        onDrop(droppedItem, clientOffset);
+    };
+
+    const [{ canDrop, isOver }, drop] = useDrop({
         accept: acceptArray,
-        drop: onDrop,
+        drop: handleDrop,
         collect: (monitor) => ({
             isOver: monitor.isOver(),
-            canDrop: monitor.canDrop(),
-            clientOffset: monitor.getClientOffset()
+            canDrop: monitor.canDrop()
         }),
     })
 
@@ -24,10 +30,11 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
     if (isOver && !canDrop) {
         className += " " + invalidDropClass;
     }
+    drop(ref);
 
     return (
         <div
-            ref={drop}
+            ref={ref}
             className={className}
         >
             {children}

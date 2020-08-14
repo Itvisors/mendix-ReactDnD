@@ -151,7 +151,7 @@ export default class MendixReactDnD extends Component {
                         key={item.id}
                         cellContainer={cellContainer}
                         item={item}
-                        onDrop={(droppedItem) => this.handleDrop(droppedItem, cellContainer, item)}
+                        onDrop={(droppedItem, clientOffset) => this.handleDrop(droppedItem, clientOffset, cellContainer, item)}
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
                     </DropWrapper>
@@ -163,7 +163,7 @@ export default class MendixReactDnD extends Component {
                             key={item.id}
                             cellContainer={cellContainer}
                             item={item}
-                            onDrop={(droppedItem) => this.handleDrop(droppedItem, cellContainer, item)}
+                            onDrop={(droppedItem, clientOffset) => this.handleDrop(droppedItem, clientOffset, cellContainer, item)}
                         >
                             <DragWrapper
                                 key={item.id}
@@ -179,9 +179,9 @@ export default class MendixReactDnD extends Component {
         }
     }
 
-    handleDrop(droppedItem, cellContainer, item) {
+    handleDrop(droppedItem, clientOffset, cellContainer, item) {
         console.info("handleDrop: Dropped container ID: " + droppedItem.type + ", item ID: " + droppedItem.id + " on item ID: " + item.id);
-        const { eventContainerID, eventGuid, dropTargetContainerID, dropTargetGuid, onDropAction } = this.props;
+        const { eventContainerID, eventGuid, eventClientX, eventClientY, dropTargetContainerID, dropTargetGuid, onDropAction } = this.props;
         const { containerID } = cellContainer;
 
         eventContainerID.setValue(droppedItem.type);
@@ -189,12 +189,12 @@ export default class MendixReactDnD extends Component {
         dropTargetContainerID.setValue(containerID.value);
         dropTargetGuid.setTextValue(item.id);
         //TODO Can we capture the screen/client position of a drop?
-        // if (eventClientX) {
-        //     eventClientX.setTextValue("" + evt.clientX);
-        // }
-        // if (eventClientY) {
-        //     eventClientY.setTextValue("" + evt.clientY);
-        // }
+        if (eventClientX) {
+            eventClientX.setTextValue("" + clientOffset.x);
+        }
+        if (eventClientY) {
+            eventClientY.setTextValue("" + clientOffset.y);
+        }
         // if (eventOffsetX) {
         //     eventOffsetX.setTextValue("" + offsetX);
         // }
