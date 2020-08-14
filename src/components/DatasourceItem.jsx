@@ -41,8 +41,8 @@ export class DatasourceItem extends Component {
         evt.stopPropagation();
         // Calculate offset from item position.
         const rect = this.itemDivRef.current.getBoundingClientRect();
-        const offsetX = evt.clientX - rect.left;
-        const offsetY = evt.clientY - rect.top;
+        const offsetX = Math.round(evt.clientX - rect.left);
+        const offsetY = Math.round(evt.clientY - rect.top);
         // Pass event.
         this.props.onClick(evt, offsetX, offsetY);
     }

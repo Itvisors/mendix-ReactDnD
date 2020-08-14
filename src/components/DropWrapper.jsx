@@ -1,15 +1,28 @@
-import { createElement } from "react";
+import React, { createElement, useCallback, useState } from "react";
 import { useDrop } from "react-dnd";
-import React, { useRef } from 'react'
 
 export function DropWrapper({ cellContainer, onDrop, children }) {
     const { acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
     const acceptArray = acceptsContainerIDs.value.split(",");
-    const ref = useRef(null);
+    const [componentLeft, setComponentLeft] = useState(0);
+    const [componentTop, setComponentTop] = useState(0);
+
+    const measureRef = useCallback(node => {
+        if (node !== null) {
+            setComponentLeft(node.getBoundingClientRect().left);
+            setComponentTop(node.getBoundingClientRect().top);
+        }
+      }, []);
 
     const handleDrop = (droppedItem, monitor) => {
         const clientOffset = monitor.getClientOffset();
-        onDrop(droppedItem, clientOffset);
+        const positionData = {
+            dropClientX: Math.round(clientOffset.x),
+            dropClientY: Math.round(clientOffset.y),
+            dropOffsetX: Math.round(clientOffset.x - componentLeft),
+            dropOffsetY: Math.round(clientOffset.y - componentTop)
+        };
+        onDrop(droppedItem, positionData);
     };
 
     const [{ canDrop, isOver }, drop] = useDrop({
@@ -30,14 +43,15 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
     if (isOver && !canDrop) {
         className += " " + invalidDropClass;
     }
-    drop(ref);
 
     return (
-        <div
-            ref={ref}
-            className={className}
-        >
-            {children}
+        <div ref={measureRef}>
+            <div
+                ref={drop}
+                className={className}
+            >
+                {children}
+            </div>
         </div>
     );
 }

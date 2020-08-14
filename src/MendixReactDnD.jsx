@@ -151,56 +151,55 @@ export default class MendixReactDnD extends Component {
                         key={item.id}
                         cellContainer={cellContainer}
                         item={item}
-                        onDrop={(droppedItem, clientOffset) => this.handleDrop(droppedItem, clientOffset, cellContainer, item)}
+                        onDrop={(droppedItem, positionData) => this.handleDrop(droppedItem, positionData, cellContainer, item)}
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
                     </DropWrapper>
                 );
-        
-                case "both":
-                    return (
-                        <DropWrapper
+
+            case "both":
+                return (
+                    <DropWrapper
+                        key={item.id}
+                        cellContainer={cellContainer}
+                        item={item}
+                        onDrop={(droppedItem, positionData) => this.handleDrop(droppedItem, positionData, cellContainer, item)}
+                    >
+                        <DragWrapper
                             key={item.id}
                             cellContainer={cellContainer}
                             item={item}
-                            onDrop={(droppedItem, clientOffset) => this.handleDrop(droppedItem, clientOffset, cellContainer, item)}
                         >
-                            <DragWrapper
-                                key={item.id}
-                                cellContainer={cellContainer}
-                                item={item}
-                            >
-                                {this.renderDatasourceItem(cellContainer, item)}
-                            </DragWrapper>
-                        </DropWrapper>
-                    );
+                            {this.renderDatasourceItem(cellContainer, item)}
+                        </DragWrapper>
+                    </DropWrapper>
+                );
             default:
                 return this.renderDatasourceItem(cellContainer, item);
         }
     }
 
-    handleDrop(droppedItem, clientOffset, cellContainer, item) {
+    handleDrop(droppedItem, positionData, cellContainer, item) {
         console.info("handleDrop: Dropped container ID: " + droppedItem.type + ", item ID: " + droppedItem.id + " on item ID: " + item.id);
-        const { eventContainerID, eventGuid, eventClientX, eventClientY, dropTargetContainerID, dropTargetGuid, onDropAction } = this.props;
+        const { eventContainerID, eventGuid, eventClientX, eventClientY, eventOffsetX, eventOffsetY, dropTargetContainerID, dropTargetGuid, onDropAction } = this.props;
         const { containerID } = cellContainer;
 
         eventContainerID.setValue(droppedItem.type);
         eventGuid.setTextValue(droppedItem.id);
         dropTargetContainerID.setValue(containerID.value);
         dropTargetGuid.setTextValue(item.id);
-        //TODO Can we capture the screen/client position of a drop?
         if (eventClientX) {
-            eventClientX.setTextValue("" + clientOffset.x);
+            eventClientX.setTextValue("" + positionData.dropClientX);
         }
         if (eventClientY) {
-            eventClientY.setTextValue("" + clientOffset.y);
+            eventClientY.setTextValue("" + positionData.dropClientY);
         }
-        // if (eventOffsetX) {
-        //     eventOffsetX.setTextValue("" + offsetX);
-        // }
-        // if (eventOffsetY) {
-        //     eventOffsetY.setTextValue("" + offsetY);
-        // }
+        if (eventOffsetX) {
+            eventOffsetX.setTextValue("" + positionData.dropOffsetX);
+        }
+        if (eventOffsetY) {
+            eventOffsetY.setTextValue("" + positionData.dropOffsetY);
+        }
         if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
             onDropAction.execute();
         }
@@ -235,10 +234,10 @@ export default class MendixReactDnD extends Component {
             eventContainerID.setValue(containerID.value);
             eventGuid.setTextValue(item.id);
             if (eventClientX) {
-                eventClientX.setTextValue("" + evt.clientX);
+                eventClientX.setTextValue("" + Math.round(evt.clientX));
             }
             if (eventClientY) {
-                eventClientY.setTextValue("" + evt.clientY);
+                eventClientY.setTextValue("" + Math.round(evt.clientY));
             }
             if (eventOffsetX) {
                 eventOffsetX.setTextValue("" + offsetX);
