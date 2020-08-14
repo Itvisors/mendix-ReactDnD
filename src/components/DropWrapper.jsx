@@ -2,7 +2,10 @@ import React, { createElement, useCallback, useState } from "react";
 import { useDrop } from "react-dnd";
 
 export function DropWrapper({ cellContainer, onDrop, children }) {
-    const { acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
+    const { containerID, acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
+    if (!acceptsContainerIDs || !acceptsContainerIDs.value) {
+        return (<span class="text-danger">Container {containerID.value} has no values set for the accept IDs to indicate which items may be dropped onto it.</span>);
+    }
     const acceptArray = acceptsContainerIDs.value.split(",");
     const [componentLeft, setComponentLeft] = useState(0);
     const [componentTop, setComponentTop] = useState(0);
