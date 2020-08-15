@@ -10,7 +10,7 @@ export class DatasourceItem extends Component {
 
     render() {
         const { cellContainer, item } = this.props;
-        const { dsContent, dragDropType } = cellContainer;
+        const { dsContent, dsNameAttribute, dragDropType } = cellContainer;
 
         // Convert Mendix properties to form that is easier to use.
         const returnOnClick = cellContainer.returnOnClick && cellContainer.returnOnClick.value;
@@ -26,9 +26,11 @@ export class DatasourceItem extends Component {
         if (returnOnClick) {
             className += " clickableItem";
         }
+        const nameValue = (dsNameAttribute) ? dsNameAttribute(item) : undefined;
+        const hasNameValue = nameValue && nameValue.value;
         // console.info("DatasourceItem: ID: " + item.id);
         return (
-            <div key={item.id} ref={this.itemDivRef} className={className} onClick={this.onClick}>
+            <div key={item.id} ref={this.itemDivRef} className={className} onClick={this.onClick} data-Name={hasNameValue && nameValue.value}>
                 {dsContent(item)}
             </div>
         );

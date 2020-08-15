@@ -52,6 +52,13 @@
                             <caption>Content for datasource</caption>
                             <description></description>
                         </property>
+                        <property key="dsNameAttribute" type="attribute" dataSource="ds" required="false">
+                            <caption>Name</caption>
+                            <description>Name attribute</description>
+                            <attributeTypes>
+                                <attributeType name="String" />
+                            </attributeTypes>
+                        </property>
                         <property key="acceptsContainerIDs" type="expression" required="false">
                             <caption>Accepts IDs</caption>
                             <description>One or more key values of the enumeration used for the Container ID. Separate values using a comma.</description>
