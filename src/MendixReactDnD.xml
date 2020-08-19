@@ -59,6 +59,25 @@
                                 <attributeType name="String" />
                             </attributeTypes>
                         </property>
+                        <property key="dsOffsetX" type="attribute" dataSource="ds" required="false">
+                            <caption>Offset X</caption>
+                            <description>Offset X position for the item. When X and Y offset are set, position absolute is also set on the item.</description>
+                            <attributeTypes>
+                                <attributeType name="Integer" />
+                            </attributeTypes>
+                        </property>
+                        <property key="dsOffsetY" type="attribute" dataSource="ds" required="false">
+                            <caption>Offset Y</caption>
+                            <description>Offset Y position for the item.</description>
+                            <attributeTypes>
+                                <attributeType name="Integer" />
+                            </attributeTypes>
+                        </property>
+                        <property key="zoomPercentage" type="expression" required="false">
+                            <caption>Zoom %</caption>
+                            <description>Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
+                            <returnType type="Integer" />
+                        </property>
                         <property key="acceptsContainerIDs" type="expression" required="false">
                             <caption>Accepts IDs</caption>
                             <description>One or more key values of the enumeration used for the Container ID. Separate values using a comma.</description>

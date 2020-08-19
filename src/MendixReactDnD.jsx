@@ -116,7 +116,7 @@ export default class MendixReactDnD extends Component {
         const cellArray = [];
         for (let containerIndex = 0; containerIndex < cellContainers.length; containerIndex++) {
             const cellContainer = cellContainers[containerIndex];
-            const { ds, containerClass } = cellContainer;
+            const { containerID, ds, containerClass } = cellContainer;
             // console.info(
             //     "MendixReactDnD: Render cell for column " + columnNumber + ", container ID " + containerID.value
             // );
@@ -125,7 +125,7 @@ export default class MendixReactDnD extends Component {
                     ? "widget-cell-content-container " + containerClass.value
                     : "widget-cell-content-container";
             cellArray.push(
-                <div className={className}>{ds.items.map(item => this.renderCellItem(cellContainer, item))}</div>
+                <div className={className} data-containerid={containerID.value}>{ds.items.map(item => this.renderCellItem(cellContainer, item))}</div>
             );
         }
         return cellArray;
