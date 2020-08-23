@@ -28,7 +28,7 @@ export function DragWrapper({ cellContainer, item, children }) {
         }
         const top = Math.round(Number(offsetY.value) * zoomFactor);
         const left = Math.round(Number(offsetX.value) * zoomFactor);
-        const transform = "translate3d(" + left + "px, " + top + "px, 0)";
+        const transform = "translate(" + left + "px, " + top + "px)";
         style.position = "absolute";
         style.transform = transform;
         style.webkitTransform = transform;
