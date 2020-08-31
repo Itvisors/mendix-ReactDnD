@@ -1,4 +1,5 @@
 import React, { Component, createElement } from "react";
+import { DatasourceItemImage } from "./DatasourceItemImage";
 
 export class DatasourceItem extends Component {
     constructor(props) {
@@ -26,11 +27,18 @@ export class DatasourceItem extends Component {
         if (returnOnClick) {
             className += " clickableItem";
         }
-        const nameValue = (dsNameAttribute) ? dsNameAttribute(item) : undefined;
+        const nameValue = dsNameAttribute ? dsNameAttribute(item) : undefined;
         const hasNameValue = nameValue && nameValue.value;
         // console.info("DatasourceItem: ID: " + item.id);
         return (
-            <div key={item.id} ref={this.itemDivRef} className={className} onClick={this.onClick} data-Name={hasNameValue && nameValue.value}>
+            <div
+                key={item.id}
+                ref={this.itemDivRef}
+                className={className}
+                onClick={this.onClick}
+                data-Name={hasNameValue && nameValue.value}
+            >
+                <DatasourceItemImage cellContainer={cellContainer} item={item} />
                 {dsContent(item)}
             </div>
         );

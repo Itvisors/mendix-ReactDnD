@@ -5,11 +5,13 @@ export function DragWrapper({ cellContainer, item, children }) {
     const { containerID, dsOffsetX, dsOffsetY, zoomPercentage, draggableClass, draggingClass } = cellContainer;
 
     // Offset values are optional! Only check the status when there is a value.
-    const offsetX = (dsOffsetX) ? dsOffsetX(item) : undefined;
-    const offsetY = (dsOffsetY) ? dsOffsetY(item) : undefined;
-    if ((offsetX && offsetX.status !== "available") || 
-        (offsetY && offsetY.status !== "available") || 
-        (zoomPercentage && zoomPercentage.status !== "available")) {
+    const offsetX = dsOffsetX ? dsOffsetX(item) : undefined;
+    const offsetY = dsOffsetY ? dsOffsetY(item) : undefined;
+    if (
+        (offsetX && offsetX.status !== "available") ||
+        (offsetY && offsetY.status !== "available") ||
+        (zoomPercentage && zoomPercentage.status !== "available")
+    ) {
         return null;
     }
 
@@ -38,11 +40,7 @@ export function DragWrapper({ cellContainer, item, children }) {
 
     const className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
     return (
-        <div
-            ref={drag}
-            style={style}
-            className={className}
-        >
+        <div ref={drag} style={style} className={className}>
             {children}
         </div>
     );

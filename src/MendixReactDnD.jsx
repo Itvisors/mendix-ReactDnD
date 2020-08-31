@@ -1,8 +1,8 @@
 import { Component, createElement } from "react";
 import { DatasourceItem } from "./components/DatasourceItem";
+import { DndProvider } from "react-dnd";
 import { DragWrapper } from "./components/DragWrapper";
 import { DropWrapper } from "./components/DropWrapper";
-import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
@@ -15,21 +15,7 @@ export default class MendixReactDnD extends Component {
             // console.info("MendixReactDnD: No containers");
             return null;
         }
-        let allContainersAvailable = true;
-        for (let containerIndex = 0; containerIndex < containerList.length; containerIndex++) {
-            const containerItem = containerList[containerIndex];
-            if (
-                !containerItem.ds ||
-                containerItem.ds.status !== "available" ||
-                !containerItem.rowNumber ||
-                containerItem.rowNumber.status !== "available" ||
-                !containerItem.columnNumber ||
-                containerItem.columnNumber.status !== "available"
-            ) {
-                allContainersAvailable = false;
-            }
-        }
-        if (!allContainersAvailable) {
+        if (!this.checkProperties()) {
             // console.info("MendixReactDnD: Some containers are not yet available");
             return null;
         }
@@ -125,7 +111,9 @@ export default class MendixReactDnD extends Component {
                     ? "widget-cell-content-container " + containerClass.value
                     : "widget-cell-content-container";
             cellArray.push(
-                <div className={className} data-containerid={containerID.value}>{ds.items.map(item => this.renderCellItem(cellContainer, item))}</div>
+                <div className={className} data-containerid={containerID.value}>
+                    {ds.items.map(item => this.renderCellItem(cellContainer, item))}
+                </div>
             );
         }
         return cellArray;
@@ -136,11 +124,7 @@ export default class MendixReactDnD extends Component {
         switch (dragDropType) {
             case "drag":
                 return (
-                    <DragWrapper
-                        key={item.id}
-                        cellContainer={cellContainer}
-                        item={item}
-                    >
+                    <DragWrapper key={item.id} cellContainer={cellContainer} item={item}>
                         {this.renderDatasourceItem(cellContainer, item)}
                     </DragWrapper>
                 );
@@ -151,7 +135,9 @@ export default class MendixReactDnD extends Component {
                         key={item.id}
                         cellContainer={cellContainer}
                         item={item}
-                        onDrop={(droppedItem, positionData) => this.handleDrop(droppedItem, positionData, cellContainer, item)}
+                        onDrop={(droppedItem, positionData) =>
+                            this.handleDrop(droppedItem, positionData, cellContainer, item)
+                        }
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
                     </DropWrapper>
@@ -163,13 +149,11 @@ export default class MendixReactDnD extends Component {
                         key={item.id}
                         cellContainer={cellContainer}
                         item={item}
-                        onDrop={(droppedItem, positionData) => this.handleDrop(droppedItem, positionData, cellContainer, item)}
+                        onDrop={(droppedItem, positionData) =>
+                            this.handleDrop(droppedItem, positionData, cellContainer, item)
+                        }
                     >
-                        <DragWrapper
-                            key={item.id}
-                            cellContainer={cellContainer}
-                            item={item}
-                        >
+                        <DragWrapper key={item.id} cellContainer={cellContainer} item={item}>
                             {this.renderDatasourceItem(cellContainer, item)}
                         </DragWrapper>
                     </DropWrapper>
@@ -180,8 +164,25 @@ export default class MendixReactDnD extends Component {
     }
 
     handleDrop(droppedItem, positionData, cellContainer, item) {
-        console.info("handleDrop: Dropped container ID: " + droppedItem.type + ", item ID: " + droppedItem.id + " on item ID: " + item.id);
-        const { eventContainerID, eventGuid, eventClientX, eventClientY, eventOffsetX, eventOffsetY, dropTargetContainerID, dropTargetGuid, onDropAction } = this.props;
+        console.info(
+            "handleDrop: Dropped container ID: " +
+                droppedItem.type +
+                ", item ID: " +
+                droppedItem.id +
+                " on item ID: " +
+                item.id
+        );
+        const {
+            eventContainerID,
+            eventGuid,
+            eventClientX,
+            eventClientY,
+            eventOffsetX,
+            eventOffsetY,
+            dropTargetContainerID,
+            dropTargetGuid,
+            onDropAction
+        } = this.props;
         const { containerID } = cellContainer;
 
         eventContainerID.setValue(droppedItem.type);
@@ -203,7 +204,6 @@ export default class MendixReactDnD extends Component {
         if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
             onDropAction.execute();
         }
-
     }
 
     renderDatasourceItem(cellContainer, item) {
@@ -294,6 +294,37 @@ export default class MendixReactDnD extends Component {
             }
         }
         return maxColumnNumber;
+    }
+
+    checkProperties() {
+        const { containerList } = this.props;
+        let result = true;
+        for (let containerIndex = 0; containerIndex < containerList.length; containerIndex++) {
+            const containerItem = containerList[containerIndex];
+            const { ds, rowNumber, columnNumber, dsImageUrl, dsImageHeight, dsImageWidth } = containerItem;
+            if (
+                !ds ||
+                ds.status !== "available" ||
+                !rowNumber ||
+                rowNumber.status !== "available" ||
+                !columnNumber ||
+                columnNumber.status !== "available"
+            ) {
+                result = false;
+            }
+            // When rendering images, check whether required attributes are available
+            if (dsImageUrl) {
+                if (!dsImageHeight) {
+                    console.warn("For images, property Image height is required");
+                    result = false;
+                }
+                if (!dsImageWidth) {
+                    console.warn("For images, property Image width is required");
+                    result = false;
+                }
+            }
+        }
+        return result;
     }
 
     isAttributeReadOnly(propName, prop) {

@@ -44,6 +44,18 @@
                             <description>Whether OnClick events should be returned for the container. Useful for positioning items on the container. Does not make sense when dragging items from this container.</description>
                             <returnType type="Boolean" />
                         </property>
+                        <property key="zoomPercentage" type="expression" required="false">
+                            <caption>Zoom %</caption>
+                            <description>Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
+                            <returnType type="Integer" />
+                        </property>
+                        <property key="acceptsContainerIDs" type="expression" required="false">
+                            <caption>Accepts IDs</caption>
+                            <description>One or more key values of the enumeration used for the Container ID. Separate values using a comma.</description>
+                            <returnType type="String" />
+                        </property>
+                    </propertyGroup>
+                    <propertyGroup caption="Datasource">
                         <property key="ds" type="datasource" isList="true" required="false">
                             <caption>Data source</caption>
                             <description></description>
@@ -73,15 +85,37 @@
                                 <attributeType name="Integer" />
                             </attributeTypes>
                         </property>
-                        <property key="zoomPercentage" type="expression" required="false">
-                            <caption>Zoom %</caption>
-                            <description>Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
-                            <returnType type="Integer" />
+                        <property key="dsImageUrl" type="attribute" dataSource="ds" required="false">
+                            <caption>Image URL</caption>
+                            <description>Image URL. Can be absolute, concatenated with Mendix remote URL when it does not start with http, should not start with / in that case. When URL and object are both set, the object is used</description>
+                            <attributeTypes>
+                                <attributeType name="String" />
+                            </attributeTypes>
                         </property>
-                        <property key="acceptsContainerIDs" type="expression" required="false">
-                            <caption>Accepts IDs</caption>
-                            <description>One or more key values of the enumeration used for the Container ID. Separate values using a comma.</description>
-                            <returnType type="String" />
+                        <property key="dsImageHeight" type="attribute" dataSource="ds" required="false">
+                            <caption>Image height</caption>
+                            <description></description>
+                            <attributeTypes>
+                                <attributeType name="Integer" />
+                            </attributeTypes>
+                        </property>
+                        <property key="dsImageWidth" type="attribute" dataSource="ds" required="false">
+                            <caption>Image width</caption>
+                            <description></description>
+                            <attributeTypes>
+                                <attributeType name="Integer" />
+                            </attributeTypes>
+                        </property>
+                        <property key="dsImageRotation" type="attribute" dataSource="ds" required="false">
+                            <caption>Rotation</caption>
+                            <description></description>
+                            <attributeTypes>
+                                <attributeType name="Integer" />
+                            </attributeTypes>
+                        </property>
+                        <property key="allowRotate" type="boolean" defaultValue="false">
+                            <caption>Allow rotate</caption>
+                            <description>Whether user may rotate the image. Only when image is rendered. If true, additional rotation handles will be shown when the user hovers over the image.</description>
                         </property>
                     </propertyGroup>
                     <propertyGroup caption="Styling">

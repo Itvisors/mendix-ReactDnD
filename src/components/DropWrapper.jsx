@@ -1,10 +1,15 @@
-import React, { createElement, useCallback, useState } from "react";
+import { createElement, useCallback, useState } from "react";
 import { useDrop } from "react-dnd";
 
 export function DropWrapper({ cellContainer, onDrop, children }) {
     const { containerID, acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
     if (!acceptsContainerIDs || !acceptsContainerIDs.value) {
-        return (<span class="text-danger">Container {containerID.value} has no values set for the accept IDs to indicate which items may be dropped onto it.</span>);
+        return (
+            <span className="text-danger">
+                Container {containerID.value} has no values set for the accept IDs to indicate which items may be
+                dropped onto it.
+            </span>
+        );
     }
     const acceptArray = acceptsContainerIDs.value.split(",");
     const [componentLeft, setComponentLeft] = useState(0);
@@ -15,7 +20,7 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
             setComponentLeft(node.getBoundingClientRect().left);
             setComponentTop(node.getBoundingClientRect().top);
         }
-      }, []);
+    }, []);
 
     const handleDrop = (droppedItem, monitor) => {
         const clientOffset = monitor.getClientOffset();
@@ -31,14 +36,14 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
     const [{ canDrop, isOver }, drop] = useDrop({
         accept: acceptArray,
         drop: handleDrop,
-        collect: (monitor) => ({
+        collect: monitor => ({
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop()
-        }),
-    })
+        })
+    });
 
     const isActive = canDrop && isOver;
-    
+
     let className = dropTargetClass;
     if (isActive) {
         className += " " + canDropClass;
@@ -49,10 +54,7 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
 
     return (
         <div ref={measureRef}>
-            <div
-                ref={drop}
-                className={className}
-            >
+            <div ref={drop} className={className}>
                 {children}
             </div>
         </div>
