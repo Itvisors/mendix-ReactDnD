@@ -2,11 +2,11 @@ import { Component, createElement } from "react";
 import { DatasourceItem } from "./components/DatasourceItem";
 import { DndProvider } from "react-dnd";
 import { DragWrapper } from "./components/DragWrapper";
-import { DropWrapper } from "./components/DropWrapper";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
+import { DropPositionWrapper } from "./components/DropPositionWrapper";
 
 export default class MendixReactDnD extends Component {
     render() {
@@ -131,24 +131,22 @@ export default class MendixReactDnD extends Component {
 
             case "drop":
                 return (
-                    <DropWrapper
+                    <DropPositionWrapper
                         key={item.id}
                         cellContainer={cellContainer}
-                        item={item}
                         onDrop={(droppedItem, positionData) =>
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
-                    </DropWrapper>
+                    </DropPositionWrapper>
                 );
 
             case "both":
                 return (
-                    <DropWrapper
+                    <DropPositionWrapper
                         key={item.id}
                         cellContainer={cellContainer}
-                        item={item}
                         onDrop={(droppedItem, positionData) =>
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }
@@ -156,7 +154,7 @@ export default class MendixReactDnD extends Component {
                         <DragWrapper key={item.id} cellContainer={cellContainer} item={item}>
                             {this.renderDatasourceItem(cellContainer, item)}
                         </DragWrapper>
-                    </DropWrapper>
+                    </DropPositionWrapper>
                 );
             default:
                 return this.renderDatasourceItem(cellContainer, item);

@@ -36,7 +36,7 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoom
         style.transform = "rotate(" + imageRotationValue + "deg)";
     }
     const uri = getUri(imageUrl);
-    return <img src={uri} style={style} />;
+    return <img className="item-image" src={uri} style={style} />;
 }
 
 function calculateZoomFactor(zoomPercentage) {
