@@ -15,7 +15,7 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
     const acceptArray = acceptsContainerIDs.value.split(",");
 
     const handleDrop = (droppedItem, monitor) => {
-        const clientOffset = monitor.getClientOffset();
+        const clientOffset = monitor.getSourceClientOffset();
         const positionData = {
             dropClientX: Math.round(clientOffset.x),
             dropClientY: Math.round(clientOffset.y)
