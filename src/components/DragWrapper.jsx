@@ -1,8 +1,8 @@
 import { createElement } from "react";
 import { useDrag } from "react-dnd";
 
-export function DragWrapper({ cellContainer, item, children }) {
-    const { containerID, dsOffsetX, dsOffsetY, zoomPercentage, draggableClass, draggingClass } = cellContainer;
+export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
+    const { containerID, dsOffsetX, dsOffsetY, draggableClass, draggingClass } = cellContainer;
 
     // Offset values are optional! Only check the status when there is a value.
     const offsetX = dsOffsetX ? dsOffsetX(item) : undefined;

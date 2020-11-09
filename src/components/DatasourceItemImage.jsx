@@ -1,8 +1,8 @@
 /*global mx */
 import { createElement } from "react";
 
-export function DatasourceItemImage({ cellContainer, item }) {
-    const { dsImageUrl, dsImageHeight, dsImageWidth, dsImageRotation, allowRotate, zoomPercentage } = cellContainer;
+export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
+    const { dsImageUrl, dsImageHeight, dsImageWidth, dsImageRotation, allowRotate } = cellContainer;
 
     if (!dsImageUrl || !dsImageHeight || !dsImageWidth) {
         return null;

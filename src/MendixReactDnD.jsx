@@ -121,10 +121,16 @@ export default class MendixReactDnD extends Component {
 
     renderCellItem(cellContainer, item) {
         const { dragDropType } = cellContainer;
+        const { zoomPercentage } = this.props;
         switch (dragDropType) {
             case "drag":
                 return (
-                    <DragWrapper key={item.id} cellContainer={cellContainer} item={item}>
+                    <DragWrapper
+                        key={item.id}
+                        cellContainer={cellContainer}
+                        item={item}
+                        zoomPercentage={zoomPercentage}
+                    >
                         {this.renderDatasourceItem(cellContainer, item)}
                     </DragWrapper>
                 );
@@ -151,7 +157,12 @@ export default class MendixReactDnD extends Component {
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }
                     >
-                        <DragWrapper key={item.id} cellContainer={cellContainer} item={item}>
+                        <DragWrapper
+                            key={item.id}
+                            cellContainer={cellContainer}
+                            item={item}
+                            zoomPercentage={zoomPercentage}
+                        >
                             {this.renderDatasourceItem(cellContainer, item)}
                         </DragWrapper>
                     </DropPositionWrapper>
@@ -171,6 +182,7 @@ export default class MendixReactDnD extends Component {
                 item.id
         );
         const {
+            adjustOffset,
             eventContainerID,
             eventGuid,
             eventClientX,
@@ -179,7 +191,8 @@ export default class MendixReactDnD extends Component {
             eventOffsetY,
             dropTargetContainerID,
             dropTargetGuid,
-            onDropAction
+            onDropAction,
+            zoomPercentage
         } = this.props;
         const { containerID } = cellContainer;
 
@@ -193,11 +206,22 @@ export default class MendixReactDnD extends Component {
         if (eventClientY) {
             eventClientY.setTextValue("" + positionData.dropClientY);
         }
-        if (eventOffsetX) {
-            eventOffsetX.setTextValue("" + positionData.dropOffsetX);
-        }
-        if (eventOffsetY) {
-            eventOffsetY.setTextValue("" + positionData.dropOffsetY);
+        if (adjustOffset.value) {
+            // Adjust offset values for zoom factor.
+            const zoomFactor = this.calculateZoomFactor(zoomPercentage);
+            if (eventOffsetX) {
+                eventOffsetX.setTextValue("" + Math.round(positionData.dropOffsetX / zoomFactor));
+            }
+            if (eventOffsetY) {
+                eventOffsetY.setTextValue("" + Math.round(positionData.dropOffsetY / zoomFactor));
+            }
+        } else {
+            if (eventOffsetX) {
+                eventOffsetX.setTextValue("" + positionData.dropOffsetX);
+            }
+            if (eventOffsetY) {
+                eventOffsetY.setTextValue("" + positionData.dropOffsetY);
+            }
         }
         if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
             onDropAction.execute();
@@ -205,11 +229,14 @@ export default class MendixReactDnD extends Component {
     }
 
     renderDatasourceItem(cellContainer, item) {
+        const { zoomPercentage } = this.props;
+
         return (
             <DatasourceItem
                 key={item.id}
                 cellContainer={cellContainer}
                 item={item}
+                zoomPercentage={zoomPercentage}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
             />
         );
@@ -218,13 +245,15 @@ export default class MendixReactDnD extends Component {
     handleClick(container, item, evt, offsetX, offsetY) {
         const { containerID, returnOnClick } = container;
         const {
+            adjustOffset,
             eventContainerID,
             eventGuid,
             eventClientX,
             eventClientY,
             eventOffsetX,
             eventOffsetY,
-            onClickAction
+            onClickAction,
+            zoomPercentage
         } = this.props;
         if (returnOnClick && returnOnClick.value) {
             console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
@@ -237,11 +266,22 @@ export default class MendixReactDnD extends Component {
             if (eventClientY) {
                 eventClientY.setTextValue("" + Math.round(evt.clientY));
             }
-            if (eventOffsetX) {
-                eventOffsetX.setTextValue("" + offsetX);
-            }
-            if (eventOffsetY) {
-                eventOffsetY.setTextValue("" + offsetY);
+            if (adjustOffset.value) {
+                // Adjust offset values for zoom factor.
+                const zoomFactor = this.calculateZoomFactor(zoomPercentage);
+                if (eventOffsetX) {
+                    eventOffsetX.setTextValue("" + Math.round(offsetX / zoomFactor));
+                }
+                if (eventOffsetY) {
+                    eventOffsetY.setTextValue("" + Math.round(offsetY / zoomFactor));
+                }
+            } else {
+                if (eventOffsetX) {
+                    eventOffsetX.setTextValue("" + offsetX);
+                }
+                if (eventOffsetY) {
+                    eventOffsetY.setTextValue("" + offsetY);
+                }
             }
             if (onClickAction && onClickAction.canExecute && !onClickAction.isExecuting) {
                 onClickAction.execute();
@@ -249,6 +289,14 @@ export default class MendixReactDnD extends Component {
         } else {
             console.info("MendixReactDnD Ignored onClick on " + containerID.value);
         }
+    }
+
+    calculateZoomFactor(zoomPercentage) {
+        if (!zoomPercentage || zoomPercentage.status !== "available" || !zoomPercentage.value) {
+            return 1;
+        }
+        const zoomFactor = zoomPercentage.value / 100;
+        return zoomFactor;
     }
 
     sortContainers() {

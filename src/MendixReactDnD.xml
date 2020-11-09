@@ -44,11 +44,6 @@
                             <description>Whether OnClick events should be returned for the container. Useful for positioning items on the container. Does not make sense when dragging items from this container.</description>
                             <returnType type="Boolean" />
                         </property>
-                        <property key="zoomPercentage" type="expression" required="false">
-                            <caption>Zoom %</caption>
-                            <description>Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
-                            <returnType type="Integer" />
-                        </property>
                         <property key="acceptsContainerIDs" type="expression" required="false">
                             <caption>Accepts IDs</caption>
                             <description>One or more key values of the enumeration used for the Container ID. Separate values using a comma.</description>
@@ -106,6 +101,11 @@
                                 <attributeType name="Integer" />
                             </attributeTypes>
                         </property>
+                        <property key="scaleImage" type="expression" dataSource="ds" required="false">
+                            <caption>Scale image</caption>
+                            <description>Scale image with zoom percentage</description>
+                            <returnType type="Boolean" />
+                        </property>
                         <property key="dsImageRotation" type="attribute" dataSource="ds" required="false">
                             <caption>Rotation</caption>
                             <description></description>
@@ -146,6 +146,19 @@
                         </property>
                     </propertyGroup>
                 </properties>
+            </property>
+        </propertyGroup>
+
+        <propertyGroup caption="Configuration">
+            <property key="zoomPercentage" type="expression" required="false">
+                <caption>Zoom %</caption>
+                <description>Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
+                <returnType type="Integer" />
+            </property>
+            <property key="adjustOffset" type="expression" required="false">
+                <caption>Adjust offset</caption>
+                <description>Adjust offset for zoom position.</description>
+                <returnType type="Boolean" />
             </property>
         </propertyGroup>
 
