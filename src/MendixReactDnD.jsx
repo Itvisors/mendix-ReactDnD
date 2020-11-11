@@ -173,14 +173,7 @@ export default class MendixReactDnD extends Component {
     }
 
     handleDrop(droppedItem, positionData, cellContainer, item) {
-        console.info(
-            "handleDrop: Dropped container ID: " +
-                droppedItem.type +
-                ", item ID: " +
-                droppedItem.id +
-                " on item ID: " +
-                item.id
-        );
+        // console.info("handleDrop: " + JSON.stringify(droppedItem));
         const {
             adjustOffset,
             eventContainerID,
@@ -206,22 +199,27 @@ export default class MendixReactDnD extends Component {
         if (eventClientY) {
             eventClientY.setTextValue("" + positionData.dropClientY);
         }
-        if (adjustOffset.value) {
+        let offsetX = positionData.dropOffsetX;
+        let offsetY = positionData.dropOffsetY;
+        if (adjustOffset && adjustOffset.value) {
             // Adjust offset values for zoom factor.
             const zoomFactor = this.calculateZoomFactor(zoomPercentage);
-            if (eventOffsetX) {
-                eventOffsetX.setTextValue("" + Math.round(positionData.dropOffsetX / zoomFactor));
+            offsetX = Math.round(offsetX / zoomFactor);
+            offsetY = Math.round(offsetY / zoomFactor);
+            // Adjust offset on drop when requested.
+            const { imageWidth, imageHeight, adjustOffsetOnDrop } = droppedItem;
+            if (adjustOffsetOnDrop && imageHeight && imageWidth && zoomFactor !== 1) {
+                const widthDifference = Math.round(imageWidth - imageWidth * zoomFactor);
+                const heightDifference = Math.round(imageHeight - imageHeight * zoomFactor);
+                offsetX = Math.round(offsetX + widthDifference / 2);
+                offsetY = Math.round(offsetY + heightDifference / 2);
             }
-            if (eventOffsetY) {
-                eventOffsetY.setTextValue("" + Math.round(positionData.dropOffsetY / zoomFactor));
-            }
-        } else {
-            if (eventOffsetX) {
-                eventOffsetX.setTextValue("" + positionData.dropOffsetX);
-            }
-            if (eventOffsetY) {
-                eventOffsetY.setTextValue("" + positionData.dropOffsetY);
-            }
+        }
+        if (eventOffsetX) {
+            eventOffsetX.setTextValue("" + offsetX);
+        }
+        if (eventOffsetY) {
+            eventOffsetY.setTextValue("" + offsetY);
         }
         if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
             onDropAction.execute();
@@ -266,7 +264,7 @@ export default class MendixReactDnD extends Component {
             if (eventClientY) {
                 eventClientY.setTextValue("" + Math.round(evt.clientY));
             }
-            if (adjustOffset.value) {
+            if (adjustOffset && adjustOffset.value) {
                 // Adjust offset values for zoom factor.
                 const zoomFactor = this.calculateZoomFactor(zoomPercentage);
                 if (eventOffsetX) {

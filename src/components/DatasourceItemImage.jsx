@@ -2,7 +2,7 @@
 import { createElement } from "react";
 
 export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
-    const { dsImageUrl, dsImageHeight, dsImageWidth, dsImageRotation, allowRotate } = cellContainer;
+    const { dsImageUrl, dsImageHeight, dsImageWidth, dsScaleImage, dsImageRotation, allowRotate } = cellContainer;
 
     if (!dsImageUrl || !dsImageHeight || !dsImageWidth) {
         return null;
@@ -12,17 +12,17 @@ export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
     const imageHeight = dsImageHeight(item);
     const imageWidth = dsImageWidth(item);
     // Image rotation and zoom percentage are optional!
+    const scaleImage = dsScaleImage ? dsScaleImage(item).value : false;
     const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
     if (
         imageUrl.status !== "available" ||
         imageHeight.status !== "available" ||
         imageWidth.status !== "available" ||
-        (imageRotation && imageRotation.status !== "available") ||
-        (zoomPercentage && zoomPercentage.status !== "available")
+        (imageRotation && imageRotation.status !== "available")
     ) {
         return null;
     }
-    const zoomFactor = calculateZoomFactor(zoomPercentage);
+    const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
     const imageRotationValue = getImageRotation(imageRotation);
     return renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor);
 }
@@ -39,7 +39,10 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoom
     return <img className="item-image" src={uri} style={style} />;
 }
 
-function calculateZoomFactor(zoomPercentage) {
+function calculateZoomFactor(zoomPercentage, scaleImage) {
+    if (!scaleImage) {
+        return 1;
+    }
     if (!zoomPercentage || zoomPercentage.status !== "available" || !zoomPercentage.value) {
         return 1;
     }

@@ -2,11 +2,23 @@ import { createElement } from "react";
 import { useDrag } from "react-dnd";
 
 export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
-    const { containerID, dsOffsetX, dsOffsetY, draggableClass, draggingClass } = cellContainer;
+    const {
+        containerID,
+        dsOffsetX,
+        dsOffsetY,
+        dsImageHeight,
+        dsImageWidth,
+        dsAdjustOffsetOnDrop,
+        draggableClass,
+        draggingClass
+    } = cellContainer;
 
     // Offset values are optional! Only check the status when there is a value.
     const offsetX = dsOffsetX ? dsOffsetX(item) : undefined;
     const offsetY = dsOffsetY ? dsOffsetY(item) : undefined;
+    const imageHeight = dsImageHeight ? dsImageHeight(item).value : undefined;
+    const imageWidth = dsImageWidth ? dsImageWidth(item).value : undefined;
+    const adjustOffsetOnDrop = dsAdjustOffsetOnDrop ? dsAdjustOffsetOnDrop(item).value : false;
     if (
         (offsetX && offsetX.status !== "available") ||
         (offsetY && offsetY.status !== "available") ||
@@ -16,7 +28,7 @@ export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
     }
 
     const [{ isDragging }, drag] = useDrag({
-        item: { type: containerID.value, id: item.id },
+        item: { type: containerID.value, id: item.id, imageHeight, imageWidth, adjustOffsetOnDrop },
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
