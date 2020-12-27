@@ -61,11 +61,13 @@
                         </property>
                         <property key="dsNameAttribute" type="attribute" dataSource="ds" required="false">
                             <caption>Name</caption>
-                            <description>Name attribute</description>
+                            <description>Name attribute. When set, will render a data-name attribute with the value on the item element.</description>
                             <attributeTypes>
                                 <attributeType name="String" />
                             </attributeTypes>
                         </property>
+                    </propertyGroup>
+                    <propertyGroup caption="Image item">
                         <property key="dsOffsetX" type="attribute" dataSource="ds" required="false">
                             <caption>Offset X</caption>
                             <description>Offset X position for the item. When X and Y offset are set, position absolute is also set on the item.</description>
@@ -82,7 +84,7 @@
                         </property>
                         <property key="dsImageUrl" type="attribute" dataSource="ds" required="false">
                             <caption>Image URL</caption>
-                            <description>Image URL. Can be absolute, concatenated with Mendix remote URL when it does not start with http, should not start with / in that case. When URL and object are both set, the object is used</description>
+                            <description>Image URL. Can be absolute, concatenated with Mendix remote URL when it does not start with http, should not start with / in that case.</description>
                             <attributeTypes>
                                 <attributeType name="String" />
                             </attributeTypes>
@@ -157,12 +159,12 @@
         <propertyGroup caption="Configuration">
             <property key="zoomPercentage" type="expression" required="false">
                 <caption>Zoom %</caption>
-                <description>Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
+                <description>Optional. Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
                 <returnType type="Integer" />
             </property>
             <property key="adjustOffset" type="expression" required="false">
                 <caption>Adjust offset</caption>
-                <description>Adjust offset for zoom position.</description>
+                <description>Optional. Adjust offset for zoom position.</description>
                 <returnType type="Boolean" />
             </property>
         </propertyGroup>
@@ -177,28 +179,28 @@
             </property>
             <property key="eventClientX" type="attribute" required="false">
                 <caption>Client X</caption>
-                <description>Client X position for the event.</description>
+                <description>Optional. Client X position for the event.</description>
                 <attributeTypes>
                     <attributeType name="Integer" />
                 </attributeTypes>
             </property>
             <property key="eventClientY" type="attribute" required="false">
                 <caption>Client Y</caption>
-                <description>Client Y position for the event.</description>
+                <description>Optional. Client Y position for the event.</description>
                 <attributeTypes>
                     <attributeType name="Integer" />
                 </attributeTypes>
             </property>
             <property key="eventOffsetX" type="attribute" required="false">
                 <caption>Offset X</caption>
-                <description>Offset X position for the event. Relative from the element</description>
+                <description>Optional. Offset X position for the event. Relative from the element</description>
                 <attributeTypes>
                     <attributeType name="Integer" />
                 </attributeTypes>
             </property>
             <property key="eventOffsetY" type="attribute" required="false">
                 <caption>Offset Y</caption>
-                <description>Offset Y position for the event. Relative from the element</description>
+                <description>Optional. Offset Y position for the event. Relative from the element</description>
                 <attributeTypes>
                     <attributeType name="Integer" />
                 </attributeTypes>
@@ -225,7 +227,7 @@
                 </attributeTypes>
             </property>
             <property key="onClickAction" type="action" required="false">
-                <caption>On click action</caption>
+                <caption>Optional. On click action</caption>
                 <description></description>
             </property>
             <property key="onDropAction" type="action">
