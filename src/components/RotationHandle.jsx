@@ -4,13 +4,13 @@ import { useDrag } from "react-dnd";
 export function RotationHandle({ cellContainer, item }) {
     const { containerID } = cellContainer;
 
-    const [{ isDragging }, drag] = useDrag({
+    const [drag] = useDrag({
         item: { type: containerID.value + "_rotationHandle", id: item.id + "_rotationHandle" },
         begin: () => {
-            onRotateDragStart();
+            console.info("Started dragging rotation handle for " + containerID.value);
         },
         end: () => {
-            onRotateDragEnd();
+            console.info("Ended dragging rotation handle for " + containerID.value);
         },
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
