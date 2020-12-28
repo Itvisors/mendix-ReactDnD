@@ -1,8 +1,9 @@
 /*global mx */
+import { RotationHandle } from "./RotationHandle";
 import { createElement } from "react";
 
 export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
-    const { dsImageUrl, dsImageHeight, dsImageWidth, dsScaleImage, dsImageRotation, allowRotate } = cellContainer;
+    const { dsImageUrl, dsImageHeight, dsImageWidth, dsScaleImage, dsImageRotation, dsAllowRotate } = cellContainer;
 
     if (!dsImageUrl || !dsImageHeight || !dsImageWidth) {
         return null;
@@ -14,6 +15,7 @@ export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
     // Image rotation and zoom percentage are optional!
     const scaleImage = dsScaleImage ? dsScaleImage(item).value : false;
     const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
+    const allowRotate = dsAllowRotate ? dsAllowRotate(item).value : false;
     if (
         imageUrl.status !== "available" ||
         imageHeight.status !== "available" ||
@@ -24,7 +26,16 @@ export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
     }
     const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
     const imageRotationValue = getImageRotation(imageRotation);
-    return renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor);
+    if (allowRotate) {
+        return (
+            <div className="item-image-rotation-container">
+                {renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor)}
+                <RotationHandle cellContainer={cellContainer} item={item} />
+            </div>
+        );
+    } else {
+        return renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor);
+    }
 }
 
 function renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor) {

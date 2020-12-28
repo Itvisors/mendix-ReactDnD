@@ -120,9 +120,10 @@
                                 <attributeType name="Integer" />
                             </attributeTypes>
                         </property>
-                        <property key="allowRotate" type="boolean" defaultValue="false">
+                        <property key="dsAllowRotate" type="expression" dataSource="ds" required="false">
                             <caption>Allow rotate</caption>
                             <description>Whether user may rotate the image. Only when image is rendered. If true, additional rotation handles will be shown when the user hovers over the image.</description>
+                            <returnType type="Boolean" />
                         </property>
                     </propertyGroup>
                     <propertyGroup caption="Styling">
