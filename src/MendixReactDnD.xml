@@ -227,12 +227,23 @@
                     <attributeType name="String" />
                 </attributeTypes>
             </property>
+            <property key="newRotation" type="attribute" required="false">
+                <caption>New rotation</caption>
+                <description>Optional. New rotation for the object. Required when allowing users to rotate items.</description>
+                <attributeTypes>
+                    <attributeType name="Integer" />
+                </attributeTypes>
+            </property>
             <property key="onClickAction" type="action" required="false">
                 <caption>Optional. On click action</caption>
                 <description></description>
             </property>
             <property key="onDropAction" type="action">
                 <caption>On drop action</caption>
+                <description></description>
+            </property>
+            <property key="onRotateAction" type="action" required="false">
+                <caption>Optional. On rotate action. Required when allowing users to rotate items.</caption>
                 <description></description>
             </property>
         </propertyGroup>

@@ -44,7 +44,8 @@ export default class MendixReactDnD extends Component {
             this.isAttributeReadOnly("eventOffsetY", this.props.eventOffsetY) ||
             this.isAttributeReadOnly("eventGuid", this.props.eventGuid) ||
             this.isAttributeReadOnly("dropTargetContainerID", this.props.dropTargetContainerID) ||
-            this.isAttributeReadOnly("dropTargetGuid", this.props.dropTargetGuid)
+            this.isAttributeReadOnly("dropTargetGuid", this.props.dropTargetGuid) ||
+            this.isAttributeReadOnly("newRotation", this.props.newRotation)
         ) {
             return null;
         }
@@ -79,17 +80,17 @@ export default class MendixReactDnD extends Component {
     }
 
     handleRotateHover(draggedItem, positionData) {
-        const rotateX = positionData.dX + draggedItem.offsetX;
+        const rotationDegree = this.calculateRotationDegree(draggedItem, positionData);
         this.setState({
-            rotationDegree: this.R2D * Math.atan2(positionData.dY, rotateX),
+            rotationDegree: rotationDegree,
             rotateContainerID: draggedItem.originalType,
             rotateItemID: draggedItem.originalId
         });
     }
 
     handleRotateDrop(droppedItem, positionData) {
-        const rotateX = positionData.dX + droppedItem.offsetX;
-        const rotationDegree = this.R2D * Math.atan2(positionData.dY, rotateX);
+        const { newRotation, onRotateAction } = this.props;
+        const rotationDegree = this.calculateRotationDegree(droppedItem, positionData);
         console.info(
             "Handle rotation drop, container ID: " +
                 droppedItem.originalType +
@@ -103,6 +104,18 @@ export default class MendixReactDnD extends Component {
             rotateContainerID: null,
             rotateItemID: null
         });
+        if (newRotation) {
+            newRotation.setTextValue("" + rotationDegree);
+        }
+        if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
+            onRotateAction.execute();
+        }
+    }
+
+    calculateRotationDegree(item, positionData) {
+        const rotateX = positionData.dX + item.offsetX;
+        const rotationDegree = Math.round(this.R2D * Math.atan2(positionData.dY, rotateX));
+        return rotationDegree;
     }
 
     renderGrid() {
@@ -318,8 +331,8 @@ export default class MendixReactDnD extends Component {
             zoomPercentage
         } = this.props;
         if (returnOnClick && returnOnClick.value) {
-            console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
-            console.dir(evt);
+            // console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
+            // console.dir(evt);
             eventContainerID.setValue(containerID.value);
             eventGuid.setTextValue(item.id);
             if (eventClientX) {
