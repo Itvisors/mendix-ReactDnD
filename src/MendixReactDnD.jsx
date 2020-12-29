@@ -18,11 +18,13 @@ export default class MendixReactDnD extends Component {
     }
 
     state = {
-        rotateX: 0,
-        rotateY: 0,
+        rotationDegree: 0,
         rotateContainerID: null,
         rotateItemID: null
     };
+
+    R2D = 180 / Math.PI;
+
     render() {
         const { containerList } = this.props;
         if (!containerList) {
@@ -66,40 +68,38 @@ export default class MendixReactDnD extends Component {
     }
 
     renderRotateHoverInfo() {
-        const { rotateContainerID, rotateItemID, rotateX, rotateY } = this.state;
+        const { rotateContainerID, rotateItemID, rotationDegree } = this.state;
         return (
             <div>
                 <span>Hover container: {rotateContainerID ? rotateContainerID : "<none>"}</span>
                 <span>, item id: {rotateItemID ? rotateItemID : "<none>"}</span>
-                <span>, dX: {rotateX}</span>
-                <span>, dY: {rotateY}</span>
+                <span>, degree: {rotationDegree}</span>
             </div>
         );
     }
 
     handleRotateHover(draggedItem, positionData) {
+        const rotateX = positionData.dX + draggedItem.offsetX;
         this.setState({
-            rotateX: positionData.dX,
-            rotateY: positionData.dY,
+            rotationDegree: this.R2D * Math.atan2(positionData.dY, rotateX),
             rotateContainerID: draggedItem.originalType,
             rotateItemID: draggedItem.originalId
         });
     }
 
     handleRotateDrop(droppedItem, positionData) {
+        const rotateX = positionData.dX + droppedItem.offsetX;
+        const rotationDegree = this.R2D * Math.atan2(positionData.dY, rotateX);
         console.info(
             "Handle rotation drop, container ID: " +
                 droppedItem.originalType +
                 ", id: " +
                 droppedItem.originalId +
-                ", X/Y: " +
-                positionData.dX +
-                "/" +
-                positionData.dY
+                ", rotation degree: " +
+                rotationDegree
         );
         this.setState({
-            rotateX: 0,
-            rotateY: 0,
+            rotationDegree: 0,
             rotateContainerID: null,
             rotateItemID: null
         });

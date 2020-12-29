@@ -26,11 +26,13 @@ export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
     }
     const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
     const imageRotationValue = getImageRotation(imageRotation);
+    // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
+    const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
     if (allowRotate) {
         return (
             <div className="item-image-rotation-container">
                 {renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor)}
-                <RotationHandle cellContainer={cellContainer} item={item} />
+                <RotationHandle cellContainer={cellContainer} offsetX={rotationHandleOffsetX} item={item} />
             </div>
         );
     } else {
