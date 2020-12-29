@@ -13,19 +13,19 @@ export function GlobalDropWrapper({ containerList, onRotateHover, onRotateDrop, 
     }
 
     const handleHover = (draggedItem, monitor) => {
-        const clientOffset = monitor.getSourceClientOffset();
+        const differenceFromOrigin = monitor.getDifferenceFromInitialOffset();
         const positionData = {
-            itemX: Math.round(clientOffset.x),
-            itemY: Math.round(clientOffset.y)
+            dX: Math.round(differenceFromOrigin.x),
+            dY: Math.round(differenceFromOrigin.y)
         };
         onRotateHover(draggedItem, positionData);
     };
 
     const handleDrop = (droppedItem, monitor) => {
-        const clientOffset = monitor.getSourceClientOffset();
+        const differenceFromOrigin = monitor.getDifferenceFromInitialOffset();
         const positionData = {
-            itemX: Math.round(clientOffset.x),
-            itemY: Math.round(clientOffset.y)
+            dX: Math.round(differenceFromOrigin.x),
+            dY: Math.round(differenceFromOrigin.y)
         };
         onRotateDrop(droppedItem, positionData);
     };

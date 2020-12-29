@@ -71,16 +71,16 @@ export default class MendixReactDnD extends Component {
             <div>
                 <span>Hover container: {rotateContainerID ? rotateContainerID : "<none>"}</span>
                 <span>, item id: {rotateItemID ? rotateItemID : "<none>"}</span>
-                <span>, X: {rotateX}</span>
-                <span>, Y: {rotateY}</span>
+                <span>, dX: {rotateX}</span>
+                <span>, dY: {rotateY}</span>
             </div>
         );
     }
 
     handleRotateHover(draggedItem, positionData) {
         this.setState({
-            rotateX: positionData.itemX,
-            rotateY: positionData.itemY,
+            rotateX: positionData.dX,
+            rotateY: positionData.dY,
             rotateContainerID: draggedItem.originalType,
             rotateItemID: draggedItem.originalId
         });
@@ -93,9 +93,9 @@ export default class MendixReactDnD extends Component {
                 ", id: " +
                 droppedItem.originalId +
                 ", X/Y: " +
-                positionData.itemX +
+                positionData.dX +
                 "/" +
-                positionData.itemY
+                positionData.dY
         );
         this.setState({
             rotateX: 0,
