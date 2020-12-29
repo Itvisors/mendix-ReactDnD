@@ -23,6 +23,7 @@ export default class MendixReactDnD extends Component {
         rotateItemID: null
     };
 
+    // Convert from radials to degrees.
     R2D = 180 / Math.PI;
 
     render() {
@@ -306,11 +307,18 @@ export default class MendixReactDnD extends Component {
     renderDatasourceItem(cellContainer, item) {
         const { zoomPercentage } = this.props;
 
+        let draggedRotationDegree = 0;
+        // Use rotation degree if ID matches, rotateItemID is null if nothing is being rotated now.
+        if (this.state.rotateItemID && this.state.rotateItemID === item.id) {
+            draggedRotationDegree = this.state.rotationDegree;
+        }
+
         return (
             <DatasourceItem
                 key={item.id}
                 cellContainer={cellContainer}
                 item={item}
+                draggedRotationDegree={draggedRotationDegree}
                 zoomPercentage={zoomPercentage}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
             />

@@ -2,7 +2,7 @@
 import { RotationHandle } from "./RotationHandle";
 import { createElement } from "react";
 
-export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
+export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree, zoomPercentage }) {
     const { dsImageUrl, dsImageHeight, dsImageWidth, dsScaleImage, dsImageRotation, dsAllowRotate } = cellContainer;
 
     if (!dsImageUrl || !dsImageHeight || !dsImageWidth) {
@@ -25,7 +25,7 @@ export function DatasourceItemImage({ cellContainer, item, zoomPercentage }) {
         return null;
     }
     const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
-    const imageRotationValue = getImageRotation(imageRotation);
+    const imageRotationValue = getImageRotation(draggedRotationDegree, imageRotation);
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
     const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
     if (allowRotate) {
@@ -63,11 +63,11 @@ function calculateZoomFactor(zoomPercentage, scaleImage) {
     return zoomFactor;
 }
 
-function getImageRotation(imageRotation) {
+function getImageRotation(draggedRotationDegree, imageRotation) {
     if (!imageRotation?.value) {
         return 0;
     }
-    return Number(imageRotation.value);
+    return Number(imageRotation.value) + draggedRotationDegree;
 }
 
 function getUri(imageUrl) {

@@ -10,7 +10,7 @@ export class DatasourceItem extends Component {
     }
 
     render() {
-        const { cellContainer, item, zoomPercentage } = this.props;
+        const { cellContainer, item, draggedRotationDegree, zoomPercentage } = this.props;
         const { dsContent, dsNameAttribute, dragDropType } = cellContainer;
 
         // Convert Mendix properties to form that is easier to use.
@@ -38,7 +38,12 @@ export class DatasourceItem extends Component {
                 onClick={this.onClick}
                 data-Name={hasNameValue && nameValue.value}
             >
-                <DatasourceItemImage cellContainer={cellContainer} item={item} zoomPercentage={zoomPercentage} />
+                <DatasourceItemImage
+                    cellContainer={cellContainer}
+                    item={item}
+                    draggedRotationDegree={draggedRotationDegree}
+                    zoomPercentage={zoomPercentage}
+                />
                 {dsContent(item)}
             </div>
         );
