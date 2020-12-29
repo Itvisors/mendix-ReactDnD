@@ -13,14 +13,15 @@ export default class MendixReactDnD extends Component {
     constructor(props) {
         super(props);
 
-        this.handleHover = this.handleHover.bind(this);
+        this.handleRotateHover = this.handleRotateHover.bind(this);
+        this.handleRotateDrop = this.handleRotateDrop.bind(this);
     }
 
     state = {
-        hoverX: 0,
-        hoverY: 0,
-        hoverContainerID: null,
-        hoverItemID: null
+        rotateX: 0,
+        rotateY: 0,
+        rotateContainerID: null,
+        rotateItemID: null
     };
     render() {
         const { containerList } = this.props;
@@ -51,31 +52,52 @@ export default class MendixReactDnD extends Component {
         return (
             <DndProvider backend={HTML5Backend}>
                 <div className={className}>
-                    <GlobalDropWrapper onHover={this.handleHover}>{this.renderGrid()}</GlobalDropWrapper>
-                    {this.renderHoverInfo()}
+                    <GlobalDropWrapper onRotateHover={this.handleRotateHover} onRotateDrop={this.handleRotateDrop}>
+                        {this.renderGrid()}
+                    </GlobalDropWrapper>
+                    {this.renderRotateHoverInfo()}
                 </div>
             </DndProvider>
         );
     }
 
-    renderHoverInfo() {
-        const { hoverContainerID, hoverItemID, hoverX, hoverY } = this.state;
+    renderRotateHoverInfo() {
+        const { rotateContainerID, rotateItemID, rotateX, rotateY } = this.state;
         return (
             <div>
-                <span>Hover container: {hoverContainerID ? hoverContainerID : "<none>"}</span>
-                <span>, item id: {hoverItemID ? hoverItemID : "<none>"}</span>
-                <span>, X: {hoverX}</span>
-                <span>, Y: {hoverY}</span>
+                <span>Hover container: {rotateContainerID ? rotateContainerID : "<none>"}</span>
+                <span>, item id: {rotateItemID ? rotateItemID : "<none>"}</span>
+                <span>, X: {rotateX}</span>
+                <span>, Y: {rotateY}</span>
             </div>
         );
     }
 
-    handleHover(droppedItem, positionData) {
+    handleRotateHover(draggedItem, positionData) {
         this.setState({
-            hoverX: positionData.hoverX,
-            hoverY: positionData.hoverY,
-            hoverContainerID: droppedItem.type,
-            hoverItemID: droppedItem.id
+            rotateX: positionData.itemX,
+            rotateY: positionData.itemY,
+            rotateContainerID: draggedItem.originalType,
+            rotateItemID: draggedItem.originalId
+        });
+    }
+
+    handleRotateDrop(droppedItem, positionData) {
+        console.info(
+            "Handle rotation drop, container ID: " +
+                droppedItem.originalType +
+                ", id: " +
+                droppedItem.originalId +
+                ", X/Y: " +
+                positionData.itemX +
+                "/" +
+                positionData.itemY
+        );
+        this.setState({
+            rotateX: 0,
+            rotateY: 0,
+            rotateContainerID: null,
+            rotateItemID: null
         });
     }
 

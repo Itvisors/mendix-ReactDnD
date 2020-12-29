@@ -4,13 +4,14 @@ import { useDrag } from "react-dnd";
 export function RotationHandle({ cellContainer, item }) {
     const { containerID } = cellContainer;
 
+    // type and id must be unique so use a suffix
+    const rotationHandleDragType = containerID.value + "_rotationHandle";
     const [{ isDragging }, drag] = useDrag({
-        item: { type: containerID.value + "_rotationHandle", id: item.id + "_rotationHandle" },
-        begin: () => {
-            console.info("Started dragging rotation handle for " + containerID.value);
-        },
-        end: () => {
-            console.info("Ended dragging rotation handle for " + containerID.value);
+        item: {
+            type: rotationHandleDragType,
+            id: item.id + "_rotationHandle",
+            originalType: containerID.value,
+            originalId: item.id
         },
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
