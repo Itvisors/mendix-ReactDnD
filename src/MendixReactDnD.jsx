@@ -52,7 +52,11 @@ export default class MendixReactDnD extends Component {
         return (
             <DndProvider backend={HTML5Backend}>
                 <div className={className}>
-                    <GlobalDropWrapper onRotateHover={this.handleRotateHover} onRotateDrop={this.handleRotateDrop}>
+                    <GlobalDropWrapper
+                        containerList={containerList}
+                        onRotateHover={this.handleRotateHover}
+                        onRotateDrop={this.handleRotateDrop}
+                    >
                         {this.renderGrid()}
                     </GlobalDropWrapper>
                     {this.renderRotateHoverInfo()}
