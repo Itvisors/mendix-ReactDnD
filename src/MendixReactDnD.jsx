@@ -7,8 +7,21 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
 import { DropPositionWrapper } from "./components/DropPositionWrapper";
+import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 
 export default class MendixReactDnD extends Component {
+    constructor(props) {
+        super(props);
+
+        this.handleHover = this.handleHover.bind(this);
+    }
+
+    state = {
+        hoverX: 0,
+        hoverY: 0,
+        hoverContainerID: null,
+        hoverItemID: null
+    };
     render() {
         const { containerList } = this.props;
         if (!containerList) {
@@ -34,11 +47,36 @@ export default class MendixReactDnD extends Component {
         }
         // console.info("MendixReactDnD: All containers are now available");
         const className = "widget-container " + this.props.class;
+
         return (
             <DndProvider backend={HTML5Backend}>
-                <div className={className}>{this.renderGrid()}</div>
+                <div className={className}>
+                    <GlobalDropWrapper onHover={this.handleHover}>{this.renderGrid()}</GlobalDropWrapper>
+                    {this.renderHoverInfo()}
+                </div>
             </DndProvider>
         );
+    }
+
+    renderHoverInfo() {
+        const { hoverContainerID, hoverItemID, hoverX, hoverY } = this.state;
+        return (
+            <div>
+                <span>Hover container: {hoverContainerID ? hoverContainerID : "<none>"}</span>
+                <span>, item id: {hoverItemID ? hoverItemID : "<none>"}</span>
+                <span>, X: {hoverX}</span>
+                <span>, Y: {hoverY}</span>
+            </div>
+        );
+    }
+
+    handleHover(droppedItem, positionData) {
+        this.setState({
+            hoverX: positionData.hoverX,
+            hoverY: positionData.hoverY,
+            hoverContainerID: droppedItem.type,
+            hoverItemID: droppedItem.id
+        });
     }
 
     renderGrid() {

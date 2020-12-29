@@ -4,7 +4,7 @@ import { useDrag } from "react-dnd";
 export function RotationHandle({ cellContainer, item }) {
     const { containerID } = cellContainer;
 
-    const [drag] = useDrag({
+    const [{ isDragging }, drag] = useDrag({
         item: { type: containerID.value + "_rotationHandle", id: item.id + "_rotationHandle" },
         begin: () => {
             console.info("Started dragging rotation handle for " + containerID.value);
@@ -17,5 +17,6 @@ export function RotationHandle({ cellContainer, item }) {
         })
     });
 
-    return <div ref={drag} className="item-image-rotation-handle" />;
+    const className = isDragging ? "item-image-rotation-handle dragging" : "item-image-rotation-handle";
+    return <div ref={drag} className={className} />;
 }
