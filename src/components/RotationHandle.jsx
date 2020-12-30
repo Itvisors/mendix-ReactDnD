@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { useDrag } from "react-dnd";
 
-export function RotationHandle({ cellContainer, offsetX, item }) {
+export function RotationHandle({ cellContainer, offsetX, imageRotation, item }) {
     const { containerID } = cellContainer;
 
     // type and id must be unique so use a suffix
@@ -12,6 +12,7 @@ export function RotationHandle({ cellContainer, offsetX, item }) {
             id: item.id + "_rotationHandle",
             originalType: containerID.value,
             originalId: item.id,
+            originalRotation: imageRotation,
             offsetX
         },
         collect: monitor => ({

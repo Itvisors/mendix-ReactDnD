@@ -19,6 +19,7 @@ export default class MendixReactDnD extends Component {
 
     state = {
         rotationDegree: 0,
+        originalRotation: 0,
         rotateContainerID: null,
         rotateItemID: null
     };
@@ -70,11 +71,12 @@ export default class MendixReactDnD extends Component {
     }
 
     renderRotateHoverInfo() {
-        const { rotateContainerID, rotateItemID, rotationDegree } = this.state;
+        const { rotateContainerID, rotateItemID, rotationDegree, originalRotation } = this.state;
         return (
             <div>
                 <span>Hover container: {rotateContainerID ? rotateContainerID : "<none>"}</span>
                 <span>, item id: {rotateItemID ? rotateItemID : "<none>"}</span>
+                <span>, original rotation: {originalRotation}</span>
                 <span>, degree: {rotationDegree}</span>
             </div>
         );
@@ -84,6 +86,7 @@ export default class MendixReactDnD extends Component {
         const rotationDegree = this.calculateRotationDegree(draggedItem, positionData);
         this.setState({
             rotationDegree: rotationDegree,
+            originalRotation: draggedItem.originalRotation,
             rotateContainerID: draggedItem.originalType,
             rotateItemID: draggedItem.originalId
         });
@@ -98,10 +101,13 @@ export default class MendixReactDnD extends Component {
                 ", id: " +
                 droppedItem.originalId +
                 ", rotation degree: " +
-                rotationDegree
+                rotationDegree +
+                ", original rotation: " +
+                droppedItem.originalRotation
         );
         this.setState({
             rotationDegree: 0,
+            originalRotation: 0,
             rotateContainerID: null,
             rotateItemID: null
         });

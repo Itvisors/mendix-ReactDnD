@@ -36,7 +36,12 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         return (
             <div className="item-image-rotation-container" style={style}>
                 {renderImage(imageUrl, imageHeight, imageWidth, zoomFactor)}
-                <RotationHandle cellContainer={cellContainer} offsetX={rotationHandleOffsetX} item={item} />
+                <RotationHandle
+                    cellContainer={cellContainer}
+                    offsetX={rotationHandleOffsetX}
+                    imageRotation={Number(imageRotation.value)}
+                    item={item}
+                />
             </div>
         );
     } else {
