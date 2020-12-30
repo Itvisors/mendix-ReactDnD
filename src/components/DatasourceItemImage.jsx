@@ -29,25 +29,26 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
     const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
     if (allowRotate) {
+        const style = {};
+        if (imageRotationValue !== 0) {
+            style.transform = "rotate(" + imageRotationValue + "deg)";
+        }
         return (
-            <div className="item-image-rotation-container">
-                {renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor)}
+            <div className="item-image-rotation-container" style={style}>
+                {renderImage(imageUrl, imageHeight, imageWidth, zoomFactor)}
                 <RotationHandle cellContainer={cellContainer} offsetX={rotationHandleOffsetX} item={item} />
             </div>
         );
     } else {
-        return renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor);
+        return renderImage(imageUrl, imageHeight, imageWidth, zoomFactor);
     }
 }
 
-function renderImage(imageUrl, imageHeight, imageWidth, imageRotationValue, zoomFactor) {
+function renderImage(imageUrl, imageHeight, imageWidth, zoomFactor) {
     const style = {
         width: Math.round(Number(imageWidth.value) * zoomFactor),
         height: Math.round(Number(imageHeight.value) * zoomFactor)
     };
-    if (imageRotationValue !== 0) {
-        style.transform = "rotate(" + imageRotationValue + "deg)";
-    }
     const uri = getUri(imageUrl);
     return <img className="item-image" src={uri} style={style} />;
 }
