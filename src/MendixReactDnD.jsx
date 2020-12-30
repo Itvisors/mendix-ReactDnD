@@ -93,23 +93,25 @@ export default class MendixReactDnD extends Component {
     }
 
     handleRotateDrop(droppedItem, positionData) {
-        const { newRotation, onRotateAction } = this.props;
+        const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
         const rotationDegree = this.calculateRotationDegree(droppedItem, positionData);
-        console.info(
-            "Handle rotation drop, container ID: " +
-                droppedItem.originalType +
-                ", id: " +
-                droppedItem.originalId +
-                ", rotation degree: " +
-                rotationDegree +
-                ", original rotation: " +
-                droppedItem.originalRotation
-        );
+        // console.info(
+        //     "Handle rotation drop, container ID: " +
+        //         droppedItem.originalType +
+        //         ", id: " +
+        //         droppedItem.originalId +
+        //         ", rotation degree: " +
+        //         rotationDegree +
+        //         ", original rotation: " +
+        //         droppedItem.originalRotation
+        // );
         if (newRotation) {
             newRotation.setTextValue("" + rotationDegree);
-        }
-        if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
-            onRotateAction.execute();
+            eventContainerID.setValue(droppedItem.originalType);
+            eventGuid.setTextValue(droppedItem.originalId);
+            if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
+                onRotateAction.execute();
+            }
         }
     }
 
@@ -317,6 +319,7 @@ export default class MendixReactDnD extends Component {
             if (Number(imageRotation.value) === this.state.originalRotation) {
                 draggedRotationDegree = this.state.rotationDegree;
             } else {
+                // console.info("renderDatasourceItem: clear rotation state");
                 this.setState({
                     rotationDegree: 0,
                     originalRotation: 0,
@@ -383,7 +386,7 @@ export default class MendixReactDnD extends Component {
                 onClickAction.execute();
             }
         } else {
-            console.info("MendixReactDnD Ignored onClick on " + containerID.value);
+            // console.info("MendixReactDnD Ignored onClick on " + containerID.value);
         }
     }
 
