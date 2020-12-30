@@ -5,6 +5,7 @@ export function RotationHandle({ cellContainer, offsetX, imageRotation, item }) 
     const { containerID } = cellContainer;
 
     // type and id must be unique so use a suffix
+    // Also store original type, id and rotation in the item
     const rotationHandleDragType = containerID.value + "_rotationHandle";
     const [{ isDragging }, drag] = useDrag({
         item: {

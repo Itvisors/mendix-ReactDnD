@@ -105,12 +105,6 @@ export default class MendixReactDnD extends Component {
                 ", original rotation: " +
                 droppedItem.originalRotation
         );
-        this.setState({
-            rotationDegree: 0,
-            originalRotation: 0,
-            rotateContainerID: null,
-            rotateItemID: null
-        });
         if (newRotation) {
             newRotation.setTextValue("" + rotationDegree);
         }
@@ -312,11 +306,24 @@ export default class MendixReactDnD extends Component {
 
     renderDatasourceItem(cellContainer, item) {
         const { zoomPercentage } = this.props;
+        const { dsImageRotation } = cellContainer;
 
         let draggedRotationDegree = 0;
         // Use rotation degree if ID matches, rotateItemID is null if nothing is being rotated now.
         if (this.state.rotateItemID && this.state.rotateItemID === item.id) {
-            draggedRotationDegree = this.state.rotationDegree;
+            const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
+            // If the datasource item still returns the original value, use the rotation degree from the rotation drag.
+            // If the datasource item has been updated, clear the state values.
+            if (Number(imageRotation.value) === this.state.originalRotation) {
+                draggedRotationDegree = this.state.rotationDegree;
+            } else {
+                this.setState({
+                    rotationDegree: 0,
+                    originalRotation: 0,
+                    rotateContainerID: null,
+                    rotateItemID: null
+                });
+            }
         }
 
         return (
