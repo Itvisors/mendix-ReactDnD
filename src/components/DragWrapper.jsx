@@ -1,4 +1,5 @@
-import { createElement } from "react";
+import { createElement, useEffect } from "react";
+import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
 export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
@@ -27,12 +28,17 @@ export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
         return null;
     }
 
-    const [{ isDragging }, drag] = useDrag({
+    const [{ isDragging }, drag, preview] = useDrag({
         item: { type: containerID.value, id: item.id, imageHeight, imageWidth, adjustOffsetOnDrop },
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
     });
+
+    // Turn off the default drag preview that the browser renders as we render our own in CustomDragLayer.
+    useEffect(() => {
+        preview(getEmptyImage(), { captureDraggingState: true });
+    }, []);
 
     const style = {};
     if (offsetX && offsetX.value && offsetY && offsetY.value) {

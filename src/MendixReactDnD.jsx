@@ -6,6 +6,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
+import { CustomDragLayer } from "./components/CustomDragLayer";
 import { DropPositionWrapper } from "./components/DropPositionWrapper";
 import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 
@@ -26,6 +27,9 @@ export default class MendixReactDnD extends Component {
 
     // Convert from radials to degrees.
     R2D = 180 / Math.PI;
+
+    containerMap = new Map();
+    itemMap = new Map();
 
     render() {
         const { containerList } = this.props;
@@ -64,6 +68,11 @@ export default class MendixReactDnD extends Component {
                     >
                         {this.renderGrid()}
                     </GlobalDropWrapper>
+                    <CustomDragLayer
+                        containerMap={this.containerMap}
+                        itemMap={this.itemMap}
+                        zoomPercentage={this.props.zoomPercentage}
+                    />
                     {this.renderRotateHoverInfo()}
                 </div>
             </DndProvider>
@@ -122,9 +131,16 @@ export default class MendixReactDnD extends Component {
     }
 
     renderGrid() {
+        // Clear the maps
+        this.containerMap.clear();
+        this.itemMap.clear();
+
         // Sort the containers on row/column.
         const containerListSorted = this.sortContainers();
-
+        // Build a map of container to use in the custom drag layer
+        for (const container of containerListSorted) {
+            this.containerMap.set(container.containerID.value, container);
+        }
         // Get the highest row number.
         const maxRowNumber = this.getMaxRowNumber(containerListSorted);
 
@@ -200,8 +216,13 @@ export default class MendixReactDnD extends Component {
     }
 
     renderCellItem(cellContainer, item) {
-        const { dragDropType } = cellContainer;
+        const { containerID, dragDropType } = cellContainer;
         const { zoomPercentage } = this.props;
+
+        // Add the item to the map for use in the custom drag layer
+        this.itemMap.set(containerID.value + "_" + item.id, item);
+
+        // Render the item
         switch (dragDropType) {
             case "drag":
                 return (

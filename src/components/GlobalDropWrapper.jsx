@@ -1,3 +1,4 @@
+import { Constants } from "../utils/Constants";
 import { createElement } from "react";
 import { useDrop } from "react-dnd";
 
@@ -8,7 +9,7 @@ export function GlobalDropWrapper({ containerList, onRotateHover, onRotateDrop, 
     for (const container of containerList) {
         const { containerID, dragDropType } = container;
         if (containerID && containerID.value && (dragDropType === "drag" || dragDropType === "both")) {
-            acceptArray.push(containerID.value + "_rotationHandle");
+            acceptArray.push(containerID.value + Constants.ROTATION_HANDLE_ID_SUFFIX);
         }
     }
 
