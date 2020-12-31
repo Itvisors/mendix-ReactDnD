@@ -137,8 +137,8 @@
                             <description>Class to place on the draggable container</description>
                         </property>
                         <property key="draggingClass" type="string" required="true" defaultValue="dragging-container">
-                            <caption>Draggable class</caption>
-                            <description>Class to place on the draggable container while it is dragged</description>
+                            <caption>Dragging class</caption>
+                            <description>Class to place on the draggable container while dragging is active. Note that this applies to the original item, not the dragged copy</description>
                         </property>
                         <property key="dropTargetClass" type="string" required="true" defaultValue="droptarget-container">
                             <caption>Drop target class</caption>

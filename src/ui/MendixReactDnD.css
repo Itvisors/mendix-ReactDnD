@@ -36,6 +36,11 @@ ReactDnD widget CSS
     opacity: 0.5;
 }
 
+/* Display none breaks the drag function! */
+.dragging-container-hidden {
+    opacity: 0;
+}
+
 div.droptarget-container {
     padding: 2px;
 }
