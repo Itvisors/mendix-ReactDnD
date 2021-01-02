@@ -2,7 +2,7 @@ import { createElement, useEffect } from "react";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
-export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
+export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDragStart, children }) {
     const {
         containerID,
         dsOffsetX,
@@ -28,8 +28,21 @@ export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
         return null;
     }
 
+    const startDrag = () => {
+        if (onDragStart) {
+            onDragStart({
+                containerID: containerID.value,
+                itemID: item.id,
+                itemOffsetX: offsetX && offsetX.value ? Number(offsetX.value) : undefined,
+                itemOffsetY: offsetY && offsetY.value ? Number(offsetY.value) : undefined
+            });
+        }
+    };
+
+    // Offset values are optional! Only take the values when they
     const [{ isDragging }, drag, preview] = useDrag({
         item: { type: containerID.value, id: item.id, imageHeight, imageWidth, adjustOffsetOnDrop },
+        begin: startDrag,
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
@@ -46,8 +59,11 @@ export function DragWrapper({ cellContainer, item, zoomPercentage, children }) {
         if (zoomPercentage && zoomPercentage.status === "available" && zoomPercentage.value) {
             zoomFactor = zoomPercentage.value / 100;
         }
-        const top = Math.round(Number(offsetY.value) * zoomFactor);
-        const left = Math.round(Number(offsetX.value) * zoomFactor);
+        // If the drop position has not yet been updated in the datasource, use the pending drop position values.
+        const offsetValueX = dropPos ? dropPos.x : Number(offsetX.value);
+        const offsetValueY = dropPos ? dropPos.y : Number(offsetY.value);
+        const top = Math.round(offsetValueY * zoomFactor);
+        const left = Math.round(offsetValueX * zoomFactor);
         const transform = "translate(" + left + "px, " + top + "px)";
         style.position = "absolute";
         style.transform = transform;
