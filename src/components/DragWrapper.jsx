@@ -35,7 +35,8 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
         }
     };
 
-    // Offset values are optional! Only take the values when they
+    // Include widht and height from state elementRect so drag layer can render element correctly.
+    // Without these values, the dragged item would always extend to the right end of the viewport.
     const [{ isDragging }, drag, preview] = useDrag({
         item: {
             type: containerID.value,

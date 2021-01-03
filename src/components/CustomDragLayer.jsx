@@ -22,6 +22,7 @@ export function CustomDragLayer({ containerMap, itemMap, zoomPercentage }) {
     const container = containerMap.get(itemType);
     const dsItem = itemMap.get(itemType + "_" + item.id);
     // Render the drag preview ourselves.
+    // Take height and width from dragged item to render with correct width and height.
     const { x, y } = currentOffset;
     const { itemWidth, itemHeight } = item;
     const style = {
