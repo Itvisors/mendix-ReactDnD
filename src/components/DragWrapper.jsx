@@ -1,8 +1,11 @@
-import { createElement, useEffect } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
 export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDragStart, children }) {
+    const layoutRef = useRef(null);
+    const [elementRect, setElementRect] = useState(null);
+
     const {
         containerID,
         dsOffsetX,
@@ -41,7 +44,15 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
 
     // Offset values are optional! Only take the values when they
     const [{ isDragging }, drag, preview] = useDrag({
-        item: { type: containerID.value, id: item.id, imageHeight, imageWidth, adjustOffsetOnDrop },
+        item: {
+            type: containerID.value,
+            id: item.id,
+            imageHeight,
+            imageWidth,
+            adjustOffsetOnDrop,
+            itemWidth: elementRect ? elementRect.width : undefined,
+            itemHeight: elementRect ? elementRect.height : undefined
+        },
         begin: startDrag,
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
@@ -52,6 +63,11 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
     useEffect(() => {
         preview(getEmptyImage(), { captureDraggingState: true });
     }, []);
+
+    useEffect(() => {
+        const rect = layoutRef.current.getBoundingClientRect();
+        setElementRect(rect);
+    });
 
     const style = {};
     if (offsetX && offsetX.value && offsetY && offsetY.value) {
@@ -75,7 +91,7 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
     const className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
     return (
         <div ref={drag} style={style} className={className}>
-            {children}
+            <div ref={layoutRef}>{children}</div>
         </div>
     );
 }

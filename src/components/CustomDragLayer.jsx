@@ -23,12 +23,15 @@ export function CustomDragLayer({ containerMap, itemMap, zoomPercentage }) {
     const dsItem = itemMap.get(itemType + "_" + item.id);
     // Render the drag preview ourselves.
     const { x, y } = currentOffset;
+    const { itemWidth, itemHeight } = item;
     const style = {
-        transform: "translate(" + x + "px, " + y + "px)"
+        transform: "translate(" + x + "px, " + y + "px)",
+        width: itemWidth + "px",
+        height: itemHeight + "px"
     };
     return (
         <div className="custom-draglayer">
-            <div style={style}>
+            <div className="custom-draglayer-item" style={style}>
                 <DatasourceItem
                     key={item.id}
                     cellContainer={container}

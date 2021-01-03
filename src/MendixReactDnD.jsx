@@ -1,14 +1,14 @@
 import { Component, createElement } from "react";
+import { CustomDragLayer } from "./components/CustomDragLayer";
 import { DatasourceItem } from "./components/DatasourceItem";
 import { DndProvider } from "react-dnd";
 import { DragWrapper } from "./components/DragWrapper";
+import { DropPositionWrapper } from "./components/DropPositionWrapper";
+import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
-import { CustomDragLayer } from "./components/CustomDragLayer";
-import { DropPositionWrapper } from "./components/DropPositionWrapper";
-import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
