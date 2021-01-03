@@ -1,8 +1,11 @@
-import { createElement } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 
 /** Drop target wrapper. */
 export function DropWrapper({ cellContainer, onDrop, children }) {
+    const layoutRef = useRef(null);
+    const [elementRect, setElementRect] = useState(null);
+
     const { containerID, acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
     if (!acceptsContainerIDs || !acceptsContainerIDs.value) {
         return (
@@ -16,9 +19,13 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
 
     const handleDrop = (droppedItem, monitor) => {
         const clientOffset = monitor.getSourceClientOffset();
+        const dropClientX = Math.round(clientOffset.x);
+        const dropClientY = Math.round(clientOffset.y);
         const positionData = {
-            dropClientX: Math.round(clientOffset.x),
-            dropClientY: Math.round(clientOffset.y)
+            dropClientX,
+            dropClientY,
+            dropOffsetX: Math.round(dropClientX - elementRect.left),
+            dropOffsetY: Math.round(dropClientY - elementRect.top)
         };
         onDrop(droppedItem, positionData);
     };
@@ -32,6 +39,13 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
         })
     });
 
+    useEffect(() => {
+        if (layoutRef.current) {
+            const rect = layoutRef.current.getBoundingClientRect();
+            setElementRect(rect);
+        }
+    });
+
     const isActive = canDrop && isOver;
 
     let className = dropTargetClass;
@@ -43,8 +57,10 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
     }
 
     return (
-        <div ref={drop} className={className}>
-            {children}
+        <div ref={layoutRef}>
+            <div ref={drop} className={className}>
+                {children}
+            </div>
         </div>
     );
 }

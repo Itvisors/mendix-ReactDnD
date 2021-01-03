@@ -23,13 +23,6 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
     const imageHeight = dsImageHeight ? dsImageHeight(item).value : undefined;
     const imageWidth = dsImageWidth ? dsImageWidth(item).value : undefined;
     const adjustOffsetOnDrop = dsAdjustOffsetOnDrop ? dsAdjustOffsetOnDrop(item).value : false;
-    if (
-        (offsetX && offsetX.status !== "available") ||
-        (offsetY && offsetY.status !== "available") ||
-        (zoomPercentage && zoomPercentage.status !== "available")
-    ) {
-        return null;
-    }
 
     const startDrag = () => {
         if (onDragStart) {
@@ -65,9 +58,19 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
     }, []);
 
     useEffect(() => {
-        const rect = layoutRef.current.getBoundingClientRect();
-        setElementRect(rect);
+        if (layoutRef.current) {
+            const rect = layoutRef.current.getBoundingClientRect();
+            setElementRect(rect);
+        }
     });
+
+    if (
+        (offsetX && offsetX.status !== "available") ||
+        (offsetY && offsetY.status !== "available") ||
+        (zoomPercentage && zoomPercentage.status !== "available")
+    ) {
+        return null;
+    }
 
     const style = {};
     if (offsetX && offsetX.value && offsetY && offsetY.value) {

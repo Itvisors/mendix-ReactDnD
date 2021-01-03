@@ -3,7 +3,7 @@ import { CustomDragLayer } from "./components/CustomDragLayer";
 import { DatasourceItem } from "./components/DatasourceItem";
 import { DndProvider } from "react-dnd";
 import { DragWrapper } from "./components/DragWrapper";
-import { DropPositionWrapper } from "./components/DropPositionWrapper";
+import { DropWrapper } from "./components/DropWrapper";
 import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -240,7 +240,7 @@ export default class MendixReactDnD extends Component {
 
             case "drop":
                 return (
-                    <DropPositionWrapper
+                    <DropWrapper
                         key={item.id}
                         cellContainer={cellContainer}
                         onDrop={(droppedItem, positionData) =>
@@ -248,12 +248,12 @@ export default class MendixReactDnD extends Component {
                         }
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
-                    </DropPositionWrapper>
+                    </DropWrapper>
                 );
 
             case "both":
                 return (
-                    <DropPositionWrapper
+                    <DropWrapper
                         key={item.id}
                         cellContainer={cellContainer}
                         onDrop={(droppedItem, positionData) =>
@@ -270,7 +270,7 @@ export default class MendixReactDnD extends Component {
                         >
                             {this.renderDatasourceItem(cellContainer, item)}
                         </DragWrapper>
-                    </DropPositionWrapper>
+                    </DropWrapper>
                 );
             default:
                 return this.renderDatasourceItem(cellContainer, item);
