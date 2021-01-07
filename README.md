@@ -87,8 +87,8 @@ Use CommunityCommons.GetImageDimensions to save the image dimensions on your ima
 | Offset X            | Integer     |      | Offset X position for the item.
 | Offset Y            | Integer     |      | Offset Y position for the item.
 | Image URL           | String      | Y    | Image URL. Can be absolute, concatenated with Mendix remote URL when it does not start with http, should not start with / in that case.
-| Image height        | Integer     | Y    |
-| Image width         | Integer     | Y    |
+| Image height        | Integer     | Y    | Image height, in pixels
+| Image width         | Integer     | Y    | Image width, in pixels
 | Scale image         | Boolean     |      | Scale image with the floorplan.
 | Adjust drop offset  | Boolean     |      | When dropping an image from a palette that is not scaled onto a canvas that can scale, set this to true to adjust the drop offset for the zomm percentage.
 | Rotation            | Integer     |      | The current rotation of the image. Required when the user is allowed to rotate the image
@@ -140,7 +140,7 @@ The elements and classes involved that you can overrule to apply styling:
 | Widget container       | widget-container        | The widget container. Any classes you put on the widget end up here
 |                        | drag-shadow             | Add this class to the widget container to show a shadow while dragging
 | Row                    | widget-row widget-row-x | Row container
-| Cell                   | widget-cell widget-cell-r`x`-c`y` | Cell at row `x` and column `y`
+| Cell                   | widget-cell widget-cell-r**x**-c**y** | Cell at row `x` and column `y`
 | Cell content container | widget-cell-content-container | Contains the contents rendered for a container
 | Drop target container  | droptarget-container    | If container is a drop target
 | Draggable container    | draggable-container     | If container is draggable
