@@ -41,7 +41,7 @@
                         </property>
                         <property key="returnOnClick" type="expression">
                             <caption>Return OnClick</caption>
-                            <description>Whether OnClick events should be returned for the container. Useful for positioning items on the container. Does not make sense when dragging items from this container.</description>
+                            <description>Whether OnClick events should be returned for the container. Useful for getting the exact click coordinate on the container.</description>
                             <returnType type="Boolean" />
                         </property>
                         <property key="acceptsContainerIDs" type="expression" required="false">
@@ -122,7 +122,7 @@
                         </property>
                         <property key="dsAllowRotate" type="expression" dataSource="ds" required="false">
                             <caption>Allow rotate</caption>
-                            <description>Whether user may rotate the image. Only when image is rendered. If true, additional rotation handles will be shown when the user hovers over the image.</description>
+                            <description>Whether user may rotate the image. Only when image is rendered. If true, a rotation handle will be shown when the user hovers over the image.</description>
                             <returnType type="Boolean" />
                         </property>
                     </propertyGroup>
@@ -149,7 +149,7 @@
                             <description>Class to place on the drop target container when a valid item is hovered over it</description>
                         </property>
                         <property key="invalidDropClass" type="string" required="true" defaultValue="droptarget-invalid">
-                            <caption>Can drop class</caption>
+                            <caption>Invalid drop class</caption>
                             <description>Class to place on the drop target container when an invalid item is hovered over it</description>
                         </property>
                     </propertyGroup>
@@ -235,7 +235,7 @@
                 </attributeTypes>
             </property>
             <property key="onClickAction" type="action" required="false">
-                <caption>Optional. On click action</caption>
+                <caption>On click action</caption>
                 <description></description>
             </property>
             <property key="onDropAction" type="action">
@@ -243,8 +243,8 @@
                 <description></description>
             </property>
             <property key="onRotateAction" type="action" required="false">
-                <caption>Optional. On rotate action. Required when allowing users to rotate items.</caption>
-                <description></description>
+                <caption>On rotate action</caption>
+                <description>Optional. On rotate action. Required when allowing users to rotate items.</description>
             </property>
         </propertyGroup>
     </properties>
