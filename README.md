@@ -12,7 +12,7 @@ Wrapper for [react-dnd](https://react-dnd.github.io/react-dnd/about) to provide 
 - Optionally apply a shadow effect to items while they are dragged 
 
 ## Not for the faint hearted!
-This is **not** an easy widget to work with! Take your time when you want to use it.
+This is **not** an easy widget to work with! Take your time when you want to use it. The result is well worth the effort!
 
 Testdrive the sample/demo project! It is a great starting point and contains a lot of stuff you can copy and adjust to your needs.
 
@@ -24,6 +24,9 @@ This has to do with how React works, the framework underneath the Mendix client 
 As a result, the Mendix widget must take a similar approach. It renders the top level component and in that all the datasource containers you define in Mendix.
 
 ## Usage
+
+Take the sample project as a starting point!
+
 - Define IDs for the various containers using an enumeration.
 - The widget needs a context object, described in more detail separately
 - Datasource containers currently only work with lists. However, nothing stops you from creating a datasource microflow that returns a single object in a list, mimicking a single object datasource.
@@ -139,7 +142,7 @@ The elements and classes involved that you can overrule to apply styling:
 |------------------------|-------------------------|--------------
 | Widget container       | widget-container        | The widget container. Any classes you put on the widget end up here
 |                        | drag-shadow             | Add this class to the widget container to show a shadow while dragging
-| Row                    | widget-row widget-row-x | Row container
+| Row                    | widget-row widget-row-x | Row container, row **x**
 | Cell                   | widget-cell widget-cell-r**x**-c**y** | Cell at row `x` and column `y`
 | Cell content container | widget-cell-content-container | Contains the contents rendered for a container
 | Drop target container  | droptarget-container    | If container is a drop target
