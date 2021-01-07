@@ -173,7 +173,7 @@
         <propertyGroup caption="Events">
             <property key="eventContainerID" type="attribute">
                 <caption>Container ID</caption>
-                <description></description>
+                <description>Container ID of the dragged item</description>
                 <attributeTypes>
                     <attributeType name="Enum" />
                 </attributeTypes>
@@ -208,7 +208,7 @@
             </property>
             <property key="eventGuid" type="attribute">
                 <caption>Object GUID</caption>
-                <description>When an object was clicked or dragged, contains the GUID of that object</description>
+                <description>When an object was clicked or dragged, contains the GUID of the dragged object</description>
                 <attributeTypes>
                     <attributeType name="String" />
                 </attributeTypes>
