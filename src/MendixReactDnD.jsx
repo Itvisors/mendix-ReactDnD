@@ -69,9 +69,9 @@ export default class MendixReactDnD extends Component {
             return null;
         }
 
-        const { showGrid, gridSize, snapToGrid, snapToSize } = this.props;
+        const { snapToGrid, snapToSize } = this.props;
         const snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
-        const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 1;
+        // const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 1;
 
         // console.info("MendixReactDnD: All containers are now available");
         const className = "widget-container " + this.props.class;
@@ -91,8 +91,6 @@ export default class MendixReactDnD extends Component {
                         zoomPercentage={this.props.zoomPercentage}
                         snapToGrid={snapToGrid ? !!snapToGrid.value : false}
                         snapToSize={snapToSizeValue}
-                        showGrid={showGrid ? !!showGrid.value : false}
-                        gridSize={gridSizeValue}
                     />
                 </div>
             </DndProvider>

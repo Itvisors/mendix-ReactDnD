@@ -125,6 +125,16 @@
                             <description>Whether user may rotate the image. Only when image is rendered. If true, a rotation handle will be shown when the user hovers over the image.</description>
                             <returnType type="Boolean" />
                         </property>
+                        <property key="dsShowGrid" type="expression" dataSource="ds" required="false">
+                            <caption>Show grid</caption>
+                            <description></description>
+                            <returnType type="Boolean" />
+                        </property>
+                        <property key="dsGridSize" type="expression" dataSource="ds" required="false">
+                            <caption>Grid size</caption>
+                            <description>Grid size. Any value less than 5 is ignored, 5 will be used</description>
+                            <returnType type="Integer" />
+                        </property>
                     </propertyGroup>
                     <propertyGroup caption="Styling">
                         <property key="containerClass" type="expression" required="false">
@@ -177,16 +187,6 @@
                 <caption>Snap to size</caption>
                 <description>Snap to size. Any value less than 5 is ignored</description>
                 <returnType type="Integer" />
-            </property>
-            <property key="gridSize" type="expression" defaultValue="1">
-                <caption>Grid size</caption>
-                <description>Grid size, 1 means no grid. Any value less than 5 is ignored</description>
-                <returnType type="Integer" />
-            </property>
-            <property key="showGrid" type="expression" required="false">
-                <caption>Show grid</caption>
-                <description>When to show the grid, best to use an enumeration for this. Possible values: never, whileDragging, always. Any other values are treated as never.</description>
-                <returnType type="String" />
             </property>
         </propertyGroup>
 

@@ -1,9 +1,19 @@
 /*global mx */
+import { Grid } from "./Grid";
 import { RotationHandle } from "./RotationHandle";
 import { createElement } from "react";
 
 export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree, zoomPercentage }) {
-    const { dsImageUrl, dsImageHeight, dsImageWidth, dsScaleImage, dsImageRotation, dsAllowRotate } = cellContainer;
+    const {
+        dsImageUrl,
+        dsImageHeight,
+        dsImageWidth,
+        dsScaleImage,
+        dsImageRotation,
+        dsAllowRotate,
+        dsShowGrid,
+        dsGridSize
+    } = cellContainer;
 
     if (!dsImageUrl || !dsImageHeight || !dsImageWidth) {
         return null;
@@ -12,10 +22,11 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
     const imageUrl = dsImageUrl(item);
     const imageHeight = dsImageHeight(item);
     const imageWidth = dsImageWidth(item);
-    // Image rotation and zoom percentage are optional!
+    // Values below are optional!
     const scaleImage = dsScaleImage ? dsScaleImage(item).value : false;
     const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
     const allowRotate = dsAllowRotate ? dsAllowRotate(item).value : false;
+    const showGrid = dsShowGrid ? dsShowGrid(item).value : false;
     if (
         imageUrl.status !== "available" ||
         imageHeight.status !== "available" ||
@@ -25,6 +36,8 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         return null;
     }
     const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
+    const imageWidthValue = Math.round(Number(imageWidth.value) * zoomFactor);
+    const imageHeightValue = Math.round(Number(imageHeight.value) * zoomFactor);
     const imageRotationValue = getImageRotation(draggedRotationDegree, imageRotation);
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
     const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
@@ -35,7 +48,7 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         }
         return (
             <div className="item-image-rotation-container" style={style}>
-                {renderImage(imageUrl, imageHeight, imageWidth, zoomFactor)}
+                {renderImage(imageUrl, imageHeightValue, imageWidthValue)}
                 <RotationHandle
                     cellContainer={cellContainer}
                     offsetX={rotationHandleOffsetX}
@@ -44,18 +57,23 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
                 />
             </div>
         );
+    } else if (showGrid) {
+        const gridSize = dsGridSize ? dsGridSize(item) : undefined;
+        const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 5;
+        return (
+            <div style={{ width: imageWidthValue, height: imageHeightValue }}>
+                {renderImage(imageUrl, imageHeightValue, imageWidthValue)}
+                <Grid gridSize={gridSizeValue} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
+            </div>
+        );
     } else {
-        return renderImage(imageUrl, imageHeight, imageWidth, zoomFactor);
+        return renderImage(imageUrl, imageHeightValue, imageWidthValue);
     }
 }
 
-function renderImage(imageUrl, imageHeight, imageWidth, zoomFactor) {
-    const style = {
-        width: Math.round(Number(imageWidth.value) * zoomFactor),
-        height: Math.round(Number(imageHeight.value) * zoomFactor)
-    };
+function renderImage(imageUrl, imageHeightValue, imageWidthValue) {
     const uri = getUri(imageUrl);
-    return <img className="item-image" src={uri} style={style} />;
+    return <img className="item-image" src={uri} style={{ width: imageWidthValue, height: imageHeightValue }} />;
 }
 
 function calculateZoomFactor(zoomPercentage, scaleImage) {

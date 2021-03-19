@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { snapOffsetToGrid } from "../utils/Utils";
 import { useDragLayer } from "react-dnd";
 
-export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToGrid, snapToSize, showGrid, gridSize }) {
+export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToGrid, snapToSize }) {
     const { itemType, isDragging, item, currentOffset } = useDragLayer(monitor => ({
         item: monitor.getItem(),
         itemType: monitor.getItemType(),
