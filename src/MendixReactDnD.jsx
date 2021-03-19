@@ -68,9 +68,13 @@ export default class MendixReactDnD extends Component {
         ) {
             return null;
         }
+
+        const { showGrid, gridSize, snapToGrid, snapToSize } = this.props;
+        const snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
+        const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 1;
+
         // console.info("MendixReactDnD: All containers are now available");
         const className = "widget-container " + this.props.class;
-
         return (
             <DndProvider backend={HTML5Backend}>
                 <div className={className}>
@@ -85,6 +89,10 @@ export default class MendixReactDnD extends Component {
                         containerMap={this.containerMap}
                         itemMap={this.itemMap}
                         zoomPercentage={this.props.zoomPercentage}
+                        snapToGrid={snapToGrid ? !!snapToGrid.value : false}
+                        snapToSize={snapToSizeValue}
+                        showGrid={showGrid ? !!showGrid.value : false}
+                        gridSize={gridSizeValue}
                     />
                 </div>
             </DndProvider>
@@ -217,7 +225,9 @@ export default class MendixReactDnD extends Component {
 
     renderCellItem(cellContainer, item) {
         const { containerID, dragDropType } = cellContainer;
-        const { zoomPercentage } = this.props;
+        const { snapToSize, snapToGrid, zoomPercentage } = this.props;
+
+        const snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
 
         // Add the item to the map for use in the custom drag layer
         this.itemMap.set(containerID.value + "_" + item.id, item);
@@ -243,6 +253,8 @@ export default class MendixReactDnD extends Component {
                     <DropWrapper
                         key={item.id}
                         cellContainer={cellContainer}
+                        snapToGrid={snapToGrid ? !!snapToGrid.value : false}
+                        snapToSize={snapToSizeValue}
                         onDrop={(droppedItem, positionData) =>
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }
@@ -256,6 +268,8 @@ export default class MendixReactDnD extends Component {
                     <DropWrapper
                         key={item.id}
                         cellContainer={cellContainer}
+                        snapToGrid={snapToGrid ? !!snapToGrid.value : false}
+                        snapToSize={snapToSizeValue}
                         onDrop={(droppedItem, positionData) =>
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }

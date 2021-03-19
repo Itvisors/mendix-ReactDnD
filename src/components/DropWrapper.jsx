@@ -1,8 +1,9 @@
 import { createElement, useEffect, useRef, useState } from "react";
+import { snapOffsetToGrid } from "../utils/Utils";
 import { useDrop } from "react-dnd";
 
 /** Drop target wrapper. */
-export function DropWrapper({ cellContainer, onDrop, children }) {
+export function DropWrapper({ cellContainer, onDrop, snapToGrid, snapToSize, children }) {
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
 
@@ -19,8 +20,12 @@ export function DropWrapper({ cellContainer, onDrop, children }) {
 
     const handleDrop = (droppedItem, monitor) => {
         const clientOffset = monitor.getSourceClientOffset();
-        const dropClientX = Math.round(clientOffset.x);
-        const dropClientY = Math.round(clientOffset.y);
+        let dropClientX = Math.round(clientOffset.x);
+        let dropClientY = Math.round(clientOffset.y);
+        if (snapToSize >= 5 && snapToGrid) {
+            dropClientX = snapOffsetToGrid(dropClientX, snapToSize);
+            dropClientY = snapOffsetToGrid(dropClientY, snapToSize);
+        }
         const positionData = {
             dropClientX,
             dropClientY,

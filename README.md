@@ -125,6 +125,11 @@ Take care when creating a palette from which the user can drag items onto the fl
 
 If you allow items to be positioned on top of each other or overlapping in any way, be sure to make the items a drop target as well. Without this, items cannot be dropped close to each other or on top of each other.
 
+### Snap to grid
+The widget has a snap to grid feature, to prevent the user from having to drag and drop at an exact pixel position.
+
+If it seems impossible to snap drop an item at the top-left corner of your background, make sure your background is positioned at a multiple of the snap to size used. So if your snap to size is 10 but the background is positoned at left=85, the snap to function will be off by 5. Note that layout grid and other containers add padding as well. Inspect in the browser where necessary. This can be seen in the demo project: snap to sizes 5 and 10 work correctly but 15 and 20 make it impossible to position an item in the top/left corner or at the top of the background.  
+
 ## Styling
 The widget is easy enough to style by setting a class on it in the widget properties and then apply styling by targeting the main widget using your class and overruling defaults. Also, the classes used for each container can be changed at the container definition.
 

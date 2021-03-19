@@ -1,9 +1,10 @@
 import { Constants } from "../utils/Constants";
 import { DatasourceItem } from "./DatasourceItem";
 import { createElement } from "react";
+import { snapOffsetToGrid } from "../utils/Utils";
 import { useDragLayer } from "react-dnd";
 
-export function CustomDragLayer({ containerMap, itemMap, zoomPercentage }) {
+export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToGrid, snapToSize, showGrid, gridSize }) {
     const { itemType, isDragging, item, currentOffset } = useDragLayer(monitor => ({
         item: monitor.getItem(),
         itemType: monitor.getItemType(),
@@ -23,10 +24,15 @@ export function CustomDragLayer({ containerMap, itemMap, zoomPercentage }) {
     const dsItem = itemMap.get(itemType + "_" + item.id);
     // Render the drag preview ourselves.
     // Take height and width from dragged item to render with correct width and height.
-    const { x, y } = currentOffset;
+    let dragX = currentOffset.x;
+    let dragY = currentOffset.y;
+    if (snapToSize >= 5 && snapToGrid) {
+        dragX = snapOffsetToGrid(dragX, snapToSize);
+        dragY = snapOffsetToGrid(dragY, snapToSize);
+    }
     const { itemWidth, itemHeight } = item;
     const style = {
-        transform: "translate(" + x + "px, " + y + "px)",
+        transform: "translate(" + dragX + "px, " + dragY + "px)",
         width: itemWidth + "px",
         height: itemHeight + "px"
     };
