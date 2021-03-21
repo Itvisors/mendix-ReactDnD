@@ -52,6 +52,8 @@ All event handling is done by setting values on the context object.
 | On rotate action    | Action      |      | Opt.               | On rotate action. Required when allowing users to rotate items.
 | Zoom %              | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
 | Adjust offset       | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
+| Snap to grid        | Boolean     |      |                    | Snap to grid while dragging
+| Snap to size        | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
 
 ## Return on click events?
 Returning on click events from the widget only makes sense when positioning items on a background. When dropping without position, a container with an onClick action is easier. The on click event of the widget allows you to capture the exact click coordinate on the container.
@@ -96,6 +98,8 @@ Use CommunityCommons.GetImageDimensions to save the image dimensions on your ima
 | Adjust drop offset  | Boolean     |      | When dropping an image from a palette that is not scaled onto a canvas that can scale, set this to true to adjust the drop offset for the zomm percentage.
 | Rotation            | Integer     |      | The current rotation of the image. Required when the user is allowed to rotate the image
 | Allow rotate        | Boolean     |      | Whether user may rotate the image. Only when image is rendered. If true, a rotation handle will be shown when the user hovers over the image.
+| Show grid           | Boolean     |      | Show a grid over this item
+| Grid size           | Integer     |      | Size of a grid cell. Note that the snap to grid feature has a separate snap to size
 
 ### Styling the container and its items
 

@@ -9,6 +9,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
+import { snapToRotation } from "./utils/Utils";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
@@ -132,7 +133,13 @@ export default class MendixReactDnD extends Component {
 
     calculateRotationDegree(item, positionData) {
         const rotateX = positionData.dX + item.offsetX;
-        const rotationDegree = Math.round(this.R2D * Math.atan2(positionData.dY, rotateX));
+        let rotationDegree = Math.round(this.R2D * Math.atan2(positionData.dY, rotateX));
+        const { snapToRotate, rotationDragDegrees } = this.props;
+        const snapToRotateValue = snapToRotate ? !!snapToRotate.value : false;
+        const rotationDragDegreesValue = rotationDragDegrees?.value ? Number(rotationDragDegrees.value) : 1;
+        if (snapToRotateValue && rotationDragDegreesValue > 0 && rotationDragDegreesValue < 360) {
+            rotationDegree = snapToRotation(rotationDegree, rotationDragDegreesValue);
+        }
         return rotationDegree;
     }
 

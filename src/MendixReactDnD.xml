@@ -188,6 +188,26 @@
                 <description>Snap to size. Any value less than 5 is ignored</description>
                 <returnType type="Integer" />
             </property>
+            <property key="snapToRotate" type="expression" required="false">
+                <caption>Snap to rotate</caption>
+                <description>When true, rotate along rotation drag degrees.</description>
+                <returnType type="Boolean" />
+            </property>
+            <property key="rotationDragDegrees" type="expression" defaultValue="5">
+                <caption>Rotation drag degrees</caption>
+                <description>Number of degrees to rotate while dragging the rotation handle</description>
+                <returnType type="Integer" />
+            </property>
+            <property key="rotationButtonDegrees" type="expression" defaultValue="90">
+                <caption>Rotation button degrees</caption>
+                <description>Number of degrees to rotate when clicking a rotation button</description>
+                <returnType type="Integer" />
+            </property>
+            <property key="addToCurrentRotation" type="expression" required="false">
+                <caption>Add to rotation</caption>
+                <description>When true, add the rotation button degrees value to the current rotation. When false, rotate to the next or previous value.</description>
+                <returnType type="Boolean" />
+            </property>
         </propertyGroup>
 
         <propertyGroup caption="Events">

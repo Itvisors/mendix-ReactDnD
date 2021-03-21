@@ -10,3 +10,16 @@ export const snapOffsetToGrid = (offset, gridSize) => {
         return offset - mod + gridSize;
     }
 };
+
+export const snapToRotation = (rotationDegree, rotationDragDegrees) => {
+    const mod = rotationDegree % rotationDragDegrees;
+    if (mod === 0) {
+        return rotationDegree;
+    }
+    const halfWay = rotationDragDegrees / 2;
+    if (mod < halfWay) {
+        return rotationDegree - mod;
+    } else {
+        return rotationDegree - mod + rotationDragDegrees;
+    }
+};
