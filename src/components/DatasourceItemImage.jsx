@@ -45,6 +45,8 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         const style = {};
         if (imageRotationValue !== 0) {
             style.transform = "rotate(" + imageRotationValue + "deg)";
+            // Set transform origin to the center of the image for proper rotation. Otherwise, the rotation handle would be included as well.
+            style.transformOrigin = Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
         }
         return (
             <div className="item-image-rotation-container" style={style}>
