@@ -110,7 +110,7 @@
                         </property>
                         <property key="dsAdjustOffsetOnDrop" type="expression" dataSource="ds" required="false">
                             <caption>Adjust drop offset</caption>
-                            <description>When dropping an image from a palette that is not scaled onto a canvas that can scale, set this to true to adjust the drop offset for the zomm percentage.</description>
+                            <description>When dropping an image from a palette that is not scaled onto a canvas that can scale, set this to true to adjust the drop offset for the zoom percentage.</description>
                             <returnType type="Boolean" />
                         </property>
                         <property key="dsImageRotation" type="attribute" dataSource="ds" required="false">
