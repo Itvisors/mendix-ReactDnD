@@ -36,24 +36,29 @@ Take the sample project as a starting point!
 ## The context object
 All event handling is done by setting values on the context object.
 
-| Attribute           | Type        | Drop | Drop with position | Remarks
-|---------------------|-------------|:----:|:------------------:|---------
-| Container ID        | Enumeration | Req. | Req.               | Container ID of the dragged item
-| Client X            | Integer     |      | Req.               | Client (mouse) X position for the event.
-| Client Y            | Integer     |      | Req.               | Client (mouse) Y position for the event.
-| Offset X            | Integer     |      | Req.               | Offset X position for the event. Relative from the element.
-| Offset Y            | Integer     |      | Req.               | Offset Y position for the event. Relative from the element.
-| Object GUID         | String      | Req. | Req.               | When an object was clicked or dragged, contains the GUID of the dragged object
-| Drop target ID      | Enumeration | Req. | Req.               | When an object was dragged onto another object, contains the container ID of the drop target
-| GUID of drop target | String      | Req. | Req.               | When an object was dragged onto another object, contains the GUID of the drop target
-| New rotation        | Integer     |      | Req.               | New rotation for the object. Required when allowing users to rotate items.
-| On click action     | Action      |      | Opt.               | Action to call after an item was clicked. See below.
-| On drop action      | Action      | Req. | Req.               | Action to call after an item was dropped.
-| On rotate action    | Action      |      | Opt.               | On rotate action. Required when allowing users to rotate items.
-| Zoom %              | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
-| Adjust offset       | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
-| Snap to grid        | Boolean     |      |                    | Snap to grid while dragging
-| Snap to size        | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
+| Attribute            | Type        | Drop | Drop with position | Remarks
+|----------------------|-------------|:----:|:------------------:|---------
+| Container ID         | Enumeration | Req. | Req.               | Container ID of the dragged item
+| Client X             | Integer     |      | Req.               | Client (mouse) X position for the event.
+| Client Y             | Integer     |      | Req.               | Client (mouse) Y position for the event.
+| Offset X             | Integer     |      | Req.               | Offset X position for the event. Relative from the element.
+| Offset Y             | Integer     |      | Req.               | Offset Y position for the event. Relative from the element.
+| Dragged difference X | Integer     |      | Opt.               | Dragged difference for the X offset.
+| Dragged difference Y | Integer     |      | Opt.               | Dragged difference for the Y offset.
+| Object GUID          | String      | Req. | Req.               | When an object was clicked or dragged, contains the GUID of the dragged object
+| Drop target ID       | Enumeration | Req. | Req.               | When an object was dragged onto another object, contains the container ID of the drop target
+| GUID of drop target  | String      | Req. | Req.               | When an object was dragged onto another object, contains the GUID of the drop target
+| New rotation         | Integer     |      | Req.               | New rotation for the object. Required when allowing users to rotate items.
+| On click action      | Action      |      | Opt.               | Action to call after an item was clicked. See below.
+| On drop action       | Action      | Req. | Req.               | Action to call after an item was dropped.
+| On rotate action     | Action      |      | Opt.               | On rotate action. Required when allowing users to rotate items.
+| Zoom %               | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
+| Adjust offset        | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
+| Snap to grid         | Boolean     |      |                    | Snap to grid while dragging
+| Snap to size         | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
+
+### Dragged difference
+When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself. Note that these attributes will only be updated after dragging a marker that has related markers.
 
 ## Return on click events?
 Returning on click events from the widget only makes sense when positioning items on a background. When dropping without position, a container with an onClick action is easier. The on click event of the widget allows you to capture the exact click coordinate on the container.
@@ -79,6 +84,13 @@ The widget allows you to choose where to put each container by setting a row and
 | Data source         |             | Y    | The datasource for the item(s) in the container.
 | Content             |             | Y    | The content to render for each item. Optional! The widget can render images, see below
 | Name                | String      |      | Name attribute. When set, will render a data-name attribute with the value on the item element.
+| Child IDs           | String      |      | See below
+
+#### Child IDs
+Datasource items can be linked to a parent item. When dragging the parent, any child items will move along too.
+Note that an item ID is not just the GUID! 
+
+Item ID: `<ContainerID>_<Item GUID>` 
 
 ### Rendering items as an image
 The widget can render items as image, allowing the user to rotate the image. Optionally, the image can resize along with the zoom percentage or keep its size. Examples: A marker on a floorplan should probably not scale so it remains visible when zooming out. Furniture placed on the floorplan should scale with the zoom percentage.

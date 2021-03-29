@@ -4,11 +4,12 @@ import { createElement } from "react";
 import { snapOffsetToGrid } from "../utils/Utils";
 import { useDragLayer } from "react-dnd";
 
-export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToGrid, snapToSize }) {
-    const { itemType, isDragging, item, currentOffset } = useDragLayer(monitor => ({
+export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToGrid, snapToSize, onDragging }) {
+    const { itemType, isDragging, item, currentOffset, differenceFromInitialOffset } = useDragLayer(monitor => ({
         item: monitor.getItem(),
         itemType: monitor.getItemType(),
         currentOffset: monitor.getSourceClientOffset(),
+        differenceFromInitialOffset: monitor.getDifferenceFromInitialOffset(),
         isDragging: monitor.isDragging()
     }));
 
@@ -29,6 +30,9 @@ export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToG
     if (snapToSize >= 5 && snapToGrid) {
         dragX = snapOffsetToGrid(dragX, snapToSize);
         dragY = snapOffsetToGrid(dragY, snapToSize);
+    }
+    if (onDragging) {
+        onDragging(itemType, item.id, differenceFromInitialOffset);
     }
     const { itemWidth, itemHeight } = item;
     const style = {
