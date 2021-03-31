@@ -1,4 +1,5 @@
 import { createElement, useEffect, useRef, useState } from "react";
+import { calculateZoomFactor } from "../utils/Utils";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
@@ -75,10 +76,7 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
 
     const style = {};
     if (offsetX && offsetX.value && offsetY && offsetY.value) {
-        let zoomFactor = 1;
-        if (zoomPercentage && zoomPercentage.status === "available" && zoomPercentage.value) {
-            zoomFactor = zoomPercentage.value / 100;
-        }
+        const zoomFactor = calculateZoomFactor(zoomPercentage, true);
         // If the drop position has not yet been updated in the datasource, use the pending drop position values.
         const offsetValueX = dropPos ? dropPos.x : Number(offsetX.value);
         const offsetValueY = dropPos ? dropPos.y : Number(offsetY.value);

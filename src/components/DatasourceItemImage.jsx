@@ -1,6 +1,7 @@
 /*global mx */
 import { Grid } from "./Grid";
 import { RotationHandle } from "./RotationHandle";
+import { calculateZoomFactor } from "../utils/Utils";
 import { createElement } from "react";
 
 export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree, zoomPercentage }) {
@@ -76,17 +77,6 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
 function renderImage(imageUrl, imageHeightValue, imageWidthValue) {
     const uri = getUri(imageUrl);
     return <img className="item-image" src={uri} style={{ width: imageWidthValue, height: imageHeightValue }} />;
-}
-
-function calculateZoomFactor(zoomPercentage, scaleImage) {
-    if (!scaleImage) {
-        return 1;
-    }
-    if (!zoomPercentage || zoomPercentage.status !== "available" || !zoomPercentage.value) {
-        return 1;
-    }
-    const zoomFactor = zoomPercentage.value / 100;
-    return zoomFactor;
 }
 
 function getImageRotation(draggedRotationDegree, imageRotation) {

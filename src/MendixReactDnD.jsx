@@ -9,7 +9,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
-import { snapToRotation } from "./utils/Utils";
+import { calculateSnapToSize, calculateZoomFactor, snapToRotation } from "./utils/Utils";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
@@ -80,8 +80,8 @@ export default class MendixReactDnD extends Component {
             return null;
         }
 
-        const { snapToGrid, snapToSize, onDragStatusInterval } = this.props;
-        const snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
+        const { snapToGrid, snapToSize, onDragStatusInterval, zoomPercentage } = this.props;
+        const snapToSizeValue = calculateSnapToSize(snapToSize, zoomPercentage);
 
         // Take the value for the on drag status interval only the first time the widget is rendered.
         if (this.onDragStatusIntervalValue === -1) {
@@ -250,7 +250,7 @@ export default class MendixReactDnD extends Component {
         const { containerID, dragDropType } = cellContainer;
         const { snapToSize, snapToGrid, zoomPercentage } = this.props;
 
-        const snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
+        const snapToSizeValue = calculateSnapToSize(snapToSize, zoomPercentage);
 
         const itemKey = containerID.value + "_" + item.id;
         // Add the item to the map for use in the custom drag layer
@@ -343,7 +343,7 @@ export default class MendixReactDnD extends Component {
         if (this.state.dropWithOffset) {
             // console.info("handleDrop: store drop data in state for position info");
             // Adjust offset values for zoom factor.
-            const zoomFactor = this.calculateZoomFactor(zoomPercentage);
+            const zoomFactor = calculateZoomFactor(zoomPercentage, true);
             this.setState({
                 dropStatus: this.DROP_STATUS_DROPPED,
                 dropClientX: Math.round(positionData.dropOffsetX / zoomFactor),
@@ -365,7 +365,7 @@ export default class MendixReactDnD extends Component {
         let offsetY = positionData.dropOffsetY;
         if (adjustOffset && adjustOffset.value) {
             // Adjust offset values for zoom factor.
-            const zoomFactor = this.calculateZoomFactor(zoomPercentage);
+            const zoomFactor = calculateZoomFactor(zoomPercentage, true);
             offsetX = Math.round(offsetX / zoomFactor);
             offsetY = Math.round(offsetY / zoomFactor);
             // Adjust offset on drop when requested.
@@ -563,7 +563,7 @@ export default class MendixReactDnD extends Component {
             }
             if (adjustOffset && adjustOffset.value) {
                 // Adjust offset values for zoom factor.
-                const zoomFactor = this.calculateZoomFactor(zoomPercentage);
+                const zoomFactor = calculateZoomFactor(zoomPercentage, true);
                 if (eventOffsetX) {
                     eventOffsetX.setTextValue("" + Math.round(offsetX / zoomFactor));
                 }
@@ -584,14 +584,6 @@ export default class MendixReactDnD extends Component {
         } else {
             // console.info("MendixReactDnD Ignored onClick on " + containerID.value);
         }
-    }
-
-    calculateZoomFactor(zoomPercentage) {
-        if (!zoomPercentage || zoomPercentage.status !== "available" || !zoomPercentage.value) {
-            return 1;
-        }
-        const zoomFactor = zoomPercentage.value / 100;
-        return zoomFactor;
     }
 
     sortContainers() {
