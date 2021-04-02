@@ -194,6 +194,8 @@ Note that an item ID is not just the GUID!
 
 Item ID: `<ContainerID>_<Item GUID>` 
 
+The demo project has an export mapping available to create the JSON data, you can of course also just piece it together as a string, choose what suits you best.
+
 ## The custom drag layer 
 The custom drag layer is a layer above the normal render layer. Nothing fancy, just a div with a z-index spanning the viewport.
 

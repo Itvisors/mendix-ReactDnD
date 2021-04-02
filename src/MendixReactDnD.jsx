@@ -48,6 +48,7 @@ export default class MendixReactDnD extends Component {
 
     containerMap = new Map();
     itemMap = new Map();
+    additionalMarkerClassMap = new Map();
 
     // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
     onDragStatusMillis = 0;
@@ -166,6 +167,9 @@ export default class MendixReactDnD extends Component {
         this.containerMap.clear();
         this.itemMap.clear();
 
+        // Load the additional marker class data into the map
+        this.loadAdditionalMarkerClassMap();
+
         // Sort the containers on row/column.
         const containerListSorted = this.sortContainers();
         // Build a map of container to use in the custom drag layer
@@ -181,6 +185,24 @@ export default class MendixReactDnD extends Component {
             rowArray.push(this.renderRow(containerListSorted, rowNumber));
         }
         return rowArray;
+    }
+
+    loadAdditionalMarkerClassMap() {
+        this.additionalMarkerClassMap.clear();
+        const { additionalMarkerClassData } = this.props;
+
+        if (
+            !additionalMarkerClassData ||
+            additionalMarkerClassData.status !== "available" ||
+            !additionalMarkerClassData.value
+        ) {
+            return;
+        }
+
+        const additionalMarkerClassArray = JSON.parse(additionalMarkerClassData.value);
+        for (const arrayItem of additionalMarkerClassArray) {
+            this.additionalMarkerClassMap.set(arrayItem.itemID, arrayItem.classes);
+        }
     }
 
     renderRow(containerList, rowNumber) {
@@ -504,7 +526,7 @@ export default class MendixReactDnD extends Component {
 
     renderDatasourceItem(cellContainer, item) {
         const { zoomPercentage } = this.props;
-        const { dsImageRotation } = cellContainer;
+        const { containerID, dsImageRotation } = cellContainer;
 
         let draggedRotationDegree = 0;
         // Use rotation degree if ID matches, rotateItemID is null if nothing is being rotated now.
@@ -525,6 +547,8 @@ export default class MendixReactDnD extends Component {
             }
         }
 
+        const itemKey = containerID.value + "_" + item.id;
+
         return (
             <DatasourceItem
                 key={item.id}
@@ -532,6 +556,7 @@ export default class MendixReactDnD extends Component {
                 item={item}
                 draggedRotationDegree={draggedRotationDegree}
                 zoomPercentage={zoomPercentage}
+                additionalMarkerClasses={this.additionalMarkerClassMap.get(itemKey)}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
             />
         );

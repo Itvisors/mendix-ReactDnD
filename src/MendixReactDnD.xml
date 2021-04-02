@@ -324,15 +324,13 @@
         </propertyGroup>
 
         <propertyGroup caption="Styling">
-            <propertyGroup caption="Additional marker classes">
-                <property key="additionalMarkerClass" type="attribute" required="false">
-                    <caption>Marker class JSON</caption>
-                    <description>JSON string that contains an array of elements. See documentation for more details</description>
-                    <attributeTypes>
-                        <attributeType name="String" />
-                    </attributeTypes>
-                </property>
-            </propertyGroup>
+            <property key="additionalMarkerClassData" type="attribute" required="false">
+                <caption>Marker class JSON</caption>
+                <description>JSON string that contains an array of elements. See documentation for more details</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
         </propertyGroup>
     </properties>
 </widget>
