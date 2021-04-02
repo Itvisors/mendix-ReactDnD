@@ -462,9 +462,12 @@ export default class MendixReactDnD extends Component {
         if (interval > this.onDragStatusIntervalValue) {
             this.onDragStatusMillis = millisNow;
             if (this.state.childIDs) {
+                const { zoomPercentage } = this.props;
+                // Adjust for zoomfactor
+                const zoomFactor = calculateZoomFactor(zoomPercentage, true);
                 this.setState({
-                    draggedDifferenceX: differenceFromInitialOffset.x,
-                    draggedDifferenceY: differenceFromInitialOffset.y
+                    draggedDifferenceX: Math.round(differenceFromInitialOffset.x / zoomFactor),
+                    draggedDifferenceY: Math.round(differenceFromInitialOffset.y / zoomFactor)
                 });
             }
         }
