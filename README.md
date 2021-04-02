@@ -69,9 +69,9 @@ Returning on click events from the widget only makes sense when positioning item
 ## Inspecting the contents
 Because the widget captures right-click events, inspecting an element by right-clicking it no longer works. The browser inspector can also directly inspect elements. The example is for Chrome. The little arrow icon in the top left of the inspector pane allows you to target elements on the page.
 
-![Inspect element 1](/doc-images/InspectElement1.png "Inspect element 1")
+![Inspect element 1](/doc-images/InspectElement1.jpg "Inspect element 1")
 
-![Inspect element 2](/doc-images/InspectElement2.png "Inspect element 2")
+![Inspect element 2](/doc-images/InspectElement2.jpg "Inspect element 2")
 
 
 ## Containers
