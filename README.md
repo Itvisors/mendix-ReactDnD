@@ -66,6 +66,14 @@ When dragging a parent marker, you will need to adjust any related markers as we
 ## Return on click events?
 Returning on click events from the widget only makes sense when positioning items on a background. When dropping without position, a container with an onClick action is easier. The on click event of the widget allows you to capture the exact click coordinate on the container.
 
+## Inspecting the contents
+Because the widget captures right-click events, inspecting an element by right-clicking it no longer works. The browser inspector can also directly inspect elements. The example is for Chrome. The little arrow icon in the top left of the inspector pane allows you to target elements on the page.
+
+![Inspect element 1](/doc-images/InspectElement1.png "Inspect element 1")
+
+![Inspect element 2](/doc-images/InspectElement2.png "Inspect element 2")
+
+
 ## Containers
 The widget allows you to choose where to put each container by setting a row and column number. The result is a grid with your containers. Note that the widget does not contain additional empty cells when you leave gaps in the column numbers. Note that it is perfectly fine to place multiple containers in the same row/column combination. This also allows a header and the list to be styled as one.
 
