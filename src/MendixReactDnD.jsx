@@ -610,6 +610,12 @@ export default class MendixReactDnD extends Component {
                 altKeyHeld.setValue(evt.altKey);
             }
 
+            // Indicate whether this is a right click event. The button value is zero for normal click.
+            const { isRightClickEvent } = this.props;
+            if (isRightClickEvent) {
+                isRightClickEvent.setValue(evt.button !== 0);
+            }
+
             // Call the action
             const { onClickAction } = this.props;
             if (onClickAction && onClickAction.canExecute && !onClickAction.isExecuting) {

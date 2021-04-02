@@ -320,6 +320,13 @@
                     <attributeType name="Boolean" />
                 </attributeTypes>
             </property>
+            <property key="isRightClickEvent" type="attribute" required="false">
+                <caption>Is right click</caption>
+                <description>Optional. Whether the user used the right mouse button for the click.</description>
+                <attributeTypes>
+                    <attributeType name="Boolean" />
+                </attributeTypes>
+            </property>
         </propertyGroup>
 
         <propertyGroup caption="Events">

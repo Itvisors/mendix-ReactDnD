@@ -45,6 +45,7 @@ export class DatasourceItem extends Component {
                 ref={this.itemDivRef}
                 className={className}
                 onClick={this.onClick}
+                onContextMenu={this.onClick}
                 data-Name={hasNameValue && nameValue.value}
             >
                 <DatasourceItemImage
@@ -62,6 +63,7 @@ export class DatasourceItem extends Component {
         // Persist the event or it will be nullified and reused.
         evt.persist();
         // Prevent other click handlers, like parent containers from receiving the event.
+        evt.preventDefault();
         evt.stopPropagation();
         // Calculate offset from item position.
         const rect = this.itemDivRef.current.getBoundingClientRect();
