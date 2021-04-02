@@ -175,6 +175,25 @@ The elements and classes involved that you can overrule to apply styling:
 |                        | draggableItem           | Added if draggable
 |                        | dropTarget              | Added if drop target
 
+### Additional marker classes
+When you want to put additional classes on a marker, without actually updating it, you can use this feature. For example to change the styling when the user clicks an item, to indicate it is selected. The value of the property is a JSON array as a string:
+```
+[
+    {
+        "itemID": "<itemID1>",
+        "classes": "myspecialclass"
+    },
+    {
+        "itemID": "<itemID2>",
+        "classes": "myspecialclass otherclass"
+    }
+]
+```
+Separate multiple clases using a space.
+Note that an item ID is not just the GUID! 
+
+Item ID: `<ContainerID>_<Item GUID>` 
+
 ## The custom drag layer 
 The custom drag layer is a layer above the normal render layer. Nothing fancy, just a div with a z-index spanning the viewport.
 

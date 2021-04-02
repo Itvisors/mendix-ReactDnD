@@ -66,6 +66,13 @@
                                 <attributeType name="String" />
                             </attributeTypes>
                         </property>
+                        <property key="dsMarkerClassAttribute" type="attribute" dataSource="ds" required="false">
+                            <caption>Marker class</caption>
+                            <description>Optional, value will be added to the CSS class of the marker.</description>
+                            <attributeTypes>
+                                <attributeType name="String" />
+                            </attributeTypes>
+                        </property>
                         <property key="dsChildIDs" type="attribute" dataSource="ds" required="false">
                             <caption>Child IDs</caption>
                             <description>Optional. Comma separated list of item IDs that are related to the datasource item. Item ID: ContainerID_ItemGUID. See documentation for more details</description>
@@ -221,7 +228,7 @@
             </property>
         </propertyGroup>
 
-        <propertyGroup caption="Events">
+        <propertyGroup caption="Event data">
             <property key="eventContainerID" type="attribute">
                 <caption>Container ID</caption>
                 <description>Container ID of the dragged item</description>
@@ -299,6 +306,9 @@
                     <attributeType name="Integer" />
                 </attributeTypes>
             </property>
+        </propertyGroup>
+
+        <propertyGroup caption="Events">
             <property key="onClickAction" type="action" required="false">
                 <caption>On click action</caption>
                 <description></description>
@@ -311,6 +321,18 @@
                 <caption>On rotate action</caption>
                 <description>Optional. On rotate action. Required when allowing users to rotate items.</description>
             </property>
+        </propertyGroup>
+
+        <propertyGroup caption="Styling">
+            <propertyGroup caption="Additional marker classes">
+                <property key="additionalMarkerClass" type="attribute" required="false">
+                    <caption>Marker class JSON</caption>
+                    <description>JSON string that contains an array of elements. See documentation for more details</description>
+                    <attributeTypes>
+                        <attributeType name="String" />
+                    </attributeTypes>
+                </property>
+            </propertyGroup>
         </propertyGroup>
     </properties>
 </widget>
