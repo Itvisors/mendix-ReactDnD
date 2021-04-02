@@ -564,28 +564,24 @@ export default class MendixReactDnD extends Component {
 
     handleClick(container, item, evt, offsetX, offsetY) {
         const { containerID, returnOnClick } = container;
-        const {
-            adjustOffset,
-            eventContainerID,
-            eventGuid,
-            eventClientX,
-            eventClientY,
-            eventOffsetX,
-            eventOffsetY,
-            onClickAction,
-            zoomPercentage
-        } = this.props;
+        const { eventContainerID, eventGuid } = this.props;
         if (returnOnClick && returnOnClick.value) {
             // console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
             // console.dir(evt);
             eventContainerID.setValue(containerID.value);
             eventGuid.setTextValue(item.id);
+
+            // Client position
+            const { eventClientX, eventClientY } = this.props;
             if (eventClientX) {
                 eventClientX.setTextValue("" + Math.round(evt.clientX));
             }
             if (eventClientY) {
                 eventClientY.setTextValue("" + Math.round(evt.clientY));
             }
+
+            // Offset
+            const { adjustOffset, eventOffsetX, eventOffsetY, zoomPercentage } = this.props;
             if (adjustOffset && adjustOffset.value) {
                 // Adjust offset values for zoom factor.
                 const zoomFactor = calculateZoomFactor(zoomPercentage, true);
@@ -603,6 +599,19 @@ export default class MendixReactDnD extends Component {
                     eventOffsetY.setTextValue("" + offsetY);
                 }
             }
+
+            // Pass the state of the alt and ctrl keys, if requested
+            const { ctrlKeyHeld } = this.props;
+            if (ctrlKeyHeld) {
+                ctrlKeyHeld.setValue(evt.ctrlKey);
+            }
+            const { altKeyHeld } = this.props;
+            if (altKeyHeld) {
+                altKeyHeld.setValue(evt.altKey);
+            }
+
+            // Call the action
+            const { onClickAction } = this.props;
             if (onClickAction && onClickAction.canExecute && !onClickAction.isExecuting) {
                 onClickAction.execute();
             }

@@ -56,6 +56,8 @@ All event handling is done by setting values on the context object.
 | Adjust offset        | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
 | Snap to grid         | Boolean     |      |                    | Snap to grid while dragging
 | Snap to size         | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
+| ctrl key             | Boolean     |      |                    | Whether the ctrl key was held during an onclick event. (Not applicable for drop events)
+| alt key              | Boolean     |      |                    | Whether the alt key was held during an onclick event. (Not applicable for drop events)
 
 ### Dragged difference
 When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself. Note that these attributes will only be updated after dragging a marker that has related markers.

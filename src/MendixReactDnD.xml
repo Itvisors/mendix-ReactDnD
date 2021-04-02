@@ -306,6 +306,20 @@
                     <attributeType name="Integer" />
                 </attributeTypes>
             </property>
+            <property key="ctrlKeyHeld" type="attribute" required="false">
+                <caption>ctrl key</caption>
+                <description>Optional. Whether the ctrl key was held during the click.</description>
+                <attributeTypes>
+                    <attributeType name="Boolean" />
+                </attributeTypes>
+            </property>
+            <property key="altKeyHeld" type="attribute" required="false">
+                <caption>alt key</caption>
+                <description>Optional. Whether the alt key was held during the click.</description>
+                <attributeTypes>
+                    <attributeType name="Boolean" />
+                </attributeTypes>
+            </property>
         </propertyGroup>
 
         <propertyGroup caption="Events">
