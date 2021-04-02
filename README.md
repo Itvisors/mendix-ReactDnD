@@ -56,6 +56,7 @@ All event handling is done by setting values on the context object.
 | Adjust offset        | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
 | Snap to grid         | Boolean     |      |                    | Snap to grid while dragging
 | Snap to size         | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
+| shift key            | Boolean     |      |                    | Whether the shift key was held during an onclick event. (Not applicable for drop events)
 | ctrl key             | Boolean     |      |                    | Whether the ctrl key was held during an onclick event. (Not applicable for drop events)
 | alt key              | Boolean     |      |                    | Whether the alt key was held during an onclick event. (Not applicable for drop events)
 | Is right click       | Boolean     |      |                    | Whether the click event is a right click. (Not applicable for drop events)

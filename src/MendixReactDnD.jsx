@@ -600,7 +600,11 @@ export default class MendixReactDnD extends Component {
                 }
             }
 
-            // Pass the state of the alt and ctrl keys, if requested
+            // Pass the state of the shift, ctrl and alt keys, if requested
+            const { shiftKeyHeld } = this.props;
+            if (shiftKeyHeld) {
+                shiftKeyHeld.setValue(evt.shiftKey);
+            }
             const { ctrlKeyHeld } = this.props;
             if (ctrlKeyHeld) {
                 ctrlKeyHeld.setValue(evt.ctrlKey);
