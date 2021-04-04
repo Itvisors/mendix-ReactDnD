@@ -57,7 +57,6 @@ div.droptarget-container.droptarget-invalid {
 
 div.item-image-rotation-container {
     display: flex;
-    align-items: center;
     padding-right: 14px;
 }
 
@@ -76,6 +75,7 @@ div.item-image-rotation-container:hover {
 
 div.item-image-rotation-container:hover div.item-image-rotation-handle {
     display: block;
+    align-self: center;
 }
 
 img.item-image {
