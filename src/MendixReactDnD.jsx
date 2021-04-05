@@ -561,6 +561,7 @@ export default class MendixReactDnD extends Component {
                 zoomPercentage={zoomPercentage}
                 additionalMarkerClasses={this.additionalMarkerClassMap.get(itemKey)}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
+                onRotateClick={rotatedForward => this.handleRotateClick(rotatedForward, cellContainer, item)}
             />
         );
     }
@@ -630,6 +631,68 @@ export default class MendixReactDnD extends Component {
             }
         } else {
             // console.info("MendixReactDnD Ignored onClick on " + containerID.value);
+        }
+    }
+
+    handleRotateClick(rotatedForward, container, item) {
+        const { containerID, dsImageRotation } = container;
+        const {
+            eventContainerID,
+            eventGuid,
+            newRotation,
+            onRotateAction,
+            rotationButtonDegrees,
+            addToCurrentRotation
+        } = this.props;
+        if (newRotation) {
+            // Get current rotation
+            let newRotationDegree = 0;
+            const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
+            if (imageRotation?.value) {
+                newRotationDegree = Number(imageRotation.value);
+            }
+            // Get value for click
+            const rotationButtonDegreesValue = rotationButtonDegrees ? Number(rotationButtonDegrees.value) : 90;
+            // Add to current value?
+            if (addToCurrentRotation?.value) {
+                if (rotatedForward) {
+                    newRotationDegree += rotationButtonDegreesValue;
+                    if (newRotationDegree >= 360) {
+                        newRotationDegree -= 360;
+                    }
+                } else {
+                    newRotationDegree -= rotationButtonDegreesValue;
+                    if (newRotationDegree < 0) {
+                        newRotationDegree += 360;
+                    }
+                }
+            } else {
+                // Snap to the next or previous step
+                const currentRotationSteps = Math.floor(newRotationDegree / rotationButtonDegreesValue);
+                if (rotatedForward) {
+                    newRotationDegree = (currentRotationSteps + 1) * rotationButtonDegreesValue;
+                    if (newRotationDegree >= 360) {
+                        newRotationDegree -= 360;
+                    }
+                } else {
+                    // If current value is not an exact multiple of the step value, round down to the previous step.
+                    // Otherwise, take a full step back.
+                    if (newRotationDegree % rotationButtonDegreesValue > 0) {
+                        newRotationDegree = currentRotationSteps * rotationButtonDegreesValue;
+                    } else {
+                        newRotationDegree = (currentRotationSteps - 1) * rotationButtonDegreesValue;
+                        if (newRotationDegree < 0) {
+                            newRotationDegree += 360;
+                        }
+                    }
+                }
+            }
+            newRotation.setTextValue("" + newRotationDegree);
+            eventContainerID.setValue(containerID.value);
+            eventGuid.setTextValue(item.id);
+            if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
+                onRotateAction.execute();
+            }
         }
     }
 

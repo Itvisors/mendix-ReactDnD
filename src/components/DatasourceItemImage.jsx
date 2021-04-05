@@ -4,7 +4,7 @@ import { RotationHandle } from "./RotationHandle";
 import { calculateZoomFactor } from "../utils/Utils";
 import { createElement } from "react";
 
-export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree, zoomPercentage }) {
+export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree, zoomPercentage, onRotateClick }) {
     const {
         dsImageUrl,
         dsImageHeight,
@@ -52,12 +52,16 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         return (
             <div className="item-image-rotation-container" style={style}>
                 {renderImage(imageUrl, imageHeightValue, imageWidthValue)}
-                <RotationHandle
-                    cellContainer={cellContainer}
-                    offsetX={rotationHandleOffsetX}
-                    imageRotation={Number(imageRotation.value)}
-                    item={item}
-                />
+                <div className="item-image-rotation-controls-container">
+                    <div className="item-image-rotate-back" onClick={() => handleRotateClick(false, onRotateClick)} />
+                    <RotationHandle
+                        cellContainer={cellContainer}
+                        offsetX={rotationHandleOffsetX}
+                        imageRotation={Number(imageRotation.value)}
+                        item={item}
+                    />
+                    <div className="item-image-rotate-forward" onClick={() => handleRotateClick(true, onRotateClick)} />
+                </div>
             </div>
         );
     } else if (showGrid) {
@@ -71,6 +75,13 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         );
     } else {
         return renderImage(imageUrl, imageHeightValue, imageWidthValue);
+    }
+}
+
+function handleRotateClick(rotatedForward, onRotateClick) {
+    // console.info("handleRotateClick: " + rotatedForward);
+    if (onRotateClick) {
+        onRotateClick(rotatedForward);
     }
 }
 
