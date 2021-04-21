@@ -95,6 +95,7 @@ The widget allows you to choose where to put each container by setting a row and
 |---------------------|-------------|:----:|---------
 | Data source         |             | Y    | The datasource for the item(s) in the container.
 | Content             |             | Y    | The content to render for each item. Optional! The widget can render images, see below
+| Disable drag        | Boolean     |      | When dragging is possible, use this to (temporarily) disable dragging of this item.
 | Name                | String      |      | Name attribute. When set, will render a data-name attribute with the value on the item element.
 | Child IDs           | String      |      | See below
 

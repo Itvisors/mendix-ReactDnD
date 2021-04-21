@@ -59,6 +59,11 @@
                             <caption>Content for datasource</caption>
                             <description></description>
                         </property>
+                        <property key="dsDisableDrag" type="expression" dataSource="ds" required="false">
+                            <caption>Disable drag</caption>
+                            <description>Optional. When dragging is possible, use this to (temporarily) disable dragging of this item.</description>
+                            <returnType type="Boolean" />
+                        </property>
                         <property key="dsNameAttribute" type="attribute" dataSource="ds" required="false">
                             <caption>Name</caption>
                             <description>Name attribute. When set, will render a data-name attribute with the value on the item element.</description>

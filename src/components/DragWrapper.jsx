@@ -9,6 +9,7 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
 
     const {
         containerID,
+        dsDisableDrag,
         dsOffsetX,
         dsOffsetY,
         dsImageHeight,
@@ -24,6 +25,7 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
     const imageHeight = dsImageHeight ? dsImageHeight(item).value : undefined;
     const imageWidth = dsImageWidth ? dsImageWidth(item).value : undefined;
     const adjustOffsetOnDrop = dsAdjustOffsetOnDrop ? dsAdjustOffsetOnDrop(item).value : false;
+    const disableDrag = dsDisableDrag ? !!dsDisableDrag(item).value : false;
 
     const startDrag = () => {
         if (onDragStart) {
@@ -49,6 +51,7 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
             itemHeight: elementRect ? elementRect.height : undefined
         },
         begin: startDrag,
+        canDrag: !disableDrag,
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
