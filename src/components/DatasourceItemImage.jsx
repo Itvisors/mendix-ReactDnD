@@ -43,15 +43,9 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
     const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
     if (allowRotate) {
-        const style = {};
-        if (imageRotationValue !== 0) {
-            style.transform = "rotate(" + imageRotationValue + "deg)";
-            // Set transform origin to the center of the image for proper rotation. Otherwise, the rotation handle would be included as well.
-            style.transformOrigin = Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
-        }
         return (
-            <div className="item-image-rotation-container" style={style}>
-                {renderImage(imageUrl, imageHeightValue, imageWidthValue)}
+            <div className="item-image-rotation-container">
+                {renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue)}
                 <div className="item-image-rotation-controls-container">
                     <div className="item-image-rotate-back" onClick={() => handleRotateClick(false, onRotateClick)} />
                     <RotationHandle
@@ -69,12 +63,12 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 5;
         return (
             <div style={{ width: imageWidthValue, height: imageHeightValue }}>
-                {renderImage(imageUrl, imageHeightValue, imageWidthValue)}
+                {renderImage(imageUrl, imageHeightValue, imageWidthValue, 0)}
                 <Grid gridSize={gridSizeValue} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
             </div>
         );
     } else {
-        return renderImage(imageUrl, imageHeightValue, imageWidthValue);
+        return renderImage(imageUrl, imageHeightValue, imageWidthValue, 0);
     }
 }
 
@@ -85,15 +79,24 @@ function handleRotateClick(rotatedForward, onRotateClick) {
     }
 }
 
-function renderImage(imageUrl, imageHeightValue, imageWidthValue) {
+function renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue) {
     const uri = getUri(imageUrl);
-    return <img className="item-image" src={uri} style={{ width: imageWidthValue, height: imageHeightValue }} />;
+    const style = { width: imageWidthValue, height: imageHeightValue };
+    if (imageRotationValue !== 0) {
+        style.transform = "rotate(" + imageRotationValue + "deg)";
+        // Set transform origin to the center of the image for proper rotation.
+        style.transformOrigin = Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
+    }
+
+    return <img className="item-image" src={uri} style={style} />;
 }
 
 function getImageRotation(draggedRotationDegree, imageRotation) {
+    // Just return null if image has no rotation attribute property set.
     if (!imageRotation?.value) {
         return 0;
     }
+    // Return the actual database value plus the current rotation drag value.
     return Number(imageRotation.value) + draggedRotationDegree;
 }
 
