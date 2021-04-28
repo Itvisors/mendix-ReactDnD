@@ -86,7 +86,8 @@ function renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationV
     if (imageRotationValue !== 0) {
         imageContainerStyle.transform = "rotate(" + imageRotationValue + "deg)";
         // Set transform origin to the center of the image for proper rotation.
-        imageContainerStyle.transformOrigin = Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
+        imageContainerStyle.transformOrigin =
+            Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
     }
 
     return (
