@@ -73,6 +73,8 @@ div.item-image-rotation-container:hover div.item-image-rotation-controls-contain
     flex-direction: column;
     justify-content: space-between;
     cursor: default;
+    z-index: 999;
+    background-color: #00000020;
 }
 
 div.item-image-rotate-back {

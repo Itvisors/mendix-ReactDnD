@@ -81,14 +81,19 @@ function handleRotateClick(rotatedForward, onRotateClick) {
 
 function renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue) {
     const uri = getUri(imageUrl);
-    const style = { width: imageWidthValue, height: imageHeightValue };
+    const imageStyle = { width: imageWidthValue, height: imageHeightValue };
+    const imageContainerStyle = {};
     if (imageRotationValue !== 0) {
-        style.transform = "rotate(" + imageRotationValue + "deg)";
+        imageContainerStyle.transform = "rotate(" + imageRotationValue + "deg)";
         // Set transform origin to the center of the image for proper rotation.
-        style.transformOrigin = Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
+        imageContainerStyle.transformOrigin = Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
     }
 
-    return <img className="item-image" src={uri} style={style} />;
+    return (
+        <div className="item-image-container" style={imageContainerStyle}>
+            <img className="item-image" src={uri} style={imageStyle} />
+        </div>
+    );
 }
 
 function getImageRotation(draggedRotationDegree, imageRotation) {
