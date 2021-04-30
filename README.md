@@ -101,9 +101,7 @@ The widget allows you to choose where to put each container by setting a row and
 
 #### Child IDs
 Datasource items can be linked to a parent item. When dragging the parent, any child items will move along too.
-Note that an item ID is not just the GUID! 
-
-Item ID: `<ContainerID>_<Item GUID>` 
+Note that an item ID is just the GUID.
 
 ### Rendering items as an image
 The widget can render items as image, allowing the user to rotate the image. Optionally, the image can resize along with the zoom percentage or keep its size. Examples: A marker on a floorplan should probably not scale so it remains visible when zooming out. Furniture placed on the floorplan should scale with the zoom percentage.
@@ -203,9 +201,7 @@ When you want to put additional classes on a marker, without actually updating i
 ]
 ```
 Separate multiple clases using a space.
-Note that an item ID is not just the GUID! 
-
-Item ID: `<ContainerID>_<Item GUID>` 
+Note that an item ID is just the GUID. So you target any marker for that specific Mendix object. Usually just the one marker of course.
 
 The demo project has an export mapping available to create the JSON data, you can of course also just piece it together as a string, choose what suits you best.
 

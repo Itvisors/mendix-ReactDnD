@@ -286,7 +286,7 @@ export default class MendixReactDnD extends Component {
                         key={item.id}
                         cellContainer={cellContainer}
                         item={item}
-                        dropPos={this.getPendingDropPos(cellContainer, item, itemKey)}
+                        dropPos={this.getPendingDropPos(cellContainer, item)}
                         onDragStart={this.handleDragStart}
                         zoomPercentage={zoomPercentage}
                     >
@@ -324,7 +324,7 @@ export default class MendixReactDnD extends Component {
                             key={item.id}
                             cellContainer={cellContainer}
                             item={item}
-                            dropPos={this.getPendingDropPos(cellContainer, item, itemKey)}
+                            dropPos={this.getPendingDropPos(cellContainer, item)}
                             onDragStart={this.handleDragStart}
                             zoomPercentage={zoomPercentage}
                         >
@@ -473,12 +473,12 @@ export default class MendixReactDnD extends Component {
         }
     }
 
-    getPendingDropPos(cellContainer, item, itemKey) {
+    getPendingDropPos(cellContainer, item) {
         const { dsOffsetX, dsOffsetY } = cellContainer;
         let dropPos = null;
 
         // If the parent of the items is being dragged, reposition the child item as well.
-        if (this.state.dropStatus !== this.DROP_STATUS_NONE && this.state.childIDs?.indexOf(itemKey) >= 0) {
+        if (this.state.dropStatus !== this.DROP_STATUS_NONE && this.state.childIDs?.indexOf(item.id) >= 0) {
             const offsetX = (dsOffsetX ? Number(dsOffsetX(item).value) : 0) + this.state.draggedDifferenceX;
             const offsetY = (dsOffsetY ? Number(dsOffsetY(item).value) : 0) + this.state.draggedDifferenceY;
             dropPos = {
@@ -529,7 +529,7 @@ export default class MendixReactDnD extends Component {
 
     renderDatasourceItem(cellContainer, item) {
         const { zoomPercentage } = this.props;
-        const { containerID, dsImageRotation } = cellContainer;
+        const { dsImageRotation } = cellContainer;
 
         let draggedRotationDegree = 0;
         // Use rotation degree if ID matches, rotateItemID is null if nothing is being rotated now.
@@ -550,8 +550,6 @@ export default class MendixReactDnD extends Component {
             }
         }
 
-        const itemKey = containerID.value + "_" + item.id;
-
         return (
             <DatasourceItem
                 key={item.id}
@@ -559,7 +557,7 @@ export default class MendixReactDnD extends Component {
                 item={item}
                 draggedRotationDegree={draggedRotationDegree}
                 zoomPercentage={zoomPercentage}
-                additionalMarkerClasses={this.additionalMarkerClassMap.get(itemKey)}
+                additionalMarkerClasses={this.additionalMarkerClassMap.get(item.id)}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
                 onRotateClick={rotatedForward => this.handleRotateClick(rotatedForward, cellContainer, item)}
             />
