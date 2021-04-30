@@ -80,7 +80,7 @@
                         </property>
                         <property key="dsChildIDs" type="attribute" dataSource="ds" required="false">
                             <caption>Child IDs</caption>
-                            <description>Optional. Comma separated list of item IDs that are related to the datasource item. Item ID: ContainerID_ItemGUID. See documentation for more details</description>
+                            <description>Optional. Comma separated list of item IDs that are related to the datasource item. Item ID is the GUID of the Mendix object. See documentation for more details</description>
                             <attributeTypes>
                                 <attributeType name="String" />
                             </attributeTypes>
