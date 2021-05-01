@@ -63,12 +63,12 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 5;
         return (
             <div style={{ width: imageWidthValue, height: imageHeightValue }}>
-                {renderImage(imageUrl, imageHeightValue, imageWidthValue, 0)}
+                {renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue)}
                 <Grid gridSize={gridSizeValue} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
             </div>
         );
     } else {
-        return renderImage(imageUrl, imageHeightValue, imageWidthValue, 0);
+        return renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue);
     }
 }
 
