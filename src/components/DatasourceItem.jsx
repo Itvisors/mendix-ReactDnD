@@ -52,9 +52,9 @@ export class DatasourceItem extends Component {
             className += " " + additionalMarkerClasses;
         }
         let style = null;
-        // If the drag/drop type is none and the datasource item has position values, it means the floorplan is shown as view only.
+        // If the drag/drop type is none or drop only and the datasource item has position values, it means the marker is shown as view only.
         // Position the item the same way the drag wrapper does.
-        if (dragDropType === "none") {
+        if (dragDropType === "none" || dragDropType === "drop") {
             const offsetX = dsOffsetX ? dsOffsetX(item) : undefined;
             const offsetY = dsOffsetY ? dsOffsetY(item) : undefined;
             if (offsetX && offsetX.value && offsetY && offsetY.value) {
