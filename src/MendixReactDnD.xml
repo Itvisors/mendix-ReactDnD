@@ -39,6 +39,15 @@
                                 <enumerationValue key="both">Both</enumerationValue>
                             </enumerationValues>
                         </property>
+                        <property key="allowSelection" type="enumeration" defaultValue="none">
+                            <caption>Allow selection</caption>
+                            <description>Whether markers may be selected. The widget keeps track of selected markers.</description>
+                            <enumerationValues>
+                                <enumerationValue key="none">None</enumerationValue>
+                                <enumerationValue key="single">Single</enumerationValue>
+                                <enumerationValue key="multiple">Multiple</enumerationValue>
+                            </enumerationValues>
+                        </property>
                         <property key="returnOnClick" type="expression">
                             <caption>Return OnClick</caption>
                             <description>Whether OnClick events should be returned for the container. Useful for getting the exact click coordinate on the container.</description>
@@ -187,6 +196,13 @@
         </propertyGroup>
 
         <propertyGroup caption="Configuration">
+            <property key="dataChangeDateAttr" type="attribute">
+                <caption>Data change date</caption>
+                <description>Update the date in your logic to make the widget update the table. (Pluggable widgets are rendered VERY often!)</description>
+                <attributeTypes>
+                    <attributeType name="DateTime"/>
+                </attributeTypes>
+            </property>
             <property key="zoomPercentage" type="expression" required="false">
                 <caption>Zoom %</caption>
                 <description>Optional. Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage</description>
@@ -230,6 +246,20 @@
             <property key="onDragStatusInterval" type="integer" defaultValue="100">
                 <caption>On drag status interval</caption>
                 <description>Interval in milliseconds used to update other elements while dragging. Too long and the other elements lag behind or jump along. To short causes too many renders or even a stack overflow or a hanging browser. Any value below 10 is ignored and 100 will be used.</description>
+            </property>
+            <property key="selectedMarkerGuids" type="attribute" required="false">
+                <caption>Selected marker GUIDs</caption>
+                <description>The selected marker(s). Comma separated list of GUIDs.</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+            <property key="selectedMarkerCount" type="attribute" required="false">
+                <caption>Selected marker count</caption>
+                <description>Optional. Number of selected markers. Only relevant when multiselect of markers is allowed at one or more containers.</description>
+                <attributeTypes>
+                    <attributeType name="Integer" />
+                </attributeTypes>
             </property>
         </propertyGroup>
 
@@ -363,6 +393,15 @@
                 <attributeTypes>
                     <attributeType name="String" />
                 </attributeTypes>
+            </property>
+            <property key="selectedMarkerClass" type="string" defaultValue="selectedItem">
+                <caption>Selected marker class</caption>
+                <description>Class to place on the selected marker(s)</description>
+            </property>
+            <property key="selectedMarkerBorderSize" type="expression" defaultValue="2">
+                <caption>Selected marker border width</caption>
+                <description>Width of border on selected marker class. Adjust to match used CSS.</description>
+                <returnType type="Integer" />
             </property>
         </propertyGroup>
     </properties>

@@ -4,7 +4,15 @@ import { RotationHandle } from "./RotationHandle";
 import { calculateZoomFactor } from "../utils/Utils";
 import { createElement } from "react";
 
-export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree, zoomPercentage, onRotateClick }) {
+export function DatasourceItemImage({
+    cellContainer,
+    item,
+    draggedRotationDegree,
+    zoomPercentage,
+    isSelected,
+    selectedMarkerBorderSize,
+    onRotateClick
+}) {
     const {
         dsImageUrl,
         dsImageHeight,
@@ -37,8 +45,12 @@ export function DatasourceItemImage({ cellContainer, item, draggedRotationDegree
         return null;
     }
     const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
-    const imageWidthValue = Math.round(Number(imageWidth.value) * zoomFactor);
-    const imageHeightValue = Math.round(Number(imageHeight.value) * zoomFactor);
+    let imageWidthValue = Math.round(Number(imageWidth.value) * zoomFactor);
+    let imageHeightValue = Math.round(Number(imageHeight.value) * zoomFactor);
+    if (isSelected) {
+        imageWidthValue += selectedMarkerBorderSize * 2;
+        imageHeightValue += selectedMarkerBorderSize * 2;
+    }
     const imageRotationValue = getImageRotation(draggedRotationDegree, imageRotation);
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
     const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
@@ -79,15 +91,25 @@ function handleRotateClick(rotatedForward, onRotateClick) {
     }
 }
 
-function renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue) {
+function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelected, selectedMarkerBorderSize) {
     const uri = getUri(imageUrl);
-    const imageStyle = { width: imageWidthValue, height: imageHeightValue };
-    const imageContainerStyle = {};
-    if (imageRotationValue !== 0) {
-        imageContainerStyle.transform = "rotate(" + imageRotationValue + "deg)";
+    const imageStyle = {
+        width: imageWidth,
+        height: imageHeight
+    };
+    // Dimensions of the container will be the same as the image, unless it is selected, then add the border size twice. (Top/left or left/right)
+    const containerWidth = isSelected ? imageWidth + selectedMarkerBorderSize * 2 : imageWidth;
+    const containerHeight = isSelected ? imageHeight + selectedMarkerBorderSize * 2 : imageHeight;
+    const imageContainerStyle = {
+        width: containerWidth,
+        height: containerHeight
+    };
+    if (imageRotation !== 0) {
+        imageContainerStyle.transform = "rotate(" + imageRotation + "deg)";
         // Set transform origin to the center of the image for proper rotation.
-        imageContainerStyle.transformOrigin =
-            Math.round(imageWidthValue / 2) + "px " + Math.round(imageHeightValue / 2) + "px";
+        const transformOriginX = Math.round(containerWidth / 2);
+        const transformOriginY = Math.round(containerHeight / 2);
+        imageContainerStyle.transformOrigin = transformOriginX + "px " + transformOriginY + "px";
     }
 
     return (

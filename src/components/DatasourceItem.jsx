@@ -14,9 +14,12 @@ export class DatasourceItem extends Component {
         const {
             cellContainer,
             item,
+            isSelected,
             draggedRotationDegree,
             zoomPercentage,
             additionalMarkerClasses,
+            selectedMarkerClass,
+            selectedMarkerBorderSize,
             onRotateClick
         } = this.props;
         const {
@@ -41,6 +44,9 @@ export class DatasourceItem extends Component {
         }
         if (returnOnClick) {
             className += " clickableItem";
+        }
+        if (isSelected) {
+            className += " " + selectedMarkerClass;
         }
         if (dsMarkerClassAttribute) {
             const markerClass = dsMarkerClassAttribute(item)?.value;
@@ -89,6 +95,8 @@ export class DatasourceItem extends Component {
                     item={item}
                     draggedRotationDegree={draggedRotationDegree}
                     zoomPercentage={zoomPercentage}
+                    isSelected={isSelected}
+                    selectedMarkerBorderSize={selectedMarkerBorderSize}
                     onRotateClick={onRotateClick}
                 />
                 {dsContent(item)}

@@ -40,7 +40,8 @@ export default class MendixReactDnD extends Component {
         originalOffsetY: 0,
         draggedDifferenceX: 0,
         draggedDifferenceY: 0,
-        childIDs: null
+        childIDs: null,
+        triggerDate: 0
     };
 
     // Convert from radials to degrees.
@@ -49,6 +50,8 @@ export default class MendixReactDnD extends Component {
     containerMap = new Map();
     itemMap = new Map();
     additionalMarkerClassMap = new Map();
+    selectedIDs = null;
+    previousDataChangeDate = null;
 
     // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
     onDragStatusMillis = 0;
@@ -67,6 +70,7 @@ export default class MendixReactDnD extends Component {
         // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
         if (
             this.isAttributeReadOnly("eventContainerID", this.props.eventContainerID) ||
+            this.isAttributeReadOnly("selectedMarkerGuids", this.props.selectedMarkerGuids) ||
             this.isAttributeReadOnly("eventClientX", this.props.eventClientX) ||
             this.isAttributeReadOnly("eventClientY", this.props.eventClientY) ||
             this.isAttributeReadOnly("eventOffsetX", this.props.eventOffsetX) ||
@@ -78,6 +82,24 @@ export default class MendixReactDnD extends Component {
             this.isAttributeReadOnly("dropTargetGuid", this.props.dropTargetGuid) ||
             this.isAttributeReadOnly("newRotation", this.props.newRotation)
         ) {
+            return null;
+        }
+        const { dataChangeDateAttr } = this.props;
+        if (dataChangeDateAttr?.status !== "available") {
+            return null;
+        }
+        if (dataChangeDateAttr.value) {
+            // Only if the date is different to prevent processing the datasource(s) when the render is only about resizing etc.
+            if (
+                !this.previousDataChangeDate ||
+                dataChangeDateAttr.value?.getTime() !== this.previousDataChangeDate?.getTime()
+            ) {
+                // Store the date, also prevents multiple renders all triggering reload of the data.
+                this.previousDataChangeDate = dataChangeDateAttr.value;
+                this.selectedIDs = this.props.selectedMarkerGuids?.value;
+            }
+        } else {
+            console.error("Data changed date is not set");
             return null;
         }
 
@@ -528,7 +550,6 @@ export default class MendixReactDnD extends Component {
     }
 
     renderDatasourceItem(cellContainer, item) {
-        const { zoomPercentage } = this.props;
         const { dsImageRotation } = cellContainer;
 
         let draggedRotationDegree = 0;
@@ -550,14 +571,20 @@ export default class MendixReactDnD extends Component {
             }
         }
 
+        // Is marker selected?
+        const isSelected = this.selectedIDs ? this.selectedIDs.indexOf(item.id) >= 0 : false;
+
         return (
             <DatasourceItem
                 key={item.id}
                 cellContainer={cellContainer}
                 item={item}
+                isSelected={isSelected}
                 draggedRotationDegree={draggedRotationDegree}
-                zoomPercentage={zoomPercentage}
+                zoomPercentage={this.props.zoomPercentage}
                 additionalMarkerClasses={this.additionalMarkerClassMap.get(item.id)}
+                selectedMarkerClass={this.props.selectedMarkerClass}
+                selectedMarkerBorderSize={this.props.selectedMarkerBorderSize}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
                 onRotateClick={rotatedForward => this.handleRotateClick(rotatedForward, cellContainer, item)}
             />
@@ -565,11 +592,70 @@ export default class MendixReactDnD extends Component {
     }
 
     handleClick(container, item, evt, offsetX, offsetY) {
-        const { containerID, returnOnClick } = container;
+        const { containerID, allowSelection, returnOnClick } = container;
         const { eventContainerID, eventGuid } = this.props;
         if (returnOnClick && returnOnClick.value) {
+            const isRightClick = evt.button !== 0;
             // console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
             // console.dir(evt);
+            // Only select marker if not right-click event
+            if (!isRightClick) {
+                // Add item ID to selected IDs for ctrl-click
+                if (allowSelection === "multiple" && evt.ctrlKey) {
+                    if (this.selectedIDs) {
+                        const idPos = this.selectedIDs.indexOf(item.id);
+                        // Already selected? Then deselect
+                        if (idPos >= 0) {
+                            // Found? Split the selectedIDs string. Return new value
+                            const newSelectedIDs = this.selectedIDs.split(",").reduce((result, id) => {
+                                if (item.id === id) {
+                                    return result;
+                                }
+                                if (result) {
+                                    return result + "," + id;
+                                }
+                                return id;
+                            }, null);
+                            this.selectedIDs = newSelectedIDs;
+                        } else {
+                            this.selectedIDs += "," + item.id;
+                        }
+                    } else {
+                        this.selectedIDs = item.id;
+                    }
+                    this.setState({
+                        triggerDate: new Date().getTime()
+                    });
+                } else {
+                    // Set item as single selected item
+                    if (allowSelection !== "none") {
+                        this.selectedIDs = item.id;
+                        this.setState({
+                            triggerDate: new Date().getTime()
+                        });
+                    } else {
+                        this.selectedIDs = null;
+                        this.setState({
+                            triggerDate: new Date().getTime()
+                        });
+                    }
+                }
+            }
+
+            const { selectedMarkerGuids } = this.props;
+            if (selectedMarkerGuids) {
+                selectedMarkerGuids.setTextValue(this.selectedIDs);
+            }
+
+            const { selectedMarkerCount } = this.props;
+            if (selectedMarkerCount) {
+                if (this.selectedIDs) {
+                    selectedMarkerCount.setTextValue("" + this.selectedIDs.split(",").length);
+                } else {
+                    selectedMarkerCount.setTextValue("0");
+                }
+            }
+
             eventContainerID.setValue(containerID.value);
             eventGuid.setTextValue(item.id);
 
@@ -619,7 +705,7 @@ export default class MendixReactDnD extends Component {
             // Indicate whether this is a right click event. The button value is zero for normal click.
             const { isRightClickEvent } = this.props;
             if (isRightClickEvent) {
-                isRightClickEvent.setValue(evt.button !== 0);
+                isRightClickEvent.setValue(isRightClick);
             }
 
             // Call the action

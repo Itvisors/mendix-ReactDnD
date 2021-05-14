@@ -36,30 +36,38 @@ Take the sample project as a starting point!
 ## The context object
 All event handling is done by setting values on the context object.
 
-| Attribute            | Type        | Drop | Drop with position | Remarks
-|----------------------|-------------|:----:|:------------------:|---------
-| Container ID         | Enumeration | Req. | Req.               | Container ID of the dragged item
-| Client X             | Integer     |      | Req.               | Client (mouse) X position for the event.
-| Client Y             | Integer     |      | Req.               | Client (mouse) Y position for the event.
-| Offset X             | Integer     |      | Req.               | Offset X position for the event. Relative from the element.
-| Offset Y             | Integer     |      | Req.               | Offset Y position for the event. Relative from the element.
-| Dragged difference X | Integer     |      | Opt.               | Dragged difference for the X offset.
-| Dragged difference Y | Integer     |      | Opt.               | Dragged difference for the Y offset.
-| Object GUID          | String      | Req. | Req.               | When an object was clicked or dragged, contains the GUID of the dragged object
-| Drop target ID       | Enumeration | Req. | Req.               | When an object was dragged onto another object, contains the container ID of the drop target
-| GUID of drop target  | String      | Req. | Req.               | When an object was dragged onto another object, contains the GUID of the drop target
-| New rotation         | Integer     |      | Req.               | New rotation for the object. Required when allowing users to rotate items.
-| On click action      | Action      |      | Opt.               | Action to call after an item was clicked. See below.
-| On drop action       | Action      | Req. | Req.               | Action to call after an item was dropped.
-| On rotate action     | Action      |      | Opt.               | On rotate action. Required when allowing users to rotate items.
-| Zoom %               | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
-| Adjust offset        | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
-| Snap to grid         | Boolean     |      |                    | Snap to grid while dragging
-| Snap to size         | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
-| shift key            | Boolean     |      |                    | Whether the shift key was held during an onclick event. (Not applicable for drop events)
-| ctrl key             | Boolean     |      |                    | Whether the ctrl key was held during an onclick event. (Not applicable for drop events)
-| alt key              | Boolean     |      |                    | Whether the alt key was held during an onclick event. (Not applicable for drop events)
-| Is right click       | Boolean     |      |                    | Whether the click event is a right click. (Not applicable for drop events)
+| Attribute             | Type        | Drop | Drop with position | Remarks
+|-----------------------|-------------|:----:|:------------------:|---------
+| Container ID          | Enumeration | Req. | Req.               | Container ID of the dragged item
+| Client X              | Integer     |      | Req.               | Client (mouse) X position for the event.
+| Client Y              | Integer     |      | Req.               | Client (mouse) Y position for the event.
+| Offset X              | Integer     |      | Req.               | Offset X position for the event. Relative from the element.
+| Offset Y              | Integer     |      | Req.               | Offset Y position for the event. Relative from the element.
+| Dragged difference X  | Integer     |      | Opt.               | Dragged difference for the X offset.
+| Dragged difference Y  | Integer     |      | Opt.               | Dragged difference for the Y offset.
+| Object GUID           | String      | Req. | Req.               | When an object was clicked or dragged, contains the GUID of the dragged object
+| Drop target ID        | Enumeration | Req. | Req.               | When an object was dragged onto another object, contains the container ID of the drop target
+| GUID of drop target   | String      | Req. | Req.               | When an object was dragged onto another object, contains the GUID of the drop target
+| New rotation          | Integer     |      | Req.               | New rotation for the object. Required when allowing users to rotate items.
+| On click action       | Action      |      | Opt.               | Action to call after an item was clicked. See below.
+| On drop action        | Action      | Req. | Req.               | Action to call after an item was dropped.
+| On rotate action      | Action      |      | Opt.               | On rotate action. Required when allowing users to rotate items.
+| Data change date      | Date        | Req. | Req.               | Update the date in your logic to make the widget update the table. (Pluggable widgets are rendered VERY often!)
+| Zoom %                | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
+| Adjust offset         | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
+| Snap to grid          | Boolean     |      |                    | Snap to grid while dragging
+| Snap to size          | Integer     |      |                    | Step for the snap to grid feature, can be configured separately from the visible grid size, configured for each container.
+| shift key             | Boolean     |      |                    | Whether the shift key was held during an onclick event. (Not applicable for drop events)
+| ctrl key              | Boolean     |      |                    | Whether the ctrl key was held during an onclick event. (Not applicable for drop events)
+| alt key               | Boolean     |      |                    | Whether the alt key was held during an onclick event. (Not applicable for drop events)
+| Is right click        | Boolean     |      |                    | Whether the click event is a right click. (Not applicable for drop events)
+| Selected marker GUIDs | String      |      |                    | The selected marker(s). Comma separated list of GUIDs.
+| Selected marker count | Integer     |      |                    | Optional. Number of selected markers. Only relevant when multiselect of markers is allowed at one or more containers.
+
+### The Data changed date attribute
+Pluggable widgets are rendered **really** often due to the way React works. Clicking buttons, conditional visibility elsewhere on the page, changing the context object or opening a popup are examples. 
+
+To improve performance, the widget will only reload the data from the datasource when the value of the data changed date attribute changes. So whenever you want the widget to refresh, set the attribute to current date/time in your microflow. When the date did not change, the widget will just render the data loaded in a previous render.
 
 ### Dragged difference
 When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself. Note that these attributes will only be updated after dragging a marker that has related markers.
@@ -86,6 +94,7 @@ The widget allows you to choose where to put each container by setting a row and
 | Row number          | Integer     | Row number, numbering starts at 1
 | Column number       | Integer     | Column number, numbering starts at 1
 | DnD type            | Enumeration | Drag/drop type.
+| Allow selection     | Enumeration | Whether markers may be selected. For single selection, the marker will be selected and the onClick action will be called.
 | Return OnClick      | Boolean     | Whether OnClick events should be returned for the container.
 | Accepts IDs         | String      | For drop targets. The IDs of containers for which items may be dropped onto this container. Usually toString() of an enumeration value you defined earlier. Separate multiple values using a comma (,).
 
@@ -151,6 +160,14 @@ The sample project has an example of positioning items on a floorplan.
 Take care when creating a palette from which the user can drag items onto the floorplan or canvas. If the item on the palette has different dimensions than the item on the floorplan it might not be positioned correctly.
 
 If you allow items to be positioned on top of each other or overlapping in any way, be sure to make the items a drop target as well. Without this, items cannot be dropped close to each other or on top of each other.
+
+### Marker selection
+
+The styling tab has additional options for marker selection, intended only for positioning items on a floorplan.
+
+The selected marker GUIDs attribute can be used to set and get the selected markers.
+
+As the markers are images with a position and size, drawing a border around them affects the layout. The default uses a 2 pixel border, so the border width property is set to 2. This is used when calculating the marker image properties.
 
 ### Snap to grid
 The widget has a snap to grid feature, to prevent the user from having to drag and drop at an exact pixel position.

@@ -32,6 +32,11 @@ ReactDnD widget CSS
     cursor: pointer;
 }
 
+div.selectedItem div.item-image-container {
+    border: 2px solid #48B0F7;
+    border-radius: 2px;
+}
+
 .dragging-container {
     opacity: 0.5;
 }
