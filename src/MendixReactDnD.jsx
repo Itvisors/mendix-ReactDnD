@@ -636,9 +636,13 @@ export default class MendixReactDnD extends Component {
             if (selectedMarkerGuids) {
                 selectedMarkerGuids.setTextValue(newSelectedIDs);
             }
-            this.setState({
-                selectedIDs: newSelectedIDs
-            });
+
+            // If selection is allowed, store selection in state
+            if (allowSelection !== "none") {
+                this.setState({
+                    selectedIDs: newSelectedIDs
+                });
+            }
 
             const { selectedMarkerCount } = this.props;
             if (selectedMarkerCount) {
