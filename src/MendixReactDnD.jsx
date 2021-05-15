@@ -484,7 +484,7 @@ export default class MendixReactDnD extends Component {
         const interval = millisNow - this.onDragStatusMillis;
         if (interval > this.onDragStatusIntervalValue) {
             this.onDragStatusMillis = millisNow;
-            if (this.state.childIDs) {
+            if (this.state.dropWithOffset) {
                 const { zoomPercentage } = this.props;
                 // Adjust for zoomfactor
                 const zoomFactor = calculateZoomFactor(zoomPercentage, true);
@@ -501,13 +501,16 @@ export default class MendixReactDnD extends Component {
         let dropPos = null;
 
         // If the parent of the items is being dragged, reposition the child item as well.
-        if (this.state.dropStatus !== this.DROP_STATUS_NONE && this.state.childIDs?.indexOf(item.id) >= 0) {
-            const offsetX = (dsOffsetX ? Number(dsOffsetX(item).value) : 0) + this.state.draggedDifferenceX;
-            const offsetY = (dsOffsetY ? Number(dsOffsetY(item).value) : 0) + this.state.draggedDifferenceY;
-            dropPos = {
-                x: offsetX,
-                y: offsetY
-            };
+        // When multiple items are being dragged, reposition these as well.
+        if (this.state.dropStatus !== this.DROP_STATUS_NONE) {
+            if (this.state.childIDs?.indexOf(item.id) >= 0 || this.state.selectedIDs?.indexOf(item.id) >= 0) {
+                const offsetX = (dsOffsetX ? Number(dsOffsetX(item).value) : 0) + this.state.draggedDifferenceX;
+                const offsetY = (dsOffsetY ? Number(dsOffsetY(item).value) : 0) + this.state.draggedDifferenceY;
+                dropPos = {
+                    x: offsetX,
+                    y: offsetY
+                };
+            }
         }
 
         // If the datasource item has not yet been updated with the new position, use the state values to prevent briefly showing the item at the old position.

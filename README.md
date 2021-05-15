@@ -70,7 +70,7 @@ Pluggable widgets are rendered **really** often due to the way React works. Clic
 To improve performance, the widget will only reload the data from the datasource when the value of the data changed date attribute changes. So whenever you want the widget to refresh, set the attribute to current date/time in your microflow. When the date did not change, the widget will just render the data loaded in a previous render.
 
 ### Dragged difference
-When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself. Note that these attributes will only be updated after dragging a marker that has related markers.
+When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself.
 
 ## Return on click events?
 Returning on click events from the widget only makes sense when positioning items on a background. When dropping without position, a container with an onClick action is easier. The on click event of the widget allows you to capture the exact click coordinate on the container.
