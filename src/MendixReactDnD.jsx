@@ -41,7 +41,7 @@ export default class MendixReactDnD extends Component {
         draggedDifferenceX: 0,
         draggedDifferenceY: 0,
         childIDs: null,
-        triggerDate: 0
+        selectedIDs: null
     };
 
     // Convert from radials to degrees.
@@ -50,7 +50,6 @@ export default class MendixReactDnD extends Component {
     containerMap = new Map();
     itemMap = new Map();
     additionalMarkerClassMap = new Map();
-    selectedIDs = null;
     previousDataChangeDate = null;
 
     // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
@@ -96,7 +95,9 @@ export default class MendixReactDnD extends Component {
             ) {
                 // Store the date, also prevents multiple renders all triggering reload of the data.
                 this.previousDataChangeDate = dataChangeDateAttr.value;
-                this.selectedIDs = this.props.selectedMarkerGuids?.value;
+                this.setState({
+                    selectedIDs: this.props.selectedMarkerGuids?.value
+                });
             }
         } else {
             console.error("Data changed date is not set");
@@ -572,7 +573,7 @@ export default class MendixReactDnD extends Component {
         }
 
         // Is marker selected?
-        const isSelected = this.selectedIDs ? this.selectedIDs.indexOf(item.id) >= 0 : false;
+        const isSelected = this.state.selectedIDs ? this.state.selectedIDs.indexOf(item.id) >= 0 : false;
 
         return (
             <DatasourceItem
@@ -595,6 +596,7 @@ export default class MendixReactDnD extends Component {
         const { containerID, allowSelection, returnOnClick } = container;
         const { eventContainerID, eventGuid } = this.props;
         if (returnOnClick && returnOnClick.value) {
+            let newSelectedIDs = this.state.selectedIDs;
             const isRightClick = evt.button !== 0;
             // console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
             // console.dir(evt);
@@ -602,12 +604,12 @@ export default class MendixReactDnD extends Component {
             if (!isRightClick) {
                 // Add item ID to selected IDs for ctrl-click
                 if (allowSelection === "multiple" && evt.ctrlKey) {
-                    if (this.selectedIDs) {
-                        const idPos = this.selectedIDs.indexOf(item.id);
+                    if (newSelectedIDs) {
+                        const idPos = newSelectedIDs.indexOf(item.id);
                         // Already selected? Then deselect
                         if (idPos >= 0) {
                             // Found? Split the selectedIDs string. Return new value
-                            const newSelectedIDs = this.selectedIDs.split(",").reduce((result, id) => {
+                            newSelectedIDs = newSelectedIDs.split(",").reduce((result, id) => {
                                 if (item.id === id) {
                                     return result;
                                 }
@@ -616,41 +618,32 @@ export default class MendixReactDnD extends Component {
                                 }
                                 return id;
                             }, null);
-                            this.selectedIDs = newSelectedIDs;
                         } else {
-                            this.selectedIDs += "," + item.id;
+                            newSelectedIDs += "," + item.id;
                         }
                     } else {
-                        this.selectedIDs = item.id;
+                        newSelectedIDs = item.id;
                     }
-                    this.setState({
-                        triggerDate: new Date().getTime()
-                    });
                 } else {
                     // Set item as single selected item
                     if (allowSelection !== "none") {
-                        this.selectedIDs = item.id;
-                        this.setState({
-                            triggerDate: new Date().getTime()
-                        });
-                    } else {
-                        this.selectedIDs = null;
-                        this.setState({
-                            triggerDate: new Date().getTime()
-                        });
+                        newSelectedIDs = item.id;
                     }
                 }
             }
 
             const { selectedMarkerGuids } = this.props;
             if (selectedMarkerGuids) {
-                selectedMarkerGuids.setTextValue(this.selectedIDs);
+                selectedMarkerGuids.setTextValue(newSelectedIDs);
             }
+            this.setState({
+                selectedIDs: newSelectedIDs
+            });
 
             const { selectedMarkerCount } = this.props;
             if (selectedMarkerCount) {
-                if (this.selectedIDs) {
-                    selectedMarkerCount.setTextValue("" + this.selectedIDs.split(",").length);
+                if (newSelectedIDs) {
+                    selectedMarkerCount.setTextValue("" + newSelectedIDs.split(",").length);
                 } else {
                     selectedMarkerCount.setTextValue("0");
                 }
