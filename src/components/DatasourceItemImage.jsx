@@ -45,19 +45,22 @@ export function DatasourceItemImage({
         return null;
     }
     const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
-    let imageWidthValue = Math.round(Number(imageWidth.value) * zoomFactor);
-    let imageHeightValue = Math.round(Number(imageHeight.value) * zoomFactor);
-    if (isSelected) {
-        imageWidthValue += selectedMarkerBorderSize * 2;
-        imageHeightValue += selectedMarkerBorderSize * 2;
-    }
+    const imageWidthValue = Math.round(Number(imageWidth.value) * zoomFactor);
+    const imageHeightValue = Math.round(Number(imageHeight.value) * zoomFactor);
     const imageRotationValue = getImageRotation(draggedRotationDegree, imageRotation);
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
     const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
     if (allowRotate) {
         return (
             <div className="item-image-rotation-container">
-                {renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue)}
+                {renderImage(
+                    imageUrl,
+                    imageHeightValue,
+                    imageWidthValue,
+                    imageRotationValue,
+                    isSelected,
+                    selectedMarkerBorderSize
+                )}
                 <div className="item-image-rotation-controls-container">
                     <div className="item-image-rotate-back" onClick={() => handleRotateClick(false, onRotateClick)} />
                     <RotationHandle
@@ -75,12 +78,26 @@ export function DatasourceItemImage({
         const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 5;
         return (
             <div style={{ width: imageWidthValue, height: imageHeightValue }}>
-                {renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue)}
+                {renderImage(
+                    imageUrl,
+                    imageHeightValue,
+                    imageWidthValue,
+                    imageRotationValue,
+                    isSelected,
+                    selectedMarkerBorderSize
+                )}
                 <Grid gridSize={gridSizeValue} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
             </div>
         );
     } else {
-        return renderImage(imageUrl, imageHeightValue, imageWidthValue, imageRotationValue);
+        return renderImage(
+            imageUrl,
+            imageHeightValue,
+            imageWidthValue,
+            imageRotationValue,
+            isSelected,
+            selectedMarkerBorderSize
+        );
     }
 }
 
@@ -97,9 +114,10 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelecte
         width: imageWidth,
         height: imageHeight
     };
-    // Dimensions of the container will be the same as the image, unless it is selected, then add the border size twice. (Top/left or left/right)
-    const containerWidth = isSelected ? imageWidth + selectedMarkerBorderSize * 2 : imageWidth;
-    const containerHeight = isSelected ? imageHeight + selectedMarkerBorderSize * 2 : imageHeight;
+    const selectedMarkerBorderSizeValue = selectedMarkerBorderSize ? Number(selectedMarkerBorderSize.value) : 2;
+    // Dimensions of the container will be the same as the image, unless it is selected, then add the border size twice. (Top/bottom or left/right)
+    const containerWidth = isSelected ? imageWidth + selectedMarkerBorderSizeValue * 2 : imageWidth;
+    const containerHeight = isSelected ? imageHeight + selectedMarkerBorderSizeValue * 2 : imageHeight;
     const imageContainerStyle = {
         width: containerWidth,
         height: containerHeight
