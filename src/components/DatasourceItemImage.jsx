@@ -129,6 +129,11 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelecte
         const transformOriginY = Math.round(containerHeight / 2);
         imageContainerStyle.transformOrigin = transformOriginX + "px " + transformOriginY + "px";
     }
+    if (isSelected) {
+        imageContainerStyle.margin = "-" + selectedMarkerBorderSizeValue + "px";
+        imageContainerStyle["border-width"] = selectedMarkerBorderSizeValue + "px";
+        imageContainerStyle["border-radius"] = selectedMarkerBorderSizeValue + "px";
+    }
 
     return (
         <div className="item-image-container" style={imageContainerStyle}>
