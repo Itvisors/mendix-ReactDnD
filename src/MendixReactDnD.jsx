@@ -10,6 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
 import { calculateSnapToSize, calculateZoomFactor, snapToRotation } from "./utils/Utils";
+import { WidgetData } from "./utils/WidgetData";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
@@ -51,25 +52,33 @@ export default class MendixReactDnD extends Component {
     itemMap = new Map();
     additionalMarkerClassMap = new Map();
     previousDataChangeDate = null;
+    widgetData = null;
+    datasourceItemContentMap = new Map();
 
     // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
     onDragStatusMillis = 0;
     onDragStatusIntervalValue = -1;
 
     render() {
+        // Take the value for the on drag status interval only the first time the widget is rendered.
+        const { onDragStatusInterval } = this.props;
+        if (this.onDragStatusIntervalValue === -1) {
+            this.onDragStatusIntervalValue = onDragStatusInterval;
+            if (this.onDragStatusIntervalValue < 10) {
+                this.onDragStatusIntervalValue = 100;
+            }
+        }
+
         const { containerList } = this.props;
         if (!containerList) {
-            // console.info("MendixReactDnD: No containers");
-            return null;
-        }
-        if (!this.checkProperties()) {
-            // console.info("MendixReactDnD: Some containers are not yet available");
+            console.warn("MendixReactDnD: No containers");
             return null;
         }
         // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
         if (
             this.isAttributeReadOnly("eventContainerID", this.props.eventContainerID) ||
             this.isAttributeReadOnly("selectedMarkerGuids", this.props.selectedMarkerGuids) ||
+            this.isAttributeReadOnly("selectedMarkerCount", this.props.selectedMarkerCount) ||
             this.isAttributeReadOnly("eventClientX", this.props.eventClientX) ||
             this.isAttributeReadOnly("eventClientY", this.props.eventClientY) ||
             this.isAttributeReadOnly("eventOffsetX", this.props.eventOffsetX) ||
@@ -83,6 +92,9 @@ export default class MendixReactDnD extends Component {
         ) {
             return null;
         }
+        if (!this.widgetData) {
+            this.widgetData = new WidgetData();
+        }
         const { dataChangeDateAttr } = this.props;
         if (dataChangeDateAttr?.status !== "available") {
             return null;
@@ -94,26 +106,26 @@ export default class MendixReactDnD extends Component {
                 dataChangeDateAttr.value?.getTime() !== this.previousDataChangeDate?.getTime()
             ) {
                 // Store the date, also prevents multiple renders all triggering reload of the data.
-                this.previousDataChangeDate = dataChangeDateAttr.value;
-                this.setState({
-                    selectedIDs: this.props.selectedMarkerGuids?.value
-                });
+                this.widgetData.loadData(this.props);
+                if (this.widgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
+                    this.loadDatasourceItemContent();
+                    this.previousDataChangeDate = dataChangeDateAttr.value;
+                    this.setState({
+                        selectedIDs: this.widgetData.selectedMarkerGuids
+                    });
+                }
             }
         } else {
             console.error("Data changed date is not set");
             return null;
         }
 
-        const { snapToGrid, snapToSize, onDragStatusInterval, zoomPercentage } = this.props;
-        const snapToSizeValue = calculateSnapToSize(snapToSize, zoomPercentage);
-
-        // Take the value for the on drag status interval only the first time the widget is rendered.
-        if (this.onDragStatusIntervalValue === -1) {
-            this.onDragStatusIntervalValue = onDragStatusInterval;
-            if (this.onDragStatusIntervalValue < 10) {
-                this.onDragStatusIntervalValue = 100;
-            }
+        if (this.widgetData.dataStatus !== this.widgetData.DATA_COMPLETE) {
+            return null;
         }
+
+        const { snapToGrid, snapToSize, zoomPercentage } = this.props;
+        const snapToSizeValue = calculateSnapToSize(snapToSize, zoomPercentage);
 
         // console.info("MendixReactDnD: All containers are now available");
         const className = "widget-container " + this.props.class;
@@ -138,6 +150,21 @@ export default class MendixReactDnD extends Component {
                 </div>
             </DndProvider>
         );
+    }
+
+    loadDatasourceItemContent() {
+        this.datasourceItemContentMap.clear();
+        for (const container of this.props.containerList) {
+            const { containerID, dsContent } = container;
+            for (const datasourceItem of container.ds.items) {
+                const mapItemID = containerID.value + "_" + datasourceItem.id;
+                const itemContent = dsContent(datasourceItem);
+                // Only add the widget content if it has children.
+                if (itemContent?.props?.children && itemContent.props.children.length > 0) {
+                    this.datasourceItemContentMap.set(mapItemID, itemContent);
+                }
+            }
+        }
     }
 
     handleRotateHover(draggedItem, positionData) {
@@ -821,37 +848,6 @@ export default class MendixReactDnD extends Component {
             }
         }
         return maxColumnNumber;
-    }
-
-    checkProperties() {
-        const { containerList } = this.props;
-        let result = true;
-        for (let containerIndex = 0; containerIndex < containerList.length; containerIndex++) {
-            const containerItem = containerList[containerIndex];
-            const { ds, rowNumber, columnNumber, dsImageUrl, dsImageHeight, dsImageWidth } = containerItem;
-            if (
-                !ds ||
-                ds.status !== "available" ||
-                !rowNumber ||
-                rowNumber.status !== "available" ||
-                !columnNumber ||
-                columnNumber.status !== "available"
-            ) {
-                result = false;
-            }
-            // When rendering images, check whether required attributes are available
-            if (dsImageUrl) {
-                if (!dsImageHeight) {
-                    console.warn("For images, property Image height is required");
-                    result = false;
-                }
-                if (!dsImageWidth) {
-                    console.warn("For images, property Image width is required");
-                    result = false;
-                }
-            }
-        }
-        return result;
     }
 
     isAttributeReadOnly(propName, prop) {

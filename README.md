@@ -69,6 +69,8 @@ Pluggable widgets are rendered **really** often due to the way React works. Clic
 
 To improve performance, the widget will only reload the data from the datasource when the value of the data changed date attribute changes. So whenever you want the widget to refresh, set the attribute to current date/time in your microflow. When the date did not change, the widget will just render the data loaded in a previous render.
 
+Be sure to only commit the context object with the data changed date with refresh in client. The datasources will get the other data. Refreshing objects retrieved through a datasource can trigger additional server roundtrips. 
+
 ### Dragged difference
 When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself.
 
@@ -107,6 +109,8 @@ The widget allows you to choose where to put each container by setting a row and
 | Disable drag        | Boolean     |      | When dragging is possible, use this to (temporarily) disable dragging of this item.
 | Name                | String      |      | Name attribute. When set, will render a data-name attribute with the value on the item element.
 | Child IDs           | String      |      | See below
+
+Be careful when using attributes over long XPaths in a datasource. This could cause performance issues.
 
 #### Child IDs
 Datasource items can be linked to a parent item. When dragging the parent, any child items will move along too.

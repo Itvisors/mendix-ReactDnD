@@ -27,7 +27,7 @@ export const calculateSnapToSize = (snapToSize, zoomPercentage) => {
     let snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
 
     const zoomFactor = calculateZoomFactor(zoomPercentage, true);
-    if (zoomPercentage !== 1) {
+    if (zoomFactor !== 1) {
         snapToSizeValue = Math.round(snapToSizeValue * zoomFactor);
     }
 
