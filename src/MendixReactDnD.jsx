@@ -216,7 +216,7 @@ export default class MendixReactDnD extends Component {
         if (newRotation) {
             newRotation.setTextValue("" + rotationDegree);
             eventContainerID.setValue(droppedItem.originalType);
-            eventGuid.setTextValue(droppedItem.originalId);
+            eventGuid.setValue(droppedItem.originalId);
             if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
                 onRotateAction.execute();
             }

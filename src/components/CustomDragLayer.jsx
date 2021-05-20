@@ -32,7 +32,7 @@ export function CustomDragLayer({ widgetData, renderWidgetContent, onDragging })
         dragY = snapOffsetToGrid(dragY, widgetData.snapToSize);
     }
     if (onDragging) {
-        onDragging(itemType, item.itemID, differenceFromInitialOffset);
+        onDragging(itemType, item.id, differenceFromInitialOffset);
     }
     const { itemWidth, itemHeight } = item;
     const style = {
@@ -44,7 +44,7 @@ export function CustomDragLayer({ widgetData, renderWidgetContent, onDragging })
         <div className="custom-draglayer">
             <div className="custom-draglayer-item" style={style}>
                 <DatasourceItem
-                    key={item.itemID}
+                    key={item.id}
                     cellContainer={container}
                     item={containerItemData}
                     draggedRotationDegree={0}
