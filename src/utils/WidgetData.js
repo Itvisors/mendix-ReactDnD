@@ -5,6 +5,8 @@ import { ContainerItemData } from "./ContainerItemData";
  * Widget data
  * Contains all dynamically loaded data like the containers and expression properties
  * These can be really expensive to retrieve for each render
+ * Note that datasource item widget content is NOT loaded here.
+ * This would make the widget data more complex for React to determine changes
  */
 export class WidgetData {
     DATA_NONE = "none";
@@ -15,6 +17,7 @@ export class WidgetData {
     _widgetProps = null;
 
     maxRowNumber = 0;
+    maxColumnNumber = 0;
 
     zoomPercentage = 0;
     zoomFactor = 0;
@@ -26,24 +29,54 @@ export class WidgetData {
     rotationButtonDegrees = 0;
     addToCurrentRotation = false;
     selectedMarkerGuids = null;
-    additionalMarkerClassData = null;
     selectedMarkerBorderSize = 2;
 
     _dataStatus = this.DATA_NONE;
 
     _containerMap = new Map();
     _itemMap = new Map();
+    _gridMap = new Map();
+    _rowMap = new Map();
+    _additionalMarkerClassMap = new Map();
 
     get dataStatus() {
         return this._dataStatus;
     }
 
-    get containerMap() {
-        return this._containerMap;
+    getContainerMapValue(key) {
+        return this._containerMap.get(key);
     }
 
-    get itemMap() {
-        return this._itemMap;
+    getContainerMapValues() {
+        return this._containerMap.values();
+    }
+
+    getItemMapValue(key) {
+        return this._itemMap.get(key);
+    }
+
+    getItemMapValues() {
+        return this._itemMap.values();
+    }
+
+    getGridMapValue(key) {
+        return this._gridMap.get(key);
+    }
+
+    getGridMapValues() {
+        return this._gridMap.values();
+    }
+
+    getRowMapValue(key) {
+        return this._rowMap.get(key);
+    }
+
+    getRowMapValues() {
+        return this._rowMap.values();
+    }
+
+    getAdditionalMarkerClassMapValue(key) {
+        return this._additionalMarkerClassMap.get(key);
     }
 
     /**
@@ -104,15 +137,26 @@ export class WidgetData {
         this.rotationButtonDegrees = this._getNumberValue(this._widgetProps.rotationDragDegrees);
         this.addToCurrentRotation = !!this._widgetProps.addToCurrentRotation?.value;
         this.selectedMarkerGuids = this._widgetProps.selectedMarkerGuids?.value;
-        this.additionalMarkerClassData = this._widgetProps.additionalMarkerClassData?.value;
         this.selectedMarkerBorderSize = this._getNumberValue(this._widgetProps.selectedMarkerBorderSize);
+
+        const additionalMarkerClassData = this._widgetProps.additionalMarkerClassData?.value;
+        this._additionalMarkerClassMap.clear();
+        if (additionalMarkerClassData) {
+            const additionalMarkerClassArray = JSON.parse(additionalMarkerClassData.value);
+            for (const arrayItem of additionalMarkerClassArray) {
+                this._additionalMarkerClassMap.set(arrayItem.itemID, arrayItem.classes);
+            }
+        }
     }
 
     _loadContainerList() {
-        // Reset the max row number value;
+        // Reset/clear the values;
         this.maxRowNumber = 0;
+        this.maxColumnNumber = 0;
         this._containerMap.clear();
         this._itemMap.clear();
+        this._gridMap.clear();
+        this._rowMap.clear();
 
         // Sort the containers on row/column.
         const containerListSorted = this._sortContainers();
@@ -132,15 +176,42 @@ export class WidgetData {
         const containerID = container.containerID.value;
         containerData.containerID = containerID;
         containerData.rowNumber = Number(container.rowNumber.value);
+        containerData.columnNumber = Number(container.columnNumber.value);
         if (containerData.rowNumber > this.maxRowNumber) {
             this.maxRowNumber = containerData.rowNumber;
         }
-        containerData.columnNumber = Number(container.columnNumber.value);
+        if (containerData.columnNumber > this.maxColumnNumber) {
+            this.maxColumnNumber = containerData.columnNumber;
+        }
         containerData.dragDropType = container.dragDropType;
         containerData.allowSelection = container.allowSelection;
         containerData.returnOnClick = !!container.returnOnClick.value;
         containerData.acceptsContainerIDs = container.acceptsContainerIDs ? container.acceptsContainerIDs.value : null;
         this._containerMap.set(containerID, containerData);
+
+        // Add container data to the grid map, which contains an array holding all containers at a row/column combination
+        const gridMapKey = "r" + containerData.rowNumber + "c" + containerData.columnNumber;
+        let gridMapItem = this._gridMap.get(gridMapKey);
+        if (!gridMapItem) {
+            gridMapItem = {
+                containerArray: []
+            };
+        }
+        gridMapItem.containerArray.push(containerData);
+        this._gridMap.set(gridMapKey, gridMapItem);
+
+        // Update the row map, which contains the max column value for each row
+        const rowMapKey = "r" + containerData.rowNumber;
+        let rowMapItem = this._rowMap.get(rowMapKey);
+        if (!rowMapItem) {
+            rowMapItem = {
+                maxColumnNumber: 0
+            };
+        }
+        if (containerData.columnNumber > rowMapItem.maxColumnNumber) {
+            rowMapItem.maxColumnNumber = containerData.columnNumber;
+        }
+        this._rowMap.set(rowMapKey, rowMapItem);
 
         for (const datasourceItem of container.ds.items) {
             this._loadContainerItemData(datasourceItem, container, containerData);
@@ -152,11 +223,11 @@ export class WidgetData {
 
     _loadContainerItemData(dsItem, container, containerData) {
         const containerItemData = new ContainerItemData();
-        const itemID = containerData.containerID + "_" + dsItem.id;
-        containerData.itemMap.set(itemID, containerItemData);
-        this._itemMap.set(itemID, containerItemData);
+        const mapKey = containerData.containerID + "_" + dsItem.id;
+        containerData.itemMap.set(mapKey, containerItemData);
+        this._itemMap.set(mapKey, containerItemData);
 
-        containerItemData.itemID = dsItem.id;
+        containerItemData.id = dsItem.id;
         containerItemData.containerID = containerData.containerID;
 
         const dsDisableDrag = this._getDsItemPropertyValue(dsItem, container.dsDisableDrag);
@@ -171,11 +242,15 @@ export class WidgetData {
         const dsChildIDs = this._getDsItemPropertyValue(dsItem, container.dsChildIDs);
         containerItemData.childIDs = dsChildIDs?.value;
 
-        const dsOffsetX = this._getDsItemPropertyValue(dsItem, container.dsOffsetX);
-        containerItemData.offsetX = this._getNumberValue(dsOffsetX);
+        // Not only get the offset data but also whether there is an offset expression at all.
+        if (container.dsOffsetX && container.dsOffsetY) {
+            containerItemData.hasOffset = true;
+            const dsOffsetX = this._getDsItemPropertyValue(dsItem, container.dsOffsetX);
+            containerItemData.offsetX = this._getNumberValue(dsOffsetX);
 
-        const dsOffsetY = this._getDsItemPropertyValue(dsItem, container.dsOffsetY);
-        containerItemData.offsetY = this._getNumberValue(dsOffsetY);
+            const dsOffsetY = this._getDsItemPropertyValue(dsItem, container.dsOffsetY);
+            containerItemData.offsetY = this._getNumberValue(dsOffsetY);
+        }
 
         const dsImageUrl = this._getDsItemPropertyValue(dsItem, container.dsImageUrl);
         containerItemData.imageUrl = dsImageUrl?.value;
@@ -199,7 +274,7 @@ export class WidgetData {
         containerItemData.allowRotate = dsAllowRotate ? !!dsAllowRotate.value : false;
 
         const dsShowGrid = this._getDsItemPropertyValue(dsItem, container.dsShowGrid);
-        containerItemData.allowRotate = dsShowGrid ? !!dsShowGrid.value : false;
+        containerItemData.showGrid = dsShowGrid ? !!dsShowGrid.value : false;
 
         const dsGridSize = this._getDsItemPropertyValue(dsItem, container.dsGridSize);
         containerItemData.gridSize = this._getNumberValue(dsGridSize);

@@ -1,39 +1,18 @@
 import { createElement, useEffect, useRef, useState } from "react";
-import { calculateZoomFactor } from "../utils/Utils";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
-export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDragStart, children }) {
+export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, children }) {
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
-
-    const {
-        containerID,
-        dsDisableDrag,
-        dsOffsetX,
-        dsOffsetY,
-        dsImageHeight,
-        dsImageWidth,
-        dsAdjustOffsetOnDrop,
-        draggableClass,
-        draggingClass
-    } = cellContainer;
-
-    // Offset values are optional! Only check the status when there is a value.
-    const offsetX = dsOffsetX ? dsOffsetX(item) : undefined;
-    const offsetY = dsOffsetY ? dsOffsetY(item) : undefined;
-    const imageHeight = dsImageHeight ? dsImageHeight(item).value : undefined;
-    const imageWidth = dsImageWidth ? dsImageWidth(item).value : undefined;
-    const adjustOffsetOnDrop = dsAdjustOffsetOnDrop ? dsAdjustOffsetOnDrop(item).value : false;
-    const disableDrag = dsDisableDrag ? !!dsDisableDrag(item).value : false;
 
     const startDrag = () => {
         if (onDragStart) {
             onDragStart({
-                containerID: containerID.value,
+                containerID: item.containerID,
                 itemID: item.id,
-                itemOffsetX: offsetX && offsetX.value ? Number(offsetX.value) : undefined,
-                itemOffsetY: offsetY && offsetY.value ? Number(offsetY.value) : undefined
+                itemOffsetX: item.offsetX,
+                itemOffsetY: item.offsetY
             });
         }
     };
@@ -42,16 +21,16 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
     // Without these values, the dragged item would always extend to the right end of the viewport.
     const [{ isDragging }, drag, preview] = useDrag({
         item: {
-            type: containerID.value,
+            type: item.containerID,
             id: item.id,
-            imageHeight,
-            imageWidth,
-            adjustOffsetOnDrop,
+            imageHeight: item.imageHeight,
+            imageWidth: item.imageWidth,
+            adjustOffsetOnDrop: item.adjustOffsetOnDrop,
             itemWidth: elementRect ? elementRect.width : undefined,
             itemHeight: elementRect ? elementRect.height : undefined
         },
         begin: startDrag,
-        canDrag: !disableDrag,
+        canDrag: !item.disableDrag,
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
@@ -69,20 +48,11 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
         }
     });
 
-    if (
-        (offsetX && offsetX.status !== "available") ||
-        (offsetY && offsetY.status !== "available") ||
-        (zoomPercentage && zoomPercentage.status !== "available")
-    ) {
-        return null;
-    }
-
     const style = {};
-    if (offsetX && offsetX.value && offsetY && offsetY.value) {
-        const zoomFactor = calculateZoomFactor(zoomPercentage, true);
+    if (item.hasOffset) {
         // If the drop position has not yet been updated in the datasource, use the pending drop position values.
-        const offsetValueX = dropPos ? dropPos.x : Number(offsetX.value);
-        const offsetValueY = dropPos ? dropPos.y : Number(offsetY.value);
+        const offsetValueX = dropPos ? dropPos.x : item.offsetX;
+        const offsetValueY = dropPos ? dropPos.y : item.offsetY;
         const top = Math.round(offsetValueY * zoomFactor);
         const left = Math.round(offsetValueX * zoomFactor);
         const transform = "translate(" + left + "px, " + top + "px)";
@@ -93,6 +63,7 @@ export function DragWrapper({ cellContainer, item, dropPos, zoomPercentage, onDr
         style.position = "relative";
     }
 
+    const { draggableClass, draggingClass } = item;
     const className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
     return (
         <div ref={drag} style={style} className={className}>

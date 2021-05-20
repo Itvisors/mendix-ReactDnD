@@ -1,7 +1,7 @@
 /**
  * Calculate the zoom factor
  *
- * @param {*} zoomPercentage    The zoomPercentage expression property
+ * @param {*} zoomPercentage    The zoomPercentage value
  * @param {boolean} scaleImage  Scale image?
  * @returns {number}            The zoom factor
  */
@@ -9,22 +9,19 @@ export const calculateZoomFactor = (zoomPercentage, scaleImage) => {
     if (!scaleImage) {
         return 1;
     }
-    if (!zoomPercentage || zoomPercentage.status !== "available" || !zoomPercentage.value) {
-        return 1;
-    }
-    const zoomFactor = zoomPercentage.value / 100;
+    const zoomFactor = zoomPercentage / 100;
     return zoomFactor;
 };
 
 /**
  * Calculate the snap to size value, taking zoom percentage into account
  *
- * @param {*} snapToSize        The snap to size expression property
- * @param {*} zoomPercentage    The zoomPercentage expression property
+ * @param {*} snapToSize        The snap to size value
+ * @param {*} zoomPercentage    The zoomPercentage value
  * @returns {number}            The snap to size to use
  */
 export const calculateSnapToSize = (snapToSize, zoomPercentage) => {
-    let snapToSizeValue = snapToSize?.value ? Number(snapToSize.value) : 1;
+    let snapToSizeValue = snapToSize;
 
     const zoomFactor = calculateZoomFactor(zoomPercentage, true);
     if (zoomFactor !== 1) {

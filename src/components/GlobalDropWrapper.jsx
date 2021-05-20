@@ -8,8 +8,8 @@ export function GlobalDropWrapper({ containerList, onRotateHover, onRotateDrop, 
     const acceptArray = [];
     for (const container of containerList) {
         const { containerID, dragDropType } = container;
-        if (containerID && containerID.value && (dragDropType === "drag" || dragDropType === "both")) {
-            acceptArray.push(containerID.value + Constants.ROTATION_HANDLE_ID_SUFFIX);
+        if (dragDropType === "drag" || dragDropType === "both") {
+            acceptArray.push(containerID + Constants.ROTATION_HANDLE_ID_SUFFIX);
         }
     }
 

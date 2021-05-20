@@ -5,13 +5,14 @@
 export class ContainerItemData {
     // Common
     containerID = null;
-    itemID = null;
+    id = null;
     disableDrag = false;
     nameAttributeValue = null;
     markerClass = null;
     childIDs = null;
 
     // Image item
+    hasOffset = false;
     offsetX = 0;
     offsetY = 0;
     imageUrl = null;

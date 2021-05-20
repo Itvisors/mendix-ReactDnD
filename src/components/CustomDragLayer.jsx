@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { snapOffsetToGrid } from "../utils/Utils";
 import { useDragLayer } from "react-dnd";
 
-export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToGrid, snapToSize, onDragging }) {
+export function CustomDragLayer({ widgetData, renderWidgetContent, onDragging }) {
     const { itemType, isDragging, item, currentOffset, differenceFromInitialOffset } = useDragLayer(monitor => ({
         item: monitor.getItem(),
         itemType: monitor.getItemType(),
@@ -21,18 +21,18 @@ export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToG
     if (itemType.endsWith(Constants.ROTATION_HANDLE_ID_SUFFIX)) {
         return null;
     }
-    const container = containerMap.get(itemType);
-    const dsItem = itemMap.get(itemType + "_" + item.id);
+    const container = widgetData.getContainerMapValue(itemType);
+    const containerItemData = widgetData.getItemMapValue(itemType + "_" + item.id);
     // Render the drag preview ourselves.
     // Take height and width from dragged item to render with correct width and height.
     let dragX = currentOffset.x;
     let dragY = currentOffset.y;
-    if (snapToSize >= 5 && snapToGrid) {
-        dragX = snapOffsetToGrid(dragX, snapToSize);
-        dragY = snapOffsetToGrid(dragY, snapToSize);
+    if (widgetData.snapToSize >= 5 && widgetData.snapToGrid) {
+        dragX = snapOffsetToGrid(dragX, widgetData.snapToSize);
+        dragY = snapOffsetToGrid(dragY, widgetData.snapToSize);
     }
     if (onDragging) {
-        onDragging(itemType, item.id, differenceFromInitialOffset);
+        onDragging(itemType, item.itemID, differenceFromInitialOffset);
     }
     const { itemWidth, itemHeight } = item;
     const style = {
@@ -44,11 +44,12 @@ export function CustomDragLayer({ containerMap, itemMap, zoomPercentage, snapToG
         <div className="custom-draglayer">
             <div className="custom-draglayer-item" style={style}>
                 <DatasourceItem
-                    key={item.id}
+                    key={item.itemID}
                     cellContainer={container}
-                    item={dsItem}
+                    item={containerItemData}
                     draggedRotationDegree={0}
-                    zoomPercentage={zoomPercentage}
+                    renderWidgetContent={renderWidgetContent}
+                    zoomPercentage={widgetData.zoomPercentage}
                 />
             </div>
         </div>

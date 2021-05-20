@@ -6,7 +6,7 @@ export class ContainerData {
     rowNumber = 0;
     columnNumber = 0;
     dragDropType = null;
-    allowSelection = false;
+    allowSelection = null;
     returnOnClick = false;
     acceptsContainerIDs = null;
 
@@ -14,5 +14,13 @@ export class ContainerData {
 
     get itemMap() {
         return this._itemMap;
+    }
+
+    getItemMapValues() {
+        return this._itemMap.values();
+    }
+
+    getItemMapValue(key) {
+        return this._itemMap.get(key);
     }
 }

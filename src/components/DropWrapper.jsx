@@ -3,20 +3,19 @@ import { snapOffsetToGrid } from "../utils/Utils";
 import { useDrop } from "react-dnd";
 
 /** Drop target wrapper. */
-export function DropWrapper({ cellContainer, onDrop, snapToGrid, snapToSize, children }) {
+export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSize, children }) {
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
 
-    const { containerID, acceptsContainerIDs, dropTargetClass, canDropClass, invalidDropClass } = cellContainer;
-    if (!acceptsContainerIDs || !acceptsContainerIDs.value) {
+    const { containerID, acceptsContainerIDs } = cellContainer;
+    if (!acceptsContainerIDs) {
         return (
             <span className="text-danger">
-                Container {containerID.value} has no values set for the accept IDs to indicate which items may be
-                dropped onto it.
+                Container {containerID} has no values set for the accept IDs to indicate which items may be dropped.
             </span>
         );
     }
-    const acceptArray = acceptsContainerIDs.value.split(",");
+    const acceptArray = acceptsContainerIDs.split(",");
 
     const handleDrop = (droppedItem, monitor) => {
         const clientOffset = monitor.getSourceClientOffset();
@@ -53,12 +52,12 @@ export function DropWrapper({ cellContainer, onDrop, snapToGrid, snapToSize, chi
 
     const isActive = canDrop && isOver;
 
-    let className = dropTargetClass;
+    let className = item.dropTargetClass;
     if (isActive) {
-        className += " " + canDropClass;
+        className += " " + item.canDropClass;
     }
     if (isOver && !canDrop) {
-        className += " " + invalidDropClass;
+        className += " " + item.invalidDropClass;
     }
 
     return (

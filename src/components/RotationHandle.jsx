@@ -3,18 +3,16 @@ import { Constants } from "../utils/Constants";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
-export function RotationHandle({ cellContainer, offsetX, imageRotation, item }) {
-    const { containerID } = cellContainer;
-
+export function RotationHandle({ offsetX, imageRotation, itemData }) {
     // type and id must be unique so use a suffix
     // Also store original type, id and rotation in the item
-    const rotationHandleDragType = containerID.value + Constants.ROTATION_HANDLE_ID_SUFFIX;
+    const rotationHandleDragType = itemData.containerID + Constants.ROTATION_HANDLE_ID_SUFFIX;
     const [{ isDragging }, drag, preview] = useDrag({
         item: {
             type: rotationHandleDragType,
-            id: item.id + Constants.ROTATION_HANDLE_ID_SUFFIX,
-            originalType: containerID.value,
-            originalId: item.id,
+            id: itemData.itemID + Constants.ROTATION_HANDLE_ID_SUFFIX,
+            originalType: itemData.containerID,
+            originalId: itemData.itemID,
             originalRotation: imageRotation,
             offsetX
         },

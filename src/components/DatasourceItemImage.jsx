@@ -5,7 +5,6 @@ import { calculateZoomFactor } from "../utils/Utils";
 import { createElement } from "react";
 
 export function DatasourceItemImage({
-    cellContainer,
     item,
     draggedRotationDegree,
     zoomPercentage,
@@ -13,44 +12,19 @@ export function DatasourceItemImage({
     selectedMarkerBorderSize,
     onRotateClick
 }) {
-    const {
-        dsImageUrl,
-        dsImageHeight,
-        dsImageWidth,
-        dsScaleImage,
-        dsImageRotation,
-        dsAllowRotate,
-        dsShowGrid,
-        dsGridSize
-    } = cellContainer;
+    const { imageUrl, imageWidth, imageHeight, imageRotation } = item;
 
-    if (!dsImageUrl || !dsImageHeight || !dsImageWidth) {
+    if (!imageUrl) {
         return null;
     }
+    const zoomFactor = calculateZoomFactor(zoomPercentage, item.scaleImage);
+    const imageWidthValue = Math.round(imageWidth * zoomFactor);
+    const imageHeightValue = Math.round(imageHeight * zoomFactor);
+    const imageRotationValue = imageRotation + draggedRotationDegree;
 
-    const imageUrl = dsImageUrl(item);
-    const imageHeight = dsImageHeight(item);
-    const imageWidth = dsImageWidth(item);
-    // Values below are optional!
-    const scaleImage = dsScaleImage ? dsScaleImage(item).value : false;
-    const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
-    const allowRotate = dsAllowRotate ? dsAllowRotate(item).value : false;
-    const showGrid = dsShowGrid ? dsShowGrid(item).value : false;
-    if (
-        imageUrl.status !== "available" ||
-        imageHeight.status !== "available" ||
-        imageWidth.status !== "available" ||
-        (imageRotation && imageRotation.status !== "available")
-    ) {
-        return null;
-    }
-    const zoomFactor = calculateZoomFactor(zoomPercentage, scaleImage);
-    const imageWidthValue = Math.round(Number(imageWidth.value) * zoomFactor);
-    const imageHeightValue = Math.round(Number(imageHeight.value) * zoomFactor);
-    const imageRotationValue = getImageRotation(draggedRotationDegree, imageRotation);
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.
-    const rotationHandleOffsetX = Math.round(imageWidth.value / 2);
-    if (allowRotate) {
+    const rotationHandleOffsetX = Math.round(imageWidth / 2);
+    if (item.allowRotate) {
         return (
             <div className="item-image-rotation-container">
                 {renderImage(
@@ -63,19 +37,12 @@ export function DatasourceItemImage({
                 )}
                 <div className="item-image-rotation-controls-container">
                     <div className="item-image-rotate-back" onClick={() => handleRotateClick(false, onRotateClick)} />
-                    <RotationHandle
-                        cellContainer={cellContainer}
-                        offsetX={rotationHandleOffsetX}
-                        imageRotation={Number(imageRotation.value)}
-                        item={item}
-                    />
+                    <RotationHandle offsetX={rotationHandleOffsetX} imageRotation={imageRotation} itemData={item} />
                     <div className="item-image-rotate-forward" onClick={() => handleRotateClick(true, onRotateClick)} />
                 </div>
             </div>
         );
-    } else if (showGrid) {
-        const gridSize = dsGridSize ? dsGridSize(item) : undefined;
-        const gridSizeValue = gridSize?.value ? Number(gridSize.value) : 5;
+    } else if (item.showGrid) {
         return (
             <div style={{ width: imageWidthValue, height: imageHeightValue }}>
                 {renderImage(
@@ -86,7 +53,7 @@ export function DatasourceItemImage({
                     isSelected,
                     selectedMarkerBorderSize
                 )}
-                <Grid gridSize={gridSizeValue} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
+                <Grid gridSize={item.gridSize} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
             </div>
         );
     } else {
@@ -114,10 +81,9 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelecte
         width: imageWidth,
         height: imageHeight
     };
-    const selectedMarkerBorderSizeValue = selectedMarkerBorderSize ? Number(selectedMarkerBorderSize.value) : 2;
     // Dimensions of the container will be the same as the image, unless it is selected, then add the border size twice. (Top/bottom or left/right)
-    const containerWidth = isSelected ? imageWidth + selectedMarkerBorderSizeValue * 2 : imageWidth;
-    const containerHeight = isSelected ? imageHeight + selectedMarkerBorderSizeValue * 2 : imageHeight;
+    const containerWidth = isSelected ? imageWidth + selectedMarkerBorderSize * 2 : imageWidth;
+    const containerHeight = isSelected ? imageHeight + selectedMarkerBorderSize * 2 : imageHeight;
     const imageContainerStyle = {
         width: containerWidth,
         height: containerHeight
@@ -130,9 +96,9 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelecte
         imageContainerStyle.transformOrigin = transformOriginX + "px " + transformOriginY + "px";
     }
     if (isSelected) {
-        imageContainerStyle.margin = "-" + selectedMarkerBorderSizeValue + "px";
-        imageContainerStyle["border-width"] = selectedMarkerBorderSizeValue + "px";
-        imageContainerStyle["border-radius"] = selectedMarkerBorderSizeValue + "px";
+        imageContainerStyle.margin = "-" + selectedMarkerBorderSize + "px";
+        imageContainerStyle["border-width"] = selectedMarkerBorderSize + "px";
+        imageContainerStyle["border-radius"] = selectedMarkerBorderSize + "px";
     }
 
     return (
@@ -142,22 +108,13 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelecte
     );
 }
 
-function getImageRotation(draggedRotationDegree, imageRotation) {
-    // Just return null if image has no rotation attribute property set.
-    if (!imageRotation?.value) {
-        return 0;
-    }
-    // Return the actual database value plus the current rotation drag value.
-    return Number(imageRotation.value) + draggedRotationDegree;
-}
-
 function getUri(imageUrl) {
-    if (!imageUrl?.value) {
+    if (!imageUrl) {
         return null;
     }
     // Full URL?
-    if (imageUrl.value.indexOf("http") === 0) {
-        return imageUrl.value;
+    if (imageUrl.indexOf("http") === 0) {
+        return imageUrl;
     }
-    return mx.remoteUrl + imageUrl.value;
+    return mx.remoteUrl + imageUrl;
 }

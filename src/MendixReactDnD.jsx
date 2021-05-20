@@ -9,13 +9,14 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
-import { calculateSnapToSize, calculateZoomFactor, snapToRotation } from "./utils/Utils";
+import { calculateZoomFactor, snapToRotation } from "./utils/Utils";
 import { WidgetData } from "./utils/WidgetData";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
         super(props);
 
+        this.getDatasourceItemContent = this.getDatasourceItemContent.bind(this);
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleRotateHover = this.handleRotateHover.bind(this);
         this.handleRotateDrop = this.handleRotateDrop.bind(this);
@@ -42,16 +43,15 @@ export default class MendixReactDnD extends Component {
         draggedDifferenceX: 0,
         draggedDifferenceY: 0,
         childIDs: null,
-        selectedIDs: null
+        selectionTriggerMillis: 0
     };
+
+    selectedIDs = null;
 
     // Convert from radials to degrees.
     R2D = 180 / Math.PI;
 
-    containerMap = new Map();
-    itemMap = new Map();
-    additionalMarkerClassMap = new Map();
-    previousDataChangeDate = null;
+    previousDataChangeDateMillis = 0;
     widgetData = null;
     datasourceItemContentMap = new Map();
 
@@ -61,9 +61,8 @@ export default class MendixReactDnD extends Component {
 
     render() {
         // Take the value for the on drag status interval only the first time the widget is rendered.
-        const { onDragStatusInterval } = this.props;
         if (this.onDragStatusIntervalValue === -1) {
-            this.onDragStatusIntervalValue = onDragStatusInterval;
+            this.onDragStatusIntervalValue = this.props.onDragStatusInterval;
             if (this.onDragStatusIntervalValue < 10) {
                 this.onDragStatusIntervalValue = 100;
             }
@@ -75,6 +74,7 @@ export default class MendixReactDnD extends Component {
             return null;
         }
         // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
+        // Entity access issues are also hard to spot as the property update is ignored without error.
         if (
             this.isAttributeReadOnly("eventContainerID", this.props.eventContainerID) ||
             this.isAttributeReadOnly("selectedMarkerGuids", this.props.selectedMarkerGuids) ||
@@ -95,56 +95,59 @@ export default class MendixReactDnD extends Component {
         if (!this.widgetData) {
             this.widgetData = new WidgetData();
         }
-        const { dataChangeDateAttr } = this.props;
-        if (dataChangeDateAttr?.status !== "available") {
-            return null;
-        }
-        if (dataChangeDateAttr.value) {
-            // Only if the date is different to prevent processing the datasource(s) when the render is only about resizing etc.
-            if (
-                !this.previousDataChangeDate ||
-                dataChangeDateAttr.value?.getTime() !== this.previousDataChangeDate?.getTime()
-            ) {
-                // Store the date, also prevents multiple renders all triggering reload of the data.
-                this.widgetData.loadData(this.props);
-                if (this.widgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
-                    this.loadDatasourceItemContent();
-                    this.previousDataChangeDate = dataChangeDateAttr.value;
-                    this.setState({
-                        selectedIDs: this.widgetData.selectedMarkerGuids
-                    });
+        const { dataChangeDateAttr, onClickAction, onDropAction, onRotateAction } = this.props;
+        if (onClickAction?.isExecuting || onDropAction?.isExecuting || onRotateAction?.isExecuting) {
+            console.info("MendixReactDnD.render: action still executing");
+        } else {
+            if (dataChangeDateAttr?.status === "available") {
+                if (dataChangeDateAttr.value) {
+                    // Only if the date is different to prevent processing the datasource(s) when the render is only about resizing etc.
+                    // Due to an issue with datasources, after an update with refresh in client, the datasources will return stale data.
+                    // Also, render will be called many times in a row until all updates are in.
+                    // The dataChangeDateAttr value helps us to know that the backend wants the data to be reloaded.
+                    // If render gets called again shortly after the dateChangedDate value, load the data again.
+                    const currentDateMillis = new Date().getTime();
+                    if (
+                        this.previousDataChangeDateMillis === 0 ||
+                        currentDateMillis - this.previousDataChangeDateMillis < 300 ||
+                        dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis
+                    ) {
+                        // Store the date, also prevents multiple renders all triggering reload of the data.
+                        this.widgetData.loadData(this.props);
+                        if (this.widgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
+                            this.loadDatasourceItemContent();
+                            this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
+                            this.selectedIDs = this.widgetData.selectedMarkerGuids;
+                        }
+                    }
+                } else {
+                    console.error("MendixReactDnD: Data changed date is not set");
+                    return null;
                 }
             }
-        } else {
-            console.error("Data changed date is not set");
-            return null;
         }
 
+        // Stop if no data has been loaded yet.
         if (this.widgetData.dataStatus !== this.widgetData.DATA_COMPLETE) {
             return null;
         }
 
-        const { snapToGrid, snapToSize, zoomPercentage } = this.props;
-        const snapToSizeValue = calculateSnapToSize(snapToSize, zoomPercentage);
+        console.info("MendixReactDnD.render");
 
-        // console.info("MendixReactDnD: All containers are now available");
         const className = "widget-container " + this.props.class;
         return (
             <DndProvider backend={HTML5Backend}>
                 <div className={className}>
                     <GlobalDropWrapper
-                        containerList={containerList}
+                        containerList={this.widgetData.getContainerMapValues()}
                         onRotateHover={this.handleRotateHover}
                         onRotateDrop={this.handleRotateDrop}
                     >
                         {this.renderGrid()}
                     </GlobalDropWrapper>
                     <CustomDragLayer
-                        containerMap={this.containerMap}
-                        itemMap={this.itemMap}
-                        zoomPercentage={this.props.zoomPercentage}
-                        snapToGrid={snapToGrid ? !!snapToGrid.value : false}
-                        snapToSize={snapToSizeValue}
+                        widgetData={this.widgetData}
+                        renderWidgetContent={this.getDatasourceItemContent}
                         onDragging={this.handleDragging}
                     />
                 </div>
@@ -152,6 +155,10 @@ export default class MendixReactDnD extends Component {
         );
     }
 
+    /**
+     * Loads the widget content for each datasource item.
+     * Kept separate from the widgetData object to keep property values simple.
+     */
     loadDatasourceItemContent() {
         this.datasourceItemContentMap.clear();
         for (const container of this.props.containerList) {
@@ -160,6 +167,7 @@ export default class MendixReactDnD extends Component {
                 const mapItemID = containerID.value + "_" + datasourceItem.id;
                 const itemContent = dsContent(datasourceItem);
                 // Only add the widget content if it has children.
+                // This prevents a lot of unnecessary empty elements when positioning markers with images
                 if (itemContent?.props?.children && itemContent.props.children.length > 0) {
                     this.datasourceItemContentMap.set(mapItemID, itemContent);
                 }
@@ -167,6 +175,16 @@ export default class MendixReactDnD extends Component {
         }
     }
 
+    getDatasourceItemContent(item) {
+        return this.datasourceItemContentMap.get(item.containerID + "_" + item.id);
+    }
+
+    /**
+     * Handle rotation drag
+     *
+     * @param {*} draggedItem The dragged item
+     * @param {*} positionData The position of the drag
+     */
     handleRotateHover(draggedItem, positionData) {
         const rotationDegree = this.calculateRotationDegree(draggedItem, positionData);
         this.setState({
@@ -177,6 +195,11 @@ export default class MendixReactDnD extends Component {
         });
     }
 
+    /**
+     * Handle drop for rotation drag
+     * @param {*} droppedItem The dropped item
+     * @param {*} positionData The position of the drop
+     */
     handleRotateDrop(droppedItem, positionData) {
         const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
         const rotationDegree = this.calculateRotationDegree(droppedItem, positionData);
@@ -203,115 +226,78 @@ export default class MendixReactDnD extends Component {
     calculateRotationDegree(item, positionData) {
         const rotateX = positionData.dX + item.offsetX;
         let rotationDegree = Math.round(this.R2D * Math.atan2(positionData.dY, rotateX));
-        const { snapToRotate, rotationDragDegrees } = this.props;
-        const snapToRotateValue = snapToRotate ? !!snapToRotate.value : false;
-        const rotationDragDegreesValue = rotationDragDegrees?.value ? Number(rotationDragDegrees.value) : 1;
-        if (snapToRotateValue && rotationDragDegreesValue > 0 && rotationDragDegreesValue < 360) {
-            rotationDegree = snapToRotation(rotationDegree, rotationDragDegreesValue);
+        const { snapToRotate, rotationDragDegrees } = this.widgetData;
+        if (snapToRotate && rotationDragDegrees > 0 && rotationDragDegrees < 360) {
+            rotationDegree = snapToRotation(rotationDegree, rotationDragDegrees);
         }
         return rotationDegree;
     }
 
     renderGrid() {
-        // Clear the maps
-        this.containerMap.clear();
-        this.itemMap.clear();
-
-        // Load the additional marker class data into the map
-        this.loadAdditionalMarkerClassMap();
-
-        // Sort the containers on row/column.
-        const containerListSorted = this.sortContainers();
-        // Build a map of container to use in the custom drag layer
-        for (const container of containerListSorted) {
-            this.containerMap.set(container.containerID.value, container);
-        }
-        // Get the highest row number.
-        const maxRowNumber = this.getMaxRowNumber(containerListSorted);
-
         // Render the rows
         const rowArray = [];
-        for (let rowNumber = 1; rowNumber <= maxRowNumber; rowNumber++) {
-            rowArray.push(this.renderRow(containerListSorted, rowNumber));
+        for (let rowNumber = 1; rowNumber <= this.widgetData.maxRowNumber; rowNumber++) {
+            rowArray.push(this.renderRow(rowNumber));
         }
         return rowArray;
     }
 
-    loadAdditionalMarkerClassMap() {
-        this.additionalMarkerClassMap.clear();
-        const { additionalMarkerClassData } = this.props;
-
-        if (
-            !additionalMarkerClassData ||
-            additionalMarkerClassData.status !== "available" ||
-            !additionalMarkerClassData.value
-        ) {
-            return;
-        }
-
-        const additionalMarkerClassArray = JSON.parse(additionalMarkerClassData.value);
-        for (const arrayItem of additionalMarkerClassArray) {
-            this.additionalMarkerClassMap.set(arrayItem.itemID, arrayItem.classes);
-        }
-    }
-
-    renderRow(containerList, rowNumber) {
+    renderRow(rowNumber) {
         // console.info("MendixReactDnD: Render row " + rowNumber);
-
-        // Filter the full container list on the current row number.
-        const rowContainers = containerList.filter(currentValue => Number(currentValue.rowNumber.value) === rowNumber);
 
         // Render one row.
         const className = "widget-row widget-row-" + rowNumber;
         return (
             <div className={className} data-rownumber={rowNumber}>
-                {this.renderRowCells(rowContainers, rowNumber)}
+                {this.renderRowCells(rowNumber)}
             </div>
         );
     }
 
-    renderRowCells(rowContainers, rowNumber) {
-        // Get the highest column number in this row.
-        const maxColumnNumber = this.getMaxColumnNumber(rowContainers);
-        // console.info("MendixReactDnD: Render cells for row " + rowNumber + ", maxColumnNumber: " + maxColumnNumber);
+    renderRowCells(rowNumber) {
+        const rowInfo = this.widgetData.getRowMapValue("r" + rowNumber);
+        // console.info(
+        //     "MendixReactDnD: Render cells for row " + rowNumber + ", maxColumnNumber: " + rowInfo.maxColumnNumber
+        // );
 
         // Render the container(s) in each cell. Make sure that containers with the same column number end up in the same div.
         const cellArray = [];
-        for (let columnNumber = 1; columnNumber <= maxColumnNumber; columnNumber++) {
+        for (let columnNumber = 1; columnNumber <= rowInfo.maxColumnNumber; columnNumber++) {
             const className = "widget-cell widget-cell-r" + rowNumber + "-c" + columnNumber;
             cellArray.push(
                 <div className={className} data-rownumber={rowNumber} data-columnnumber={columnNumber}>
-                    {this.renderCell(rowContainers, columnNumber)}
+                    {this.renderCell(rowNumber, columnNumber)}
                 </div>
             );
         }
         return cellArray;
     }
 
-    renderCell(rowContainers, columnNumber) {
+    renderCell(rowNumber, columnNumber) {
         // console.info("MendixReactDnD: Render cells for column " + columnNumber);
 
-        // Filter the row container list on the current column number.
-        // The developer may place multiple containers in the same cell so there can be multiple.
-        const cellContainers = rowContainers.filter(
-            currentValue => Number(currentValue.columnNumber.value) === columnNumber
-        );
+        // Get the grid information for the row/column combination. There may be no data at all for that cell.
+        const gridMapKey = "r" + rowNumber + "c" + columnNumber;
+        const gridMapItem = this.widgetData.getGridMapValue(gridMapKey);
+        if (!gridMapItem) {
+            return null;
+        }
 
         // Render each container.
         const cellArray = [];
-        for (let containerIndex = 0; containerIndex < cellContainers.length; containerIndex++) {
-            const cellContainer = cellContainers[containerIndex];
-            const { containerID, ds, containerClass } = cellContainer;
-            // console.info(
-            //     "MendixReactDnD: Render cell for column " + columnNumber + ", container ID " + containerID.value
-            // );
-            const className =
-                containerClass && containerClass.value
-                    ? "widget-cell-content-container " + containerClass.value
-                    : "widget-cell-content-container";
+        for (const cellContainer of gridMapItem.containerArray) {
+            const { containerID, containerClass } = cellContainer;
+            // console.info("MendixReactDnD: Render cell for column " + columnNumber + ", container ID " + containerID);
+            const itemArray = [];
+            for (const item of cellContainer.getItemMapValues()) {
+                itemArray.push(this.renderCellItem(cellContainer, item));
+            }
+            const className = containerClass
+                ? "widget-cell-content-container " + containerClass
+                : "widget-cell-content-container";
             cellArray.push(
-                <div className={className} data-containerid={containerID.value}>
-                    {ds.items.map(item => this.renderCellItem(cellContainer, item))}
+                <div className={className} data-containerid={containerID}>
+                    {itemArray}
                 </div>
             );
         }
@@ -319,26 +305,18 @@ export default class MendixReactDnD extends Component {
     }
 
     renderCellItem(cellContainer, item) {
-        const { containerID, dragDropType } = cellContainer;
-        const { snapToSize, snapToGrid, zoomPercentage } = this.props;
+        const { dragDropType } = cellContainer;
+        const { snapToSize, snapToGrid, zoomFactor } = this.widgetData;
 
-        const snapToSizeValue = calculateSnapToSize(snapToSize, zoomPercentage);
-
-        const itemKey = containerID.value + "_" + item.id;
-        // Add the item to the map for use in the custom drag layer
-        this.itemMap.set(itemKey, item);
-
-        // Render the item
         switch (dragDropType) {
             case "drag":
                 return (
                     <DragWrapper
                         key={item.id}
-                        cellContainer={cellContainer}
                         item={item}
-                        dropPos={this.getPendingDropPos(cellContainer, item)}
+                        dropPos={this.getPendingDropPos(item)}
                         onDragStart={this.handleDragStart}
-                        zoomPercentage={zoomPercentage}
+                        zoomFactor={zoomFactor}
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
                     </DragWrapper>
@@ -349,8 +327,9 @@ export default class MendixReactDnD extends Component {
                     <DropWrapper
                         key={item.id}
                         cellContainer={cellContainer}
-                        snapToGrid={snapToGrid ? !!snapToGrid.value : false}
-                        snapToSize={snapToSizeValue}
+                        item={item}
+                        snapToGrid={snapToGrid}
+                        snapToSize={snapToSize}
                         onDrop={(droppedItem, positionData) =>
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }
@@ -364,19 +343,19 @@ export default class MendixReactDnD extends Component {
                     <DropWrapper
                         key={item.id}
                         cellContainer={cellContainer}
-                        snapToGrid={snapToGrid ? !!snapToGrid.value : false}
-                        snapToSize={snapToSizeValue}
+                        item={item}
+                        snapToGrid={snapToGrid}
+                        snapToSize={snapToSize}
                         onDrop={(droppedItem, positionData) =>
                             this.handleDrop(droppedItem, positionData, cellContainer, item)
                         }
                     >
                         <DragWrapper
                             key={item.id}
-                            cellContainer={cellContainer}
                             item={item}
-                            dropPos={this.getPendingDropPos(cellContainer, item)}
+                            dropPos={this.getPendingDropPos(item)}
                             onDragStart={this.handleDragStart}
-                            zoomPercentage={zoomPercentage}
+                            zoomFactor={zoomFactor}
                         >
                             {this.renderDatasourceItem(cellContainer, item)}
                         </DragWrapper>
@@ -395,7 +374,6 @@ export default class MendixReactDnD extends Component {
         //         JSON.stringify(positionData)
         // );
         const {
-            adjustOffset,
             eventContainerID,
             eventClientY,
             eventGuid,
@@ -406,16 +384,14 @@ export default class MendixReactDnD extends Component {
             draggedDifferenceY,
             dropTargetContainerID,
             dropTargetGuid,
-            onDropAction,
-            zoomPercentage
+            onDropAction
         } = this.props;
+        const { adjustOffset, zoomFactor } = this.widgetData;
         const { containerID } = cellContainer;
 
         // When using offset positions, set drop data in state for rendering while datasource has not yet updated itself
         if (this.state.dropWithOffset) {
             // console.info("handleDrop: store drop data in state for position info");
-            // Adjust offset values for zoom factor.
-            const zoomFactor = calculateZoomFactor(zoomPercentage, true);
             this.setState({
                 dropStatus: this.DROP_STATUS_DROPPED,
                 dropClientX: Math.round(positionData.dropOffsetX / zoomFactor),
@@ -425,7 +401,7 @@ export default class MendixReactDnD extends Component {
 
         eventContainerID.setValue(droppedItem.type);
         eventGuid.setTextValue(droppedItem.id);
-        dropTargetContainerID.setValue(containerID.value);
+        dropTargetContainerID.setValue(containerID);
         dropTargetGuid.setTextValue(item.id);
         if (eventClientX) {
             eventClientX.setTextValue("" + positionData.dropClientX);
@@ -435,9 +411,8 @@ export default class MendixReactDnD extends Component {
         }
         let offsetX = positionData.dropOffsetX;
         let offsetY = positionData.dropOffsetY;
-        if (adjustOffset && adjustOffset.value) {
+        if (adjustOffset) {
             // Adjust offset values for zoom factor.
-            const zoomFactor = calculateZoomFactor(zoomPercentage, true);
             offsetX = Math.round(offsetX / zoomFactor);
             offsetY = Math.round(offsetY / zoomFactor);
             // Adjust offset on drop when requested.
@@ -477,31 +452,11 @@ export default class MendixReactDnD extends Component {
             originalOffsetY: itemOffsetY,
             childIDs: null
         };
-        // Find the container for which the item was being dragged
-        const containerItem = this.getContainerItem(containerID);
-        const { dsChildIDs } = containerItem;
-        if (dsChildIDs) {
-            const dsItem = this.itemMap.get(containerID + "_" + itemID);
-            if (dsItem) {
-                const dsChildIDsValue = dsChildIDs(dsItem).value;
-                if (dsChildIDsValue) {
-                    newStateValue.childIDs = dsChildIDsValue;
-                }
-            }
+        const dsItem = this.widgetData.getGridMapValue(containerID + "_" + itemID);
+        if (dsItem && dsItem.childIDs) {
+            newStateValue.childIDs = dsItem.childIDs;
         }
         this.setState(newStateValue);
-    }
-
-    getContainerItem(searchID) {
-        const { containerList } = this.props;
-        for (let containerIndex = 0; containerIndex < containerList.length; containerIndex++) {
-            const containerItem = containerList[containerIndex];
-            const { containerID } = containerItem;
-            if (containerID.value === searchID) {
-                return containerItem;
-            }
-        }
-        return null;
     }
 
     handleDragging(draggedContainerID, draggedItemID, differenceFromInitialOffset) {
@@ -523,19 +478,16 @@ export default class MendixReactDnD extends Component {
         }
     }
 
-    getPendingDropPos(cellContainer, item) {
-        const { dsOffsetX, dsOffsetY } = cellContainer;
+    getPendingDropPos(item) {
         let dropPos = null;
 
         // If the parent of the items is being dragged, reposition the child item as well.
         // When multiple items are being dragged, reposition these as well.
         if (this.state.dropStatus !== this.DROP_STATUS_NONE) {
-            if (this.state.childIDs?.indexOf(item.id) >= 0 || this.state.selectedIDs?.indexOf(item.id) >= 0) {
-                const offsetX = (dsOffsetX ? Number(dsOffsetX(item).value) : 0) + this.state.draggedDifferenceX;
-                const offsetY = (dsOffsetY ? Number(dsOffsetY(item).value) : 0) + this.state.draggedDifferenceY;
+            if (this.state.childIDs?.indexOf(item.id) >= 0 || this.selectedIDs?.indexOf(item.id) >= 0) {
                 dropPos = {
-                    x: offsetX,
-                    y: offsetY
+                    x: item.offsetX,
+                    y: item.offsetY
                 };
             }
         }
@@ -544,10 +496,8 @@ export default class MendixReactDnD extends Component {
         if (this.state.dropStatus === this.DROP_STATUS_DROPPED && this.state.dropItemID === item.id) {
             // Only when dropping with an offset, as the offset is optional.
             if (this.state.dropWithOffset) {
-                const offsetX = dsOffsetX ? Number(dsOffsetX(item).value) : 0;
-                const offsetY = dsOffsetY ? Number(dsOffsetY(item).value) : 0;
                 // As long as the datasource item has the old values
-                if (this.state.originalOffsetX === offsetX && this.state.originalOffsetY === offsetY) {
+                if (this.state.originalOffsetX === item.offsetX && this.state.originalOffsetY === item.offsetY) {
                     dropPos = {
                         x: this.state.dropClientX,
                         y: this.state.dropClientY
@@ -581,15 +531,12 @@ export default class MendixReactDnD extends Component {
     }
 
     renderDatasourceItem(cellContainer, item) {
-        const { dsImageRotation } = cellContainer;
-
         let draggedRotationDegree = 0;
         // Use rotation degree if ID matches, rotateItemID is null if nothing is being rotated now.
         if (this.state.rotateItemID && this.state.rotateItemID === item.id) {
-            const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
             // If the datasource item still returns the original value, use the rotation degree from the rotation drag.
             // If the datasource item has been updated, clear the state values.
-            if (Number(imageRotation.value) === this.state.originalRotation) {
+            if (item.imageRotation === this.state.originalRotation) {
                 draggedRotationDegree = this.state.rotationDegree;
             } else {
                 // console.info("renderDatasourceItem: clear rotation state");
@@ -603,7 +550,7 @@ export default class MendixReactDnD extends Component {
         }
 
         // Is marker selected?
-        const isSelected = this.state.selectedIDs ? this.state.selectedIDs.indexOf(item.id) >= 0 : false;
+        const isSelected = this.selectedIDs ? this.selectedIDs.indexOf(item.id) >= 0 : false;
 
         return (
             <DatasourceItem
@@ -612,10 +559,11 @@ export default class MendixReactDnD extends Component {
                 item={item}
                 isSelected={isSelected}
                 draggedRotationDegree={draggedRotationDegree}
-                zoomPercentage={this.props.zoomPercentage}
-                additionalMarkerClasses={this.additionalMarkerClassMap.get(item.id)}
+                zoomPercentage={this.widgetData.zoomPercentage}
+                additionalMarkerClasses={this.widgetData.getAdditionalMarkerClassMapValue(item.id)}
                 selectedMarkerClass={this.props.selectedMarkerClass}
-                selectedMarkerBorderSize={this.props.selectedMarkerBorderSize}
+                selectedMarkerBorderSize={this.widgetData.selectedMarkerBorderSize}
+                renderWidgetContent={this.getDatasourceItemContent}
                 onClick={(evt, offsetX, offsetY) => this.handleClick(cellContainer, item, evt, offsetX, offsetY)}
                 onRotateClick={rotatedForward => this.handleRotateClick(rotatedForward, cellContainer, item)}
             />
@@ -625,21 +573,20 @@ export default class MendixReactDnD extends Component {
     handleClick(container, item, evt, offsetX, offsetY) {
         const { containerID, allowSelection, returnOnClick } = container;
         const { eventContainerID, eventGuid } = this.props;
-        if (returnOnClick && returnOnClick.value) {
-            let newSelectedIDs = this.state.selectedIDs;
+        if (returnOnClick) {
             const isRightClick = evt.button !== 0;
-            // console.info("MendixReactDnD onClick on " + containerID.value + " offset X/Y: " + offsetX + "/" + offsetY);
+            // console.info("MendixReactDnD onClick on " + containerID + " offset X/Y: " + offsetX + "/" + offsetY);
             // console.dir(evt);
             // Only select marker if not right-click event
             if (!isRightClick) {
                 // Add item ID to selected IDs for ctrl-click
                 if (allowSelection === "multiple" && evt.ctrlKey) {
-                    if (newSelectedIDs) {
-                        const idPos = newSelectedIDs.indexOf(item.id);
+                    if (this.selectedIDs) {
+                        const idPos = this.selectedIDs.indexOf(item.id);
                         // Already selected? Then deselect
                         if (idPos >= 0) {
                             // Found? Split the selectedIDs string. Return new value
-                            newSelectedIDs = newSelectedIDs.split(",").reduce((result, id) => {
+                            this.selectedIDs = this.selectedIDs.split(",").reduce((result, id) => {
                                 if (item.id === id) {
                                     return result;
                                 }
@@ -649,41 +596,43 @@ export default class MendixReactDnD extends Component {
                                 return id;
                             }, null);
                         } else {
-                            newSelectedIDs += "," + item.id;
+                            this.selectedIDs += "," + item.id;
                         }
                     } else {
-                        newSelectedIDs = item.id;
+                        this.selectedIDs = item.id;
                     }
                 } else {
                     // Set item as single selected item
                     if (allowSelection !== "none") {
-                        newSelectedIDs = item.id;
+                        this.selectedIDs = item.id;
                     }
                 }
             }
 
             const { selectedMarkerGuids } = this.props;
             if (selectedMarkerGuids) {
-                selectedMarkerGuids.setTextValue(newSelectedIDs);
+                selectedMarkerGuids.setTextValue(this.selectedIDs);
             }
 
-            // If selection is allowed, store selection in state
+            // If selection is allowed, update trigger date in state to force rerender.
+            // Keeping the selection itself in state is not possible because it gets filled during rendering.
+            // Setting the state during render can cause an infinite loop.
             if (allowSelection !== "none") {
                 this.setState({
-                    selectedIDs: newSelectedIDs
+                    selectionTriggerMillis: new Date().getTime()
                 });
             }
 
             const { selectedMarkerCount } = this.props;
             if (selectedMarkerCount) {
-                if (newSelectedIDs) {
-                    selectedMarkerCount.setTextValue("" + newSelectedIDs.split(",").length);
+                if (this.selectedIDs) {
+                    selectedMarkerCount.setTextValue("" + this.selectedIDs.split(",").length);
                 } else {
                     selectedMarkerCount.setTextValue("0");
                 }
             }
 
-            eventContainerID.setValue(containerID.value);
+            eventContainerID.setValue(containerID);
             eventGuid.setTextValue(item.id);
 
             // Client position
@@ -696,8 +645,9 @@ export default class MendixReactDnD extends Component {
             }
 
             // Offset
-            const { adjustOffset, eventOffsetX, eventOffsetY, zoomPercentage } = this.props;
-            if (adjustOffset && adjustOffset.value) {
+            const { adjustOffset, zoomPercentage } = this.widgetData;
+            const { eventOffsetX, eventOffsetY } = this.props;
+            if (adjustOffset) {
                 // Adjust offset values for zoom factor.
                 const zoomFactor = calculateZoomFactor(zoomPercentage, true);
                 if (eventOffsetX) {
@@ -741,57 +691,46 @@ export default class MendixReactDnD extends Component {
                 onClickAction.execute();
             }
         } else {
-            // console.info("MendixReactDnD Ignored onClick on " + containerID.value);
+            // console.info("MendixReactDnD Ignored onClick on " + containerID);
         }
     }
 
     handleRotateClick(rotatedForward, container, item) {
-        const { containerID, dsImageRotation } = container;
-        const {
-            eventContainerID,
-            eventGuid,
-            newRotation,
-            onRotateAction,
-            rotationButtonDegrees,
-            addToCurrentRotation
-        } = this.props;
-        if (newRotation) {
+        const { containerID } = container;
+        const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
+        const { rotationButtonDegrees, addToCurrentRotation } = this.widgetData;
+        if (newRotation && rotationButtonDegrees > 0) {
             // Get current rotation
-            let newRotationDegree = 0;
-            const imageRotation = dsImageRotation ? dsImageRotation(item) : undefined;
-            if (imageRotation?.value) {
-                newRotationDegree = Number(imageRotation.value);
-            }
+            let newRotationDegree = item.imageRotation;
             // Get value for click
-            const rotationButtonDegreesValue = rotationButtonDegrees ? Number(rotationButtonDegrees.value) : 90;
             // Add to current value?
-            if (addToCurrentRotation?.value) {
+            if (addToCurrentRotation) {
                 if (rotatedForward) {
-                    newRotationDegree += rotationButtonDegreesValue;
+                    newRotationDegree += rotationButtonDegrees;
                     if (newRotationDegree >= 360) {
                         newRotationDegree -= 360;
                     }
                 } else {
-                    newRotationDegree -= rotationButtonDegreesValue;
+                    newRotationDegree -= rotationButtonDegrees;
                     if (newRotationDegree < 0) {
                         newRotationDegree += 360;
                     }
                 }
             } else {
                 // Snap to the next or previous step
-                const currentRotationSteps = Math.floor(newRotationDegree / rotationButtonDegreesValue);
+                const currentRotationSteps = Math.floor(newRotationDegree / rotationButtonDegrees);
                 if (rotatedForward) {
-                    newRotationDegree = (currentRotationSteps + 1) * rotationButtonDegreesValue;
+                    newRotationDegree = (currentRotationSteps + 1) * rotationButtonDegrees;
                     if (newRotationDegree >= 360) {
                         newRotationDegree -= 360;
                     }
                 } else {
                     // If current value is not an exact multiple of the step value, round down to the previous step.
                     // Otherwise, take a full step back.
-                    if (newRotationDegree % rotationButtonDegreesValue > 0) {
-                        newRotationDegree = currentRotationSteps * rotationButtonDegreesValue;
+                    if (newRotationDegree % rotationButtonDegrees > 0) {
+                        newRotationDegree = currentRotationSteps * rotationButtonDegrees;
                     } else {
-                        newRotationDegree = (currentRotationSteps - 1) * rotationButtonDegreesValue;
+                        newRotationDegree = (currentRotationSteps - 1) * rotationButtonDegrees;
                         if (newRotationDegree < 0) {
                             newRotationDegree += 360;
                         }
@@ -799,55 +738,12 @@ export default class MendixReactDnD extends Component {
                 }
             }
             newRotation.setTextValue("" + newRotationDegree);
-            eventContainerID.setValue(containerID.value);
+            eventContainerID.setValue(containerID);
             eventGuid.setTextValue(item.id);
             if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
                 onRotateAction.execute();
             }
         }
-    }
-
-    sortContainers() {
-        // Create a shallow copy, we want to sort the containers on row/column but not mess with the array in props.
-        const containerListSorted = this.props.containerList.slice();
-        containerListSorted.sort((a, b) => {
-            const rowA = Number(a.rowNumber.value);
-            const rowB = Number(b.rowNumber.value);
-            const columnA = Number(a.columnNumber.value);
-            const columnB = Number(b.columnNumber.value);
-            if (rowA < rowB) {
-                return -1;
-            }
-            if (rowA === rowB) {
-                return columnA - columnB;
-            }
-            return 1;
-        });
-        return containerListSorted;
-    }
-
-    getMaxRowNumber(containerList) {
-        let maxRowNumber = 1;
-        for (let containerIndex = 0; containerIndex < containerList.length; containerIndex++) {
-            const containerItem = containerList[containerIndex];
-            const rowNumber = Number(containerItem.rowNumber.value);
-            if (rowNumber > maxRowNumber) {
-                maxRowNumber = rowNumber;
-            }
-        }
-        return maxRowNumber;
-    }
-
-    getMaxColumnNumber(containerList) {
-        let maxColumnNumber = 1;
-        for (let containerIndex = 0; containerIndex < containerList.length; containerIndex++) {
-            const containerItem = containerList[containerIndex];
-            const columnNumber = Number(containerItem.columnNumber.value);
-            if (columnNumber > maxColumnNumber) {
-                maxColumnNumber = columnNumber;
-            }
-        }
-        return maxColumnNumber;
     }
 
     isAttributeReadOnly(propName, prop) {

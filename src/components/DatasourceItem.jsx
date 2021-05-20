@@ -20,19 +20,10 @@ export class DatasourceItem extends Component {
             additionalMarkerClasses,
             selectedMarkerClass,
             selectedMarkerBorderSize,
+            renderWidgetContent,
             onRotateClick
         } = this.props;
-        const {
-            dsContent,
-            dsNameAttribute,
-            dsMarkerClassAttribute,
-            dragDropType,
-            dsOffsetX,
-            dsOffsetY
-        } = cellContainer;
-
-        // Convert Mendix properties to form that is easier to use.
-        const returnOnClick = cellContainer.returnOnClick && cellContainer.returnOnClick.value;
+        const { dragDropType } = cellContainer;
 
         // Set the class name(s).
         let className = "widget-cell-content-container-item";
@@ -42,17 +33,14 @@ export class DatasourceItem extends Component {
         if (dragDropType === "drop" || dragDropType === "both") {
             className += " dropTarget";
         }
-        if (returnOnClick) {
+        if (cellContainer.returnOnClick) {
             className += " clickableItem";
         }
         if (isSelected) {
             className += " " + selectedMarkerClass;
         }
-        if (dsMarkerClassAttribute) {
-            const markerClass = dsMarkerClassAttribute(item)?.value;
-            if (markerClass) {
-                className += " " + markerClass;
-            }
+        if (item.markerClass) {
+            className += " " + item.markerClass;
         }
         if (additionalMarkerClasses) {
             className += " " + additionalMarkerClasses;
@@ -61,14 +49,10 @@ export class DatasourceItem extends Component {
         // If the drag/drop type is none or drop only and the datasource item has position values, it means the marker is shown as view only.
         // Position the item the same way the drag wrapper does.
         if (dragDropType === "none" || dragDropType === "drop") {
-            const offsetX = dsOffsetX ? dsOffsetX(item) : undefined;
-            const offsetY = dsOffsetY ? dsOffsetY(item) : undefined;
-            if (offsetX && offsetX.value && offsetY && offsetY.value) {
+            if (item.hasOffset) {
                 const zoomFactor = calculateZoomFactor(zoomPercentage, true);
-                const offsetValueX = Number(offsetX.value);
-                const offsetValueY = Number(offsetY.value);
-                const top = Math.round(offsetValueY * zoomFactor);
-                const left = Math.round(offsetValueX * zoomFactor);
+                const top = Math.round(item.offsetY * zoomFactor);
+                const left = Math.round(item.offsetX * zoomFactor);
                 const transform = "translate(" + left + "px, " + top + "px)";
                 style = {
                     position: "absolute",
@@ -77,8 +61,6 @@ export class DatasourceItem extends Component {
                 };
             }
         }
-        const nameValue = dsNameAttribute ? dsNameAttribute(item) : undefined;
-        const hasNameValue = nameValue && nameValue.value;
         // console.info("DatasourceItem: ID: " + item.id);
         return (
             <div
@@ -88,10 +70,9 @@ export class DatasourceItem extends Component {
                 style={style}
                 onClick={this.onClick}
                 onContextMenu={this.onClick}
-                data-Name={hasNameValue && nameValue.value}
+                data-Name={item.nameAttributeValue}
             >
                 <DatasourceItemImage
-                    cellContainer={cellContainer}
                     item={item}
                     draggedRotationDegree={draggedRotationDegree}
                     zoomPercentage={zoomPercentage}
@@ -99,7 +80,7 @@ export class DatasourceItem extends Component {
                     selectedMarkerBorderSize={selectedMarkerBorderSize}
                     onRotateClick={onRotateClick}
                 />
-                {dsContent(item)}
+                {renderWidgetContent(item)}
             </div>
         );
     }
