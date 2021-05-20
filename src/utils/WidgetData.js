@@ -142,7 +142,7 @@ export class WidgetData {
         const additionalMarkerClassData = this._widgetProps.additionalMarkerClassData?.value;
         this._additionalMarkerClassMap.clear();
         if (additionalMarkerClassData) {
-            const additionalMarkerClassArray = JSON.parse(additionalMarkerClassData.value);
+            const additionalMarkerClassArray = JSON.parse(additionalMarkerClassData);
             for (const arrayItem of additionalMarkerClassArray) {
                 this._additionalMarkerClassMap.set(arrayItem.itemID, arrayItem.classes);
             }

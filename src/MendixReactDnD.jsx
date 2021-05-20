@@ -9,8 +9,8 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
-import { calculateZoomFactor, snapToRotation } from "./utils/Utils";
 import { WidgetData } from "./utils/WidgetData";
+import { snapToRotation } from "./utils/Utils";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
@@ -132,7 +132,7 @@ export default class MendixReactDnD extends Component {
             return null;
         }
 
-        console.info("MendixReactDnD.render");
+        // console.info("MendixReactDnD.render");
 
         const className = "widget-container " + this.props.class;
         return (
@@ -467,9 +467,8 @@ export default class MendixReactDnD extends Component {
         if (interval > this.onDragStatusIntervalValue) {
             this.onDragStatusMillis = millisNow;
             if (this.state.dropWithOffset) {
-                const { zoomPercentage } = this.props;
                 // Adjust for zoomfactor
-                const zoomFactor = calculateZoomFactor(zoomPercentage, true);
+                const { zoomFactor } = this.widgetData;
                 this.setState({
                     draggedDifferenceX: Math.round(differenceFromInitialOffset.x / zoomFactor),
                     draggedDifferenceY: Math.round(differenceFromInitialOffset.y / zoomFactor)
@@ -645,11 +644,10 @@ export default class MendixReactDnD extends Component {
             }
 
             // Offset
-            const { adjustOffset, zoomPercentage } = this.widgetData;
+            const { adjustOffset, zoomFactor } = this.widgetData;
             const { eventOffsetX, eventOffsetY } = this.props;
             if (adjustOffset) {
                 // Adjust offset values for zoom factor.
-                const zoomFactor = calculateZoomFactor(zoomPercentage, true);
                 if (eventOffsetX) {
                     eventOffsetX.setTextValue("" + Math.round(offsetX / zoomFactor));
                 }
