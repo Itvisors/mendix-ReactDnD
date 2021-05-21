@@ -11,8 +11,8 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, children }
             onDragStart({
                 containerID: item.containerID,
                 itemID: item.id,
-                itemOffsetX: item.offsetX,
-                itemOffsetY: item.offsetY
+                itemOffsetX: item.hasOffset ? item.offsetX : undefined,
+                itemOffsetY: item.hasOffset ? item.offsetY : undefined
             });
         }
     };
