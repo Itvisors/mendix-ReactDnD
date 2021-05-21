@@ -96,9 +96,8 @@ export default class MendixReactDnD extends Component {
             this.widgetData = new WidgetData();
         }
         const { dataChangeDateAttr, onClickAction, onDropAction, onRotateAction } = this.props;
-        if (onClickAction?.isExecuting || onDropAction?.isExecuting || onRotateAction?.isExecuting) {
-            console.info("MendixReactDnD.render: action still executing");
-        } else {
+        const actionExecuting = onClickAction?.isExecuting || onDropAction?.isExecuting || onRotateAction?.isExecuting;
+        if (!actionExecuting) {
             if (dataChangeDateAttr?.status === "available") {
                 if (dataChangeDateAttr.value) {
                     // Only if the date is different to prevent processing the datasource(s) when the render is only about resizing etc.
@@ -113,8 +112,13 @@ export default class MendixReactDnD extends Component {
                         dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis
                     ) {
                         // Store the date, also prevents multiple renders all triggering reload of the data.
-                        this.widgetData.loadData(this.props);
-                        if (this.widgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
+                        // First load the data in a new object.
+                        // If that is successful, save the new widgetData object.
+                        // This prevents flickering when a datasource item value turns out to be unavailable.
+                        const newWidgetData = new WidgetData();
+                        newWidgetData.loadData(this.props);
+                        if (newWidgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
+                            this.widgetData = newWidgetData;
                             this.loadDatasourceItemContent();
                             this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
                             this.selectedIDs = this.widgetData.selectedMarkerGuids;
@@ -452,7 +456,7 @@ export default class MendixReactDnD extends Component {
             originalOffsetY: itemOffsetY,
             childIDs: null
         };
-        const dsItem = this.widgetData.getGridMapValue(containerID + "_" + itemID);
+        const dsItem = this.widgetData.getItemMapValue(containerID + "_" + itemID);
         if (dsItem && dsItem.childIDs) {
             newStateValue.childIDs = dsItem.childIDs;
         }
@@ -482,11 +486,13 @@ export default class MendixReactDnD extends Component {
 
         // If the parent of the items is being dragged, reposition the child item as well.
         // When multiple items are being dragged, reposition these as well.
+        const { childIDs } = this.state;
+        const { selectedIDs } = this;
         if (this.state.dropStatus !== this.DROP_STATUS_NONE) {
-            if (this.state.childIDs?.indexOf(item.id) >= 0 || this.selectedIDs?.indexOf(item.id) >= 0) {
+            if ((childIDs && childIDs.indexOf(item.id) >= 0) || (selectedIDs && selectedIDs.indexOf(item.id) >= 0)) {
                 dropPos = {
-                    x: item.offsetX,
-                    y: item.offsetY
+                    x: item.offsetX + this.state.draggedDifferenceX,
+                    y: item.offsetY + this.state.draggedDifferenceY
                 };
             }
         }

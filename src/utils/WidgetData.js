@@ -84,7 +84,7 @@ export class WidgetData {
      * If the data is loaded successfully, the data status will be DATA_COMPLETE
      */
     loadData(widgetProps) {
-        console.info("MendixReactDnD.WidgetData.loadData: Start");
+        // console.info("MendixReactDnD.WidgetData.loadData: Start");
 
         this._dataStatus = this.DATA_LOADING;
 
@@ -93,13 +93,13 @@ export class WidgetData {
 
         this._checkTopLevelProps();
         if (this._dataStatus === this.DATA_INCOMPLETE) {
-            console.info("MendixReactDnD.WidgetData.loadData: Some dynamic properties are not yet available");
+            // console.info("MendixReactDnD.WidgetData.loadData: Some dynamic properties are not yet available");
             return;
         }
 
         this._checkContainers();
         if (this._dataStatus === this.DATA_INCOMPLETE) {
-            console.info("MendixReactDnD.WidgetData.loadData: Some containers are not yet available");
+            // console.info("MendixReactDnD.WidgetData.loadData: Some containers are not yet available");
             return;
         }
 
@@ -116,7 +116,7 @@ export class WidgetData {
         // Clear class level reference to the passed props.
         this._widgetProps = null;
 
-        console.info("MendixReactDnD.WidgetData.loadData: Done, result: " + this._dataStatus);
+        // console.info("MendixReactDnD.WidgetData.loadData: Done, result: " + this._dataStatus);
     }
 
     _loadTopLevelProps() {
