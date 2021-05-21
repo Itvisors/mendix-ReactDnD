@@ -377,19 +377,6 @@ export default class MendixReactDnD extends Component {
         //         ", positionData: " +
         //         JSON.stringify(positionData)
         // );
-        const {
-            eventContainerID,
-            eventClientY,
-            eventGuid,
-            eventOffsetX,
-            eventClientX,
-            eventOffsetY,
-            draggedDifferenceX,
-            draggedDifferenceY,
-            dropTargetContainerID,
-            dropTargetGuid,
-            onDropAction
-        } = this.props;
         const { adjustOffset, zoomFactor } = this.widgetData;
         const { containerID } = cellContainer;
 
@@ -403,16 +390,20 @@ export default class MendixReactDnD extends Component {
             });
         }
 
+        const { eventContainerID, eventGuid, dropTargetContainerID, dropTargetGuid } = this.props;
         eventContainerID.setValue(droppedItem.type);
         eventGuid.setTextValue(droppedItem.id);
         dropTargetContainerID.setValue(containerID);
         dropTargetGuid.setTextValue(item.id);
+
+        const { eventClientX, eventClientY } = this.props;
         if (eventClientX) {
             eventClientX.setTextValue("" + positionData.dropClientX);
         }
         if (eventClientY) {
             eventClientY.setTextValue("" + positionData.dropClientY);
         }
+
         let offsetX = positionData.dropOffsetX;
         let offsetY = positionData.dropOffsetY;
         if (adjustOffset) {
@@ -428,18 +419,26 @@ export default class MendixReactDnD extends Component {
                 offsetY = Math.round(offsetY + heightDifference / 2);
             }
         }
+
+        const { eventOffsetX, eventOffsetY } = this.props;
         if (eventOffsetX) {
             eventOffsetX.setTextValue("" + offsetX);
         }
         if (eventOffsetY) {
             eventOffsetY.setTextValue("" + offsetY);
         }
+
+        const { draggedDifferenceX, draggedDifferenceY } = this.props;
         if (draggedDifferenceX) {
             draggedDifferenceX.setTextValue("" + this.state.draggedDifferenceX);
         }
         if (draggedDifferenceY) {
             draggedDifferenceY.setTextValue("" + this.state.draggedDifferenceY);
         }
+
+        this.updateSelectionInContext();
+
+        const { onDropAction } = this.props;
         if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
             onDropAction.execute();
         }
@@ -459,6 +458,12 @@ export default class MendixReactDnD extends Component {
         const dsItem = this.widgetData.getItemMapValue(containerID + "_" + itemID);
         if (dsItem && dsItem.childIDs) {
             newStateValue.childIDs = dsItem.childIDs;
+        }
+        // Reset the selected IDs if user ctrl-clicks markers and then starts dragging another marker
+        if (this.selectedIDs) {
+            if (this.selectedIDs.indexOf(itemID) === -1) {
+                this.selectedIDs = null;
+            }
         }
         this.setState(newStateValue);
     }
@@ -614,11 +619,6 @@ export default class MendixReactDnD extends Component {
                 }
             }
 
-            const { selectedMarkerGuids } = this.props;
-            if (selectedMarkerGuids) {
-                selectedMarkerGuids.setTextValue(this.selectedIDs);
-            }
-
             // If selection is allowed, update trigger date in state to force rerender.
             // Keeping the selection itself in state is not possible because it gets filled during rendering.
             // Setting the state during render can cause an infinite loop.
@@ -628,14 +628,7 @@ export default class MendixReactDnD extends Component {
                 });
             }
 
-            const { selectedMarkerCount } = this.props;
-            if (selectedMarkerCount) {
-                if (this.selectedIDs) {
-                    selectedMarkerCount.setTextValue("" + this.selectedIDs.split(",").length);
-                } else {
-                    selectedMarkerCount.setTextValue("0");
-                }
-            }
+            this.updateSelectionInContext();
 
             eventContainerID.setValue(containerID);
             eventGuid.setTextValue(item.id);
@@ -696,6 +689,22 @@ export default class MendixReactDnD extends Component {
             }
         } else {
             // console.info("MendixReactDnD Ignored onClick on " + containerID);
+        }
+    }
+
+    updateSelectionInContext() {
+        const { selectedMarkerGuids } = this.props;
+        if (selectedMarkerGuids) {
+            selectedMarkerGuids.setTextValue(this.selectedIDs);
+        }
+
+        const { selectedMarkerCount } = this.props;
+        if (selectedMarkerCount) {
+            if (this.selectedIDs) {
+                selectedMarkerCount.setTextValue("" + this.selectedIDs.split(",").length);
+            } else {
+                selectedMarkerCount.setTextValue("0");
+            }
         }
     }
 
