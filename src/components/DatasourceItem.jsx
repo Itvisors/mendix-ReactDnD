@@ -10,6 +10,17 @@ export class DatasourceItem extends Component {
         this.itemDivRef = React.createRef();
     }
 
+    shouldComponentUpdate(nextProps) {
+        return (
+            nextProps.cellContainer.containerID !== this.props.cellContainer.containerID ||
+            nextProps.item.id !== this.props.item.id ||
+            nextProps.isSelected !== this.props.isSelected ||
+            nextProps.draggedRotationDegree !== this.props.draggedRotationDegree ||
+            nextProps.zoomPercentage !== this.props.zoomPercentage ||
+            nextProps.additionalMarkerClasses !== this.props.additionalMarkerClasses
+        );
+    }
+
     render() {
         const {
             cellContainer,

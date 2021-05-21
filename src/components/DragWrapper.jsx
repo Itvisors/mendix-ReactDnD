@@ -2,7 +2,7 @@ import { createElement, useEffect, useRef, useState } from "react";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
-export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, children }) {
+export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd, children }) {
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
 
@@ -30,9 +30,17 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, children }
             itemHeight: elementRect ? elementRect.height : undefined
         },
         begin: startDrag,
+        end: (draggedItem, monitor) => {
+            onDragEnd({
+                containerID: item.containerID,
+                itemID: item.id,
+                didDrop: monitor.didDrop()
+            });
+        },
         canDrag: !item.disableDrag,
         collect: monitor => ({
-            isDragging: !!monitor.isDragging()
+            isDragging: !!monitor.isDragging(),
+            didDrop: !!monitor.didDrop()
         })
     });
 

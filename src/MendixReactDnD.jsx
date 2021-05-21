@@ -18,6 +18,7 @@ export default class MendixReactDnD extends Component {
 
         this.getDatasourceItemContent = this.getDatasourceItemContent.bind(this);
         this.handleDragStart = this.handleDragStart.bind(this);
+        this.handleDragEnd = this.handleDragEnd.bind(this);
         this.handleRotateHover = this.handleRotateHover.bind(this);
         this.handleRotateDrop = this.handleRotateDrop.bind(this);
         this.handleDragging = this.handleDragging.bind(this);
@@ -320,6 +321,7 @@ export default class MendixReactDnD extends Component {
                         item={item}
                         dropPos={this.getPendingDropPos(item)}
                         onDragStart={this.handleDragStart}
+                        onDragEnd={this.handleDragEnd}
                         zoomFactor={zoomFactor}
                     >
                         {this.renderDatasourceItem(cellContainer, item)}
@@ -359,6 +361,7 @@ export default class MendixReactDnD extends Component {
                             item={item}
                             dropPos={this.getPendingDropPos(item)}
                             onDragStart={this.handleDragStart}
+                            onDragEnd={this.handleDragEnd}
                             zoomFactor={zoomFactor}
                         >
                             {this.renderDatasourceItem(cellContainer, item)}
@@ -372,8 +375,12 @@ export default class MendixReactDnD extends Component {
 
     handleDrop(droppedItem, positionData, cellContainer, item) {
         // console.info(
-        //     "handleDrop: droppedItem: " +
+        //     "handleDrop: item: " +
         //         JSON.stringify(droppedItem) +
+        //         " dropped on container " +
+        //         cellContainer.containerID +
+        //         ", item " +
+        //         (item ? JSON.stringify(item) : "(none)") +
         //         ", positionData: " +
         //         JSON.stringify(positionData)
         // );
@@ -466,6 +473,14 @@ export default class MendixReactDnD extends Component {
             }
         }
         this.setState(newStateValue);
+    }
+
+    handleDragEnd({ didDrop }) {
+        // Method also receives containerID and itemID in the parameter object
+        // console.info("handleDragEnd, did drop: " + didDrop);
+        if (!didDrop) {
+            this.clearDropState();
+        }
     }
 
     handleDragging(draggedContainerID, draggedItemID, differenceFromInitialOffset) {
