@@ -7,15 +7,7 @@ export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSiz
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
 
-    const { containerID, acceptsContainerIDs } = cellContainer;
-    if (!acceptsContainerIDs) {
-        return (
-            <span className="text-danger">
-                Container {containerID} has no values set for the accept IDs to indicate which items may be dropped.
-            </span>
-        );
-    }
-    const acceptArray = acceptsContainerIDs.split(",");
+    const acceptArray = cellContainer.acceptsContainerIDs.split(",");
 
     const handleDrop = (droppedItem, monitor) => {
         const clientOffset = monitor.getSourceClientOffset();
@@ -34,6 +26,13 @@ export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSiz
         onDrop(droppedItem, positionData);
     };
 
+    useEffect(() => {
+        if (layoutRef.current) {
+            const rect = layoutRef.current.getBoundingClientRect();
+            setElementRect(rect);
+        }
+    }, []);
+
     const [{ canDrop, isOver }, drop] = useDrop({
         accept: acceptArray,
         drop: handleDrop,
@@ -41,13 +40,6 @@ export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSiz
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop()
         })
-    });
-
-    useEffect(() => {
-        if (layoutRef.current) {
-            const rect = layoutRef.current.getBoundingClientRect();
-            setElementRect(rect);
-        }
     });
 
     const isActive = canDrop && isOver;
@@ -60,6 +52,14 @@ export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSiz
         className += " " + item.invalidDropClass;
     }
 
+    if (!cellContainer.acceptsContainerIDs) {
+        const { containerID } = cellContainer;
+        return (
+            <span className="text-danger">
+                Container {containerID} has no values set for the accept IDs to indicate which items may be dropped.
+            </span>
+        );
+    }
     return (
         <div ref={layoutRef}>
             <div ref={drop} className={className}>

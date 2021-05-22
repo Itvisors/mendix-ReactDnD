@@ -47,14 +47,11 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
     // Turn off the default drag preview that the browser renders as we render our own in CustomDragLayer.
     useEffect(() => {
         preview(getEmptyImage(), { captureDraggingState: true });
-    }, []);
-
-    useEffect(() => {
         if (layoutRef.current) {
             const rect = layoutRef.current.getBoundingClientRect();
             setElementRect(rect);
         }
-    });
+    }, [preview]);
 
     const style = {};
     if (item.hasOffset) {

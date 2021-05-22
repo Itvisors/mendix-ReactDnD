@@ -24,7 +24,7 @@ export function RotationHandle({ offsetX, imageRotation, itemData }) {
     // Turn off the default drag preview that the browser renders as we render our own in CustomDragLayer.
     useEffect(() => {
         preview(getEmptyImage(), { captureDraggingState: true });
-    }, []);
+    }, [preview]);
 
     const className = isDragging ? "item-image-rotation-handle dragging" : "item-image-rotation-handle";
     return <div ref={drag} className={className} />;
