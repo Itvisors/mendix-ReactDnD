@@ -14,24 +14,6 @@ export const calculateZoomFactor = (zoomPercentage, scaleImage) => {
 };
 
 /**
- * Calculate the snap to size value, taking zoom percentage into account
- *
- * @param {*} snapToSize        The snap to size value
- * @param {*} zoomPercentage    The zoomPercentage value
- * @returns {number}            The snap to size to use
- */
-export const calculateSnapToSize = (snapToSize, zoomPercentage) => {
-    let snapToSizeValue = snapToSize;
-
-    const zoomFactor = calculateZoomFactor(zoomPercentage, true);
-    if (zoomFactor !== 1) {
-        snapToSizeValue = Math.round(snapToSizeValue * zoomFactor);
-    }
-
-    return snapToSizeValue;
-};
-
-/**
  * Snap offset to grid zize
  * @param {number} offset       The offset value
  * @param {number} gridSize     The grid size value

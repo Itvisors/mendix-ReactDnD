@@ -12,8 +12,10 @@ export class DatasourceItem extends Component {
 
     shouldComponentUpdate(nextProps) {
         return (
+            nextProps.item.shouldRender(this.props.item) ||
             nextProps.cellContainer.containerID !== this.props.cellContainer.containerID ||
-            nextProps.item.id !== this.props.item.id ||
+            nextProps.cellContainer.allowSelection !== this.props.cellContainer.allowSelection ||
+            nextProps.cellContainer.returnOnClick !== this.props.cellContainer.returnOnClick ||
             nextProps.isSelected !== this.props.isSelected ||
             nextProps.draggedRotationDegree !== this.props.draggedRotationDegree ||
             nextProps.zoomPercentage !== this.props.zoomPercentage ||
