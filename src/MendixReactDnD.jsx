@@ -98,6 +98,9 @@ export default class MendixReactDnD extends Component {
         }
         const { dataChangeDateAttr, onClickAction, onDropAction, onRotateAction } = this.props;
         const actionExecuting = onClickAction?.isExecuting || onDropAction?.isExecuting || onRotateAction?.isExecuting;
+        // if (actionExecuting) {
+        //     console.info("MendixReactDnD.render: action still executing");
+        // }
         if (!actionExecuting) {
             if (dataChangeDateAttr?.status === "available") {
                 if (dataChangeDateAttr.value) {
