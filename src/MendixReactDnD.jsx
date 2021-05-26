@@ -174,7 +174,10 @@ export default class MendixReactDnD extends Component {
             if (dsContent) {
                 for (const datasourceItem of container.ds.items) {
                     const mapItemID = containerID.value + "_" + datasourceItem.id;
-                    const itemContent = dsContent(datasourceItem);
+                    // For Mendix 8, use dsContent as a function, for Mendix 9, dsContent is an object, call dsContent.get
+                    const itemContent = this.widgetData.callDsPropDirectly
+                        ? dsContent(datasourceItem)
+                        : dsContent.get(datasourceItem);
                     // Only add the widget content if it has children.
                     // This prevents a lot of unnecessary empty elements when positioning markers with images
                     if (itemContent?.props?.children && itemContent.props.children.length > 0) {
