@@ -171,13 +171,15 @@ export default class MendixReactDnD extends Component {
         this.datasourceItemContentMap.clear();
         for (const container of this.props.containerList) {
             const { containerID, dsContent } = container;
-            for (const datasourceItem of container.ds.items) {
-                const mapItemID = containerID.value + "_" + datasourceItem.id;
-                const itemContent = dsContent(datasourceItem);
-                // Only add the widget content if it has children.
-                // This prevents a lot of unnecessary empty elements when positioning markers with images
-                if (itemContent?.props?.children && itemContent.props.children.length > 0) {
-                    this.datasourceItemContentMap.set(mapItemID, itemContent);
+            if (dsContent) {
+                for (const datasourceItem of container.ds.items) {
+                    const mapItemID = containerID.value + "_" + datasourceItem.id;
+                    const itemContent = dsContent(datasourceItem);
+                    // Only add the widget content if it has children.
+                    // This prevents a lot of unnecessary empty elements when positioning markers with images
+                    if (itemContent?.props?.children && itemContent.props.children.length > 0) {
+                        this.datasourceItemContentMap.set(mapItemID, itemContent);
+                    }
                 }
             }
         }
