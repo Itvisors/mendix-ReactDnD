@@ -215,7 +215,10 @@ export default class MendixReactDnD extends Component {
      */
     handleRotateDrop(droppedItem, positionData) {
         const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
-        const rotationDegree = this.calculateRotationDegree(droppedItem, positionData);
+        // Return the new rotation value, need to add current value to the dragged angle.
+        // User might drag beyond full circle, prevent values beyond 360
+        const rotationDegree =
+            (this.calculateRotationDegree(droppedItem, positionData) + droppedItem.originalRotation) % 360;
         // console.info(
         //     "Handle rotation drop, container ID: " +
         //         droppedItem.originalType +

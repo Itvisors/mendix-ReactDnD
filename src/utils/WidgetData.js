@@ -137,7 +137,7 @@ export class WidgetData {
         }
         this.snapToRotate = !!this._widgetProps.snapToRotate?.value;
         this.rotationDragDegrees = this._getNumberValue(this._widgetProps.rotationDragDegrees);
-        this.rotationButtonDegrees = this._getNumberValue(this._widgetProps.rotationDragDegrees);
+        this.rotationButtonDegrees = this._getNumberValue(this._widgetProps.rotationButtonDegrees);
         this.addToCurrentRotation = !!this._widgetProps.addToCurrentRotation?.value;
         this.selectedMarkerGuids = this._widgetProps.selectedMarkerGuids?.value;
         this.selectedMarkerBorderSize = this._getNumberValue(this._widgetProps.selectedMarkerBorderSize);
