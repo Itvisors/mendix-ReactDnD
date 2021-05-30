@@ -36,11 +36,11 @@ export class WidgetData {
 
     _dataStatus = this.DATA_NONE;
 
-    _containerMap = new Map();
-    _itemMap = new Map();
-    _gridMap = new Map();
-    _rowMap = new Map();
-    _additionalMarkerClassMap = new Map();
+    _containerMap = new Map(); // The container by container ID
+    _itemMap = new Map(); // The items by <container ID>_<Item ID>
+    _gridMap = new Map(); // The grid cells by rXcY
+    _rowMap = new Map(); // The row info by rX, contains max column number for that row
+    _additionalMarkerClassMap = new Map(); // Additional markers class data
 
     get dataStatus() {
         return this._dataStatus;

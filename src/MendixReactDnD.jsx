@@ -1,4 +1,5 @@
 import { Component, createElement } from "react";
+import { CellContainer } from "./components/CellContainer";
 import { CustomDragLayer } from "./components/CustomDragLayer";
 import { DatasourceItem } from "./components/DatasourceItem";
 import { DndProvider } from "react-dnd";
@@ -6,11 +7,11 @@ import { DragWrapper } from "./components/DragWrapper";
 import { DropWrapper } from "./components/DropWrapper";
 import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { WidgetData } from "./utils/WidgetData";
+import { snapToRotation } from "./utils/Utils";
 
 // eslint-disable-next-line sort-imports
 import "./ui/MendixReactDnD.css";
-import { WidgetData } from "./utils/WidgetData";
-import { snapToRotation } from "./utils/Utils";
 
 export default class MendixReactDnD extends Component {
     constructor(props) {
@@ -27,6 +28,9 @@ export default class MendixReactDnD extends Component {
     DROP_STATUS_NONE = "none";
     DROP_STATUS_DRAGGING = "dragging";
     DROP_STATUS_DROPPED = "dropped";
+
+    // Interval used for updating the dragged difference values.
+    DRAGGING_STATUS_UPDATE_INTERVAL = 100;
 
     state = {
         rotationDegree: 0,
@@ -48,6 +52,7 @@ export default class MendixReactDnD extends Component {
     draggedDifferenceY = 0;
     childIDs = null;
     selectedIDs = null;
+    additionalItemInfoForDragging = [];
 
     // Convert from radials to degrees.
     R2D = 180 / Math.PI;
@@ -56,6 +61,7 @@ export default class MendixReactDnD extends Component {
     widgetData = null;
     datasourceItemContentMap = new Map(); // Holds the widget content for each datasource item
     cellContentMap = new Map(); // Holds the cell content (drag/drop wrappers with datasource item)
+    containerCellRectMap = new Map(); // The rects by rXcY
 
     // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
     onDragStatusMillis = 0;
@@ -157,7 +163,10 @@ export default class MendixReactDnD extends Component {
                     </GlobalDropWrapper>
                     <CustomDragLayer
                         widgetData={this.widgetData}
+                        containerCellRectMap={this.containerCellRectMap}
+                        onDragStatusInterval={this.onDragStatusIntervalValue}
                         renderWidgetContent={this.getDatasourceItemContent}
+                        additionalItemInfoForDragging={this.additionalItemInfoForDragging}
                         onDragging={this.handleDragging}
                     />
                 </div>
@@ -281,25 +290,38 @@ export default class MendixReactDnD extends Component {
         // Render the container(s) in each cell. Make sure that containers with the same column number end up in the same div.
         const cellArray = [];
         for (let columnNumber = 1; columnNumber <= rowInfo.maxColumnNumber; columnNumber++) {
-            const className = "widget-cell widget-cell-r" + rowNumber + "-c" + columnNumber;
-            cellArray.push(
-                <div className={className} data-rownumber={rowNumber} data-columnnumber={columnNumber}>
-                    {this.renderCell(rowNumber, columnNumber)}
-                </div>
-            );
+            cellArray.push(this.renderCellContainer(rowNumber, columnNumber));
         }
         return cellArray;
     }
 
-    renderCell(rowNumber, columnNumber) {
-        // console.info("MendixReactDnD: Render cells for column " + columnNumber);
-
+    renderCellContainer(rowNumber, columnNumber) {
+        // console.info(
+        //     "MendixReactDnD.renderCellContainer: Render cells for row " + rowNumber + ", column: " + columnNumber
+        // );
         // Get the grid information for the row/column combination. There may be no data at all for that cell.
-        const gridMapKey = "r" + rowNumber + "c" + columnNumber;
-        const gridMapItem = this.widgetData.getGridMapValue(gridMapKey);
+        const mapKey = "r" + rowNumber + "c" + columnNumber;
+        const gridMapItem = this.widgetData.getGridMapValue(mapKey);
         if (!gridMapItem) {
             return null;
         }
+
+        return (
+            <CellContainer
+                rowNumber={rowNumber}
+                columnNumber={columnNumber}
+                onBoundingClientRectUpdate={rect => {
+                    // Store the rect in the widget data map for use while dragging
+                    this.containerCellRectMap.set(mapKey, rect);
+                }}
+            >
+                {this.renderCell(gridMapItem)}
+            </CellContainer>
+        );
+    }
+
+    renderCell(gridMapItem) {
+        // console.info("MendixReactDnD.gridMapItem: Render cells");
 
         // Render each container.
         const cellArray = [];
@@ -324,6 +346,16 @@ export default class MendixReactDnD extends Component {
 
     renderCellItem(cellContainer, item) {
         const { dragDropType } = cellContainer;
+        // console.info(
+        //     "MendixReactDnD.renderCellItem: Render cell item " +
+        //         item.nameAttributeValue +
+        //         " at r" +
+        //         cellContainer.rowNumber +
+        //         "c" +
+        //         cellContainer.columnNumber +
+        //         " dragDropType: " +
+        //         dragDropType
+        // );
 
         switch (dragDropType) {
             case "drag":
@@ -341,6 +373,7 @@ export default class MendixReactDnD extends Component {
     }
 
     renderDropWrapper(cellContainer, item) {
+        // Return the element created earlier when drag is active or another marker is being rotated
         const mapKey = item.containerID + "_" + item.id;
         if (this.cellContentMap.has(mapKey)) {
             if (this.dropStatus === this.DROP_STATUS_DRAGGING) {
@@ -369,6 +402,17 @@ export default class MendixReactDnD extends Component {
     renderBothWrappers(cellContainer, item) {
         const dropPos = this.getPendingDropPos(item);
         const mapKey = item.containerID + "_" + item.id;
+        // console.info("renderBothWrappers");
+        // While dragging, don't render any child items or additionally selected items.
+        // The custom drag layer will render these along with the item being dragged.
+        if (this.dropStatus === this.DROP_STATUS_DRAGGING && item.id !== this.dropItemID) {
+            const { selectedIDs, childIDs } = this;
+            if ((childIDs && childIDs.indexOf(item.id) >= 0) || (selectedIDs && selectedIDs.indexOf(item.id) >= 0)) {
+                // console.info("MendixReactDnD.renderBothWrappers: Do not render " + item.nameAttributeValue);
+                return null;
+            }
+        }
+        // Return the element created earlier when drag is active or another marker is being rotated
         if (this.cellContentMap.has(mapKey)) {
             if (this.dropStatus === this.DROP_STATUS_DRAGGING && !dropPos) {
                 return this.cellContentMap.get(mapKey);
@@ -394,8 +438,16 @@ export default class MendixReactDnD extends Component {
     }
 
     renderDragWrapper(cellContainer, item) {
-        const dropPos = this.getPendingDropPos(item);
         const mapKey = item.containerID + "_" + item.id;
+        // While dragging, don't render any child items or additionally selected items as the custom drag layer will render these
+        if (this.dropStatus === this.DROP_STATUS_DRAGGING && item.id !== this.dropItemID) {
+            const { selectedIDs, childIDs } = this;
+            if ((childIDs && childIDs.indexOf(item.id) >= 0) || (selectedIDs && selectedIDs.indexOf(item.id) >= 0)) {
+                return null;
+            }
+        }
+        const dropPos = this.getPendingDropPos(item);
+        // Return the element created earlier when drag is active or another marker is being rotated
         if (this.cellContentMap.has(mapKey)) {
             if (this.dropStatus === this.DROP_STATUS_DRAGGING && !dropPos) {
                 return this.cellContentMap.get(mapKey);
@@ -479,14 +531,14 @@ export default class MendixReactDnD extends Component {
             eventOffsetY.setTextValue("" + offsetY);
         }
 
-        console.info(
-            "handleDrop dragged difference this X/Y " +
-                this.draggedDifferenceX +
-                "/" +
-                this.draggedDifferenceY +
-                ", position data: " +
-                JSON.stringify(positionData)
-        );
+        // console.info(
+        //     "handleDrop dragged difference this X/Y " +
+        //         this.draggedDifferenceX +
+        //         "/" +
+        //         this.draggedDifferenceY +
+        //         ", position data: " +
+        //         JSON.stringify(positionData)
+        // );
         const { draggedDifferenceX, draggedDifferenceY } = this.props;
         if (draggedDifferenceX) {
             draggedDifferenceX.setTextValue("" + this.draggedDifferenceX);
@@ -504,7 +556,7 @@ export default class MendixReactDnD extends Component {
     }
 
     handleDragStart({ containerID, itemID, itemOffsetX, itemOffsetY }) {
-        // console.info("handleDragStart: " + containerID + " - " + itemID + ", offset: " + itemOffsetX + "/" + itemOffsetY);
+        // console.info("handleDragStart: " + containerID + " - " + itemID);
         this.dropStatus = this.DROP_STATUS_DRAGGING;
         this.dropContainerID = containerID;
         this.dropItemID = itemID;
@@ -516,12 +568,34 @@ export default class MendixReactDnD extends Component {
         if (dsItem && dsItem.childIDs) {
             this.childIDs = dsItem.childIDs;
         }
+        const { selectedIDs } = this;
         // Reset the selected IDs if user ctrl-clicks markers and then starts dragging another marker
-        if (this.selectedIDs) {
+        if (selectedIDs) {
             if (this.selectedIDs.indexOf(itemID) === -1) {
                 this.selectedIDs = null;
             }
         }
+
+        // Build list with markers that should move along with the dragged marker
+        this.additionalItemInfoForDragging = [];
+        const { childIDs } = this;
+        for (const container of this.widgetData.getContainerMapValues()) {
+            for (const containerItem of container.getItemMapValues()) {
+                if (containerItem.id !== itemID) {
+                    if (
+                        (childIDs && childIDs.indexOf(containerItem.id) >= 0) ||
+                        (selectedIDs && selectedIDs.indexOf(containerItem.id) >= 0)
+                    ) {
+                        this.additionalItemInfoForDragging.push({ container, item: containerItem });
+                    }
+                }
+            }
+        }
+
+        // Force render by updating the state so custom drag layer will get the item info.
+        this.setState({
+            stateTriggerMillis: new Date().getTime()
+        });
     }
 
     handleDragEnd({ didDrop }) {
@@ -538,7 +612,7 @@ export default class MendixReactDnD extends Component {
         // This method can be called really often so access properties as late as possible.
         const millisNow = new Date().getTime();
         const interval = millisNow - this.onDragStatusMillis;
-        if (interval > this.onDragStatusIntervalValue) {
+        if (interval > this.DRAGGING_STATUS_UPDATE_INTERVAL) {
             this.onDragStatusMillis = millisNow;
             if (this.dropWithOffset) {
                 // Adjust for zoomfactor
@@ -550,10 +624,26 @@ export default class MendixReactDnD extends Component {
     }
 
     getPendingDropPos(item) {
+        if (this.dropStatus !== this.DROP_STATUS_DROPPED) {
+            return null;
+        }
+
         let dropPos = null;
 
+        // If the parent of the items is being dragged, reposition the child item as well.
+        // When multiple items are being dragged, reposition these as well.
+        const { childIDs, selectedIDs } = this;
+        if ((childIDs && childIDs.indexOf(item.id) >= 0) || (selectedIDs && selectedIDs.indexOf(item.id) >= 0)) {
+            dropPos = {
+                x: item.offsetX + this.draggedDifferenceX,
+                y: item.offsetY + this.draggedDifferenceY
+            };
+            // console.info("getPendingDropPos: additional item pending drop offset X/Y: " + JSON.stringify(dropPos));
+            return dropPos;
+        }
+
         // If the datasource item has not yet been updated with the new position, use the state values to prevent briefly showing the item at the old position.
-        if (this.dropStatus === this.DROP_STATUS_DROPPED && this.dropItemID === item.id) {
+        if (this.dropItemID === item.id) {
             // Only when dropping with an offset, as the offset is optional.
             if (this.dropWithOffset) {
                 // As long as the datasource item has the old values
@@ -562,9 +652,9 @@ export default class MendixReactDnD extends Component {
                         x: this.dropClientX,
                         y: this.dropClientY
                     };
-                    console.info("getPendingDropPos: pending drop offset X/Y: " + JSON.stringify(dropPos));
+                    // console.info("getPendingDropPos: dropped item pending drop offset X/Y: " + JSON.stringify(dropPos));
                 } else {
-                    console.info("getPendingDropPos: clear drop state with position offset");
+                    // console.info("getPendingDropPos: clear drop state with position offset");
                     this.clearDropState();
                 }
             } else {
