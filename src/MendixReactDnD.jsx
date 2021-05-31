@@ -61,7 +61,8 @@ export default class MendixReactDnD extends Component {
     widgetData = null;
     datasourceItemContentMap = new Map(); // Holds the widget content for each datasource item
     cellContentMap = new Map(); // Holds the cell content (drag/drop wrappers with datasource item)
-    containerCellRectMap = new Map(); // The rects by rXcY
+    containerCellRectMap = new Map(); // The rect for each container by rXcY
+    containerCellScrollMap = new Map(); // The scroll position for each container by rXcY
 
     // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
     onDragStatusMillis = 0;
@@ -164,6 +165,7 @@ export default class MendixReactDnD extends Component {
                     <CustomDragLayer
                         widgetData={this.widgetData}
                         containerCellRectMap={this.containerCellRectMap}
+                        containerCellScrollMap={this.containerCellScrollMap}
                         onDragStatusInterval={this.onDragStatusIntervalValue}
                         renderWidgetContent={this.getDatasourceItemContent}
                         additionalItemInfoForDragging={this.additionalItemInfoForDragging}
@@ -313,6 +315,9 @@ export default class MendixReactDnD extends Component {
                 onBoundingClientRectUpdate={rect => {
                     // Store the rect in the widget data map for use while dragging
                     this.containerCellRectMap.set(mapKey, rect);
+                }}
+                onContainerScroll={scrollInfo => {
+                    this.containerCellScrollMap.set(mapKey, scrollInfo);
                 }}
             >
                 {this.renderCell(gridMapItem)}

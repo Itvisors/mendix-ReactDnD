@@ -1,7 +1,13 @@
 import React, { Component, createElement } from "react";
 
 export class CellContainer extends Component {
-    layoutRef = React.createRef();
+    constructor(props) {
+        super(props);
+
+        this.layoutRef = React.createRef();
+
+        this.handleScroll = this.handleScroll.bind(this);
+    }
 
     // Keep track of container absolute position and size for use in the custom drag layer.
     currentRect = null;
@@ -40,25 +46,25 @@ export class CellContainer extends Component {
                 className={className}
                 data-rownumber={rowNumber}
                 data-columnnumber={columnNumber}
-                onScroll={evt => {
-                    const { onContainerScroll } = this.props;
-                    if (onContainerScroll) {
-                        onContainerScroll(evt);
-                    }
-                }}
+                onScroll={this.handleScroll}
             >
                 {this.props.children}
             </div>
         );
     }
-    // export function CellContainer({ rowNumber, columnNumber, onBoundingClientRectUpdate, children }) {
 
-    // useEffect(() => {
-    //     if (layoutRef.current) {
-    //         const rect = layoutRef.current.getBoundingClientRect();
-    //         if (onBoundingClientRectUpdate) {
-    //             onBoundingClientRectUpdate(rect);
-    //         }
-    //     }
-    // });
+    handleScroll() {
+        if (this.layoutRef.current) {
+            console.info(
+                "handleScroll T/L: " + this.layoutRef.current.scrollTop + "/" + this.layoutRef.current.scrollLeft
+            );
+            const { onContainerScroll } = this.props;
+            if (onContainerScroll) {
+                onContainerScroll({
+                    scrollTop: this.layoutRef.current.scrollTop,
+                    scrollLeft: this.layoutRef.current.scrollLeft
+                });
+            }
+        }
+    }
 }

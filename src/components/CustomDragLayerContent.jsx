@@ -53,20 +53,33 @@ export class CustomDragLayerContent extends Component {
 
     renderAdditionalItems() {
         const additionalItems = [];
+        const { zoomFactor } = this.props.widgetData;
 
         for (const itemInfo of this.props.additionalItemInfoForDragging) {
-            const { zoomFactor } = this.props.widgetData;
             const { container, item } = itemInfo;
             const mapKey = "r" + container.rowNumber + "c" + container.columnNumber;
+
+            // Get the absolute offset of the container
             const containerRect = this.props.containerCellRectMap.get(mapKey);
             const containerLeft = containerRect ? containerRect.left : 0;
             const containerTop = containerRect ? containerRect.top : 0;
-            const left = Math.round(item.offsetX * zoomFactor) + this.draggedDifferenceX + containerLeft;
-            const top = Math.round(item.offsetY * zoomFactor) + this.draggedDifferenceY + containerTop;
+
+            // Get the current scroll position of the container
+            const containerScrollInfo = this.props.containerCellScrollMap.get(mapKey);
+            const containerScrollTop = containerScrollInfo ? containerScrollInfo.scrollTop : 0;
+            const containerScrollLeft = containerScrollInfo ? containerScrollInfo.scrollLeft : 0;
+
+            // Calculate left and top position, taking into account the container offset and scroll position
+            const left =
+                Math.round(item.offsetX * zoomFactor) + this.draggedDifferenceX + containerLeft - containerScrollLeft;
+            const top =
+                Math.round(item.offsetY * zoomFactor) + this.draggedDifferenceY + containerTop - containerScrollTop;
             const style = {
                 top: top + "px",
                 left: left + "px"
             };
+
+            // Create the item
             const additionalItem = (
                 <div className="custom-draglayer-item" style={style}>
                     <DatasourceItem

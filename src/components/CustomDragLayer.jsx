@@ -6,6 +6,7 @@ import { useDragLayer } from "react-dnd";
 export function CustomDragLayer({
     widgetData,
     containerCellRectMap,
+    containerCellScrollMap,
     onDragStatusInterval,
     renderWidgetContent,
     additionalItemInfoForDragging,
@@ -42,6 +43,7 @@ export function CustomDragLayer({
             differenceFromInitialOffset={differenceFromInitialOffset}
             widgetData={widgetData}
             containerCellRectMap={containerCellRectMap}
+            containerCellScrollMap={containerCellScrollMap}
             onDragStatusInterval={onDragStatusInterval}
             renderWidgetContent={renderWidgetContent}
         />
