@@ -55,9 +55,9 @@ export class CellContainer extends Component {
 
     handleScroll() {
         if (this.layoutRef.current) {
-            console.info(
-                "handleScroll T/L: " + this.layoutRef.current.scrollTop + "/" + this.layoutRef.current.scrollLeft
-            );
+            // console.info(
+            //     "handleScroll T/L: " + this.layoutRef.current.scrollTop + "/" + this.layoutRef.current.scrollLeft
+            // );
             const { onContainerScroll } = this.props;
             if (onContainerScroll) {
                 onContainerScroll({

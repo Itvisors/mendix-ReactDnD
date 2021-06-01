@@ -149,6 +149,8 @@ export default class MendixReactDnD extends Component {
             return null;
         }
 
+        this.checkPendingDropPos();
+
         // console.info("MendixReactDnD.render");
 
         const className = "widget-container " + this.props.class;
@@ -260,6 +262,27 @@ export default class MendixReactDnD extends Component {
             rotationDegree = snapToRotation(rotationDegree, rotationDragDegrees);
         }
         return rotationDegree;
+    }
+
+    checkPendingDropPos() {
+        if (this.dropStatus !== this.DROP_STATUS_DROPPED) {
+            return;
+        }
+
+        const item = this.widgetData.getItemMapValue(this.dropContainerID + "_" + this.dropItemID);
+        if (item) {
+            // Only when dropping with an offset, as the offset is optional.
+            if (this.dropWithOffset) {
+                // When the datasource item no longer has the old values
+                if (this.originalOffsetX !== item.offsetX || this.originalOffsetY !== item.offsetY) {
+                    // console.info("checkPendingDropPos: clear drop state with position offset");
+                    this.clearDropState();
+                }
+            } else {
+                // console.info("checkPendingDropPos: clear drop state without postion offset");
+                this.clearDropState();
+            }
+        }
     }
 
     renderGrid() {
@@ -648,24 +671,13 @@ export default class MendixReactDnD extends Component {
         }
 
         // If the datasource item has not yet been updated with the new position, use the state values to prevent briefly showing the item at the old position.
-        if (this.dropItemID === item.id) {
-            // Only when dropping with an offset, as the offset is optional.
-            if (this.dropWithOffset) {
-                // As long as the datasource item has the old values
-                if (this.originalOffsetX === item.offsetX && this.originalOffsetY === item.offsetY) {
-                    dropPos = {
-                        x: item.offsetX + this.draggedDifferenceX,
-                        y: item.offsetY + this.draggedDifferenceY
-                    };
-                    // console.info("getPendingDropPos: dropped item pending drop offset X/Y: " + JSON.stringify(dropPos));
-                } else {
-                    // console.info("getPendingDropPos: clear drop state with position offset");
-                    this.clearDropState();
-                }
-            } else {
-                // console.info("getPendingDropPos: clear drop state without postion offset");
-                this.clearDropState();
-            }
+        // Only when dropping with an offset, as the offset is optional.
+        if (this.dropItemID === item.id && this.dropWithOffset) {
+            dropPos = {
+                x: item.offsetX + this.draggedDifferenceX,
+                y: item.offsetY + this.draggedDifferenceY
+            };
+            // console.info("getPendingDropPos: dropped item pending drop offset X/Y: " + JSON.stringify(dropPos));
         }
         return dropPos;
     }
