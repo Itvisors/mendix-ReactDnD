@@ -654,8 +654,8 @@ export default class MendixReactDnD extends Component {
                 // As long as the datasource item has the old values
                 if (this.originalOffsetX === item.offsetX && this.originalOffsetY === item.offsetY) {
                     dropPos = {
-                        x: this.dropClientX,
-                        y: this.dropClientY
+                        x: item.offsetX + this.draggedDifferenceX,
+                        y: item.offsetY + this.draggedDifferenceY
                     };
                     // console.info("getPendingDropPos: dropped item pending drop offset X/Y: " + JSON.stringify(dropPos));
                 } else {
