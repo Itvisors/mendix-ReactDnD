@@ -604,14 +604,26 @@ export default class MendixReactDnD extends Component {
             }
         }
 
+        // Add child IDs of any multiselected markers
+        if (selectedIDs) {
+            for (const item of this.widgetData.getItemMapValues()) {
+                if (selectedIDs.indexOf(item.id) >= 0) {
+                    if (this.childIDs) {
+                        this.childIDs += "," + item.childIDs;
+                    } else {
+                        this.childIDs = item.childIDs;
+                    }
+                }
+            }
+        }
+
         // Build list with markers that should move along with the dragged marker
         this.additionalItemInfoForDragging = [];
-        const { childIDs } = this;
         for (const container of this.widgetData.getContainerMapValues()) {
             for (const containerItem of container.getItemMapValues()) {
                 if (containerItem.id !== itemID) {
                     if (
-                        (childIDs && childIDs.indexOf(containerItem.id) >= 0) ||
+                        (this.childIDs && this.childIDs.indexOf(containerItem.id) >= 0) ||
                         (selectedIDs && selectedIDs.indexOf(containerItem.id) >= 0)
                     ) {
                         this.additionalItemInfoForDragging.push({ container, item: containerItem });

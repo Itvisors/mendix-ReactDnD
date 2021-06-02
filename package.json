@@ -6,8 +6,8 @@
   "copyright": "2020 ITvisors",
   "author": "Marcel Groeneweg",
   "config": {
-    "widgetPath": "../test/widgets",
-    "projectPath": "../test/",
+    "widgetPath": "../testPlaceringen/widgets",
+    "projectPath": "../testPlaceringen/",
     "mendixHost": "http://localhost:8080",
     "developmentPort": "3000"
   },
