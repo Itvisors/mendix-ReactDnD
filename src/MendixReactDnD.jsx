@@ -29,9 +29,6 @@ export default class MendixReactDnD extends Component {
     DROP_STATUS_DRAGGING = "dragging";
     DROP_STATUS_DROPPED = "dropped";
 
-    // Interval used for updating the dragged difference values.
-    DRAGGING_STATUS_UPDATE_INTERVAL = 100;
-
     state = {
         rotationDegree: 0,
         originalRotation: 0,
@@ -64,19 +61,7 @@ export default class MendixReactDnD extends Component {
     containerCellRectMap = new Map(); // The rect for each container by rXcY
     containerCellScrollMap = new Map(); // The scroll position for each container by rXcY
 
-    // Update state only every few times to prevent a LOT of state updates, renders and possibly loops.
-    onDragStatusMillis = 0;
-    onDragStatusIntervalValue = -1;
-
     render() {
-        // Take the value for the on drag status interval only the first time the widget is rendered.
-        if (this.onDragStatusIntervalValue === -1) {
-            this.onDragStatusIntervalValue = this.props.onDragStatusInterval;
-            if (this.onDragStatusIntervalValue < 10) {
-                this.onDragStatusIntervalValue = 100;
-            }
-        }
-
         const { containerList } = this.props;
         if (!containerList) {
             console.warn("MendixReactDnD: No containers");
@@ -168,7 +153,6 @@ export default class MendixReactDnD extends Component {
                         widgetData={this.widgetData}
                         containerCellRectMap={this.containerCellRectMap}
                         containerCellScrollMap={this.containerCellScrollMap}
-                        onDragStatusInterval={this.onDragStatusIntervalValue}
                         renderWidgetContent={this.getDatasourceItemContent}
                         additionalItemInfoForDragging={this.additionalItemInfoForDragging}
                         onDragging={this.handleDragging}
@@ -648,18 +632,11 @@ export default class MendixReactDnD extends Component {
     }
 
     handleDragging(draggedContainerID, draggedItemID, differenceFromInitialOffset) {
-        // Handle only once in a specified interval to prevent a lot of state updates, renders and possible loops.
-        // This method can be called really often so access properties as late as possible.
-        const millisNow = new Date().getTime();
-        const interval = millisNow - this.onDragStatusMillis;
-        if (interval > this.DRAGGING_STATUS_UPDATE_INTERVAL) {
-            this.onDragStatusMillis = millisNow;
-            if (this.dropWithOffset) {
-                // Adjust for zoomfactor
-                const { zoomFactor } = this.widgetData;
-                this.draggedDifferenceX = Math.round(differenceFromInitialOffset.x / zoomFactor);
-                this.draggedDifferenceY = Math.round(differenceFromInitialOffset.y / zoomFactor);
-            }
+        if (this.dropWithOffset) {
+            // Adjust for zoomfactor
+            const { zoomFactor } = this.widgetData;
+            this.draggedDifferenceX = Math.round(differenceFromInitialOffset.x / zoomFactor);
+            this.draggedDifferenceY = Math.round(differenceFromInitialOffset.y / zoomFactor);
         }
     }
 

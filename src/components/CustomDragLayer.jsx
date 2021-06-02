@@ -7,7 +7,6 @@ export function CustomDragLayer({
     widgetData,
     containerCellRectMap,
     containerCellScrollMap,
-    onDragStatusInterval,
     renderWidgetContent,
     additionalItemInfoForDragging,
     onDragging
@@ -44,7 +43,6 @@ export function CustomDragLayer({
             widgetData={widgetData}
             containerCellRectMap={containerCellRectMap}
             containerCellScrollMap={containerCellScrollMap}
-            onDragStatusInterval={onDragStatusInterval}
             renderWidgetContent={renderWidgetContent}
         />
     );

@@ -243,10 +243,6 @@
                 <description>When true, add the rotation button degrees value to the current rotation. When false, rotate to the next or previous value.</description>
                 <returnType type="Boolean" />
             </property>
-            <property key="onDragStatusInterval" type="integer" defaultValue="100">
-                <caption>On drag status interval</caption>
-                <description>Interval in milliseconds used to update other elements while dragging. Too long and the other elements lag behind or jump along. To short causes too many renders or even a stack overflow or a hanging browser. Any value below 10 is ignored and 100 will be used.</description>
-            </property>
             <property key="selectedMarkerGuids" type="attribute" required="false">
                 <caption>Selected marker GUIDs</caption>
                 <description>The selected marker(s). Comma separated list of GUIDs.</description>
