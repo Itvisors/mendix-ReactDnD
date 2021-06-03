@@ -212,6 +212,7 @@ export default class MendixReactDnD extends Component {
      */
     handleRotateHover(draggedItem, positionData) {
         const rotationDegree = this.calculateRotationDegree(draggedItem, positionData);
+        // console.info("handleRotateHover, rotation degree: " + rotationDegree);
         this.setState({
             rotationDegree: rotationDegree,
             originalRotation: draggedItem.originalRotation,
@@ -404,7 +405,7 @@ export default class MendixReactDnD extends Component {
             if (this.dropStatus === this.DROP_STATUS_DRAGGING) {
                 return this.cellContentMap.get(mapKey);
             }
-            if (this.rotateItemID && this.rotateItemID !== item.id) {
+            if (this.state.rotateItemID && this.state.rotateItemID !== item.id) {
                 return this.cellContentMap.get(mapKey);
             }
         }
@@ -442,7 +443,7 @@ export default class MendixReactDnD extends Component {
             if (this.dropStatus === this.DROP_STATUS_DRAGGING && !dropPos) {
                 return this.cellContentMap.get(mapKey);
             }
-            if (this.rotateItemID && this.rotateItemID !== item.id) {
+            if (this.state.rotateItemID && this.state.rotateItemID !== item.id) {
                 return this.cellContentMap.get(mapKey);
             }
         }
@@ -477,7 +478,7 @@ export default class MendixReactDnD extends Component {
             if (this.dropStatus === this.DROP_STATUS_DRAGGING && !dropPos) {
                 return this.cellContentMap.get(mapKey);
             }
-            if (this.rotateItemID && this.rotateItemID !== item.id) {
+            if (this.state.rotateItemID && this.state.rotateItemID !== item.id) {
                 return this.cellContentMap.get(mapKey);
             }
         }
@@ -700,7 +701,7 @@ export default class MendixReactDnD extends Component {
     renderDatasourceItem(cellContainer, item) {
         let draggedRotationDegree = 0;
         // Use rotation degree if ID matches, rotateItemID is null if nothing is being rotated now.
-        if (this.rotateItemID && this.rotateItemID === item.id) {
+        if (this.state.rotateItemID && this.state.rotateItemID === item.id) {
             // If the datasource item still returns the original value, use the rotation degree from the rotation drag.
             // If the datasource item has been updated, clear the state values.
             if (item.imageRotation === this.state.originalRotation) {
