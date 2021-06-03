@@ -95,18 +95,20 @@ export class WidgetData {
         this._widgetProps = widgetProps;
 
         this._checkTopLevelProps();
-        if (this._dataStatus === this.DATA_INCOMPLETE) {
-            // console.info("MendixReactDnD.WidgetData.loadData: Some dynamic properties are not yet available");
-            return;
+        // if (this._dataStatus === this.DATA_INCOMPLETE) {
+        //     console.info("MendixReactDnD.WidgetData.loadData: Some dynamic properties are not yet available");
+        // }
+
+        if (this._dataStatus === this.DATA_LOADING) {
+            this._checkContainers();
+            // if (this._dataStatus === this.DATA_INCOMPLETE) {
+            //     console.info("MendixReactDnD.WidgetData.loadData: Some containers are not yet available");
+            // }
         }
 
-        this._checkContainers();
-        if (this._dataStatus === this.DATA_INCOMPLETE) {
-            // console.info("MendixReactDnD.WidgetData.loadData: Some containers are not yet available");
-            return;
+        if (this._dataStatus === this.DATA_LOADING) {
+            this._loadTopLevelProps();
         }
-
-        this._loadTopLevelProps();
 
         if (this._dataStatus === this.DATA_LOADING) {
             this._loadContainerList();

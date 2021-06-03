@@ -54,6 +54,7 @@ export default class MendixReactDnD extends Component {
     // Convert from radials to degrees.
     R2D = 180 / Math.PI;
 
+    previousDataLoadMillis = 0;
     previousDataChangeDateMillis = 0;
     widgetData = null;
     datasourceItemContentMap = new Map(); // Holds the widget content for each datasource item
@@ -103,16 +104,25 @@ export default class MendixReactDnD extends Component {
                     // The dataChangeDateAttr value helps us to know that the backend wants the data to be reloaded.
                     // If render gets called again shortly after the dateChangedDate value, load the data again.
                     const currentDateMillis = new Date().getTime();
-                    if (
-                        this.previousDataChangeDateMillis === 0 ||
-                        currentDateMillis - this.previousDataChangeDateMillis < 300 ||
-                        dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis
-                    ) {
+                    let loadDataNow = false;
+                    if (this.previousDataChangeDateMillis === 0) {
+                        loadDataNow = true;
+                        // console.info("MendixReactDnD.render: no previous data changed date; load data");
+                    } else if (currentDateMillis - this.previousDataLoadMillis < 300) {
+                        loadDataNow = true;
+                        // console.info("MendixReactDnD.render: another render quickly after data load; load data");
+                    } else if (dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis) {
+                        loadDataNow = true;
+                        // console.info("MendixReactDnD.render: different data changed date; load data");
+                    }
+                    if (loadDataNow) {
+                        this.previousDataLoadMillis = currentDateMillis;
                         // Store the date, also prevents multiple renders all triggering reload of the data.
                         // First load the data in a new object.
                         // If that is successful, save the new widgetData object.
                         // This prevents flickering when a datasource item value turns out to be unavailable.
                         const newWidgetData = new WidgetData();
+                        // console.info("MendixReactDnD.render: load data");
                         newWidgetData.loadData(this.props);
                         if (newWidgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
                             this.widgetData = newWidgetData;
@@ -120,7 +130,10 @@ export default class MendixReactDnD extends Component {
                             this.loadDatasourceItemContent();
                             this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
                             this.selectedIDs = this.widgetData.selectedMarkerGuids;
+                            // console.info("MendixReactDnD.render: new data loaded");
                         }
+                    } else {
+                        // console.info("MendixReactDnD.render: skip data load");
                     }
                 } else {
                     console.error("MendixReactDnD: Data changed date is not set");
