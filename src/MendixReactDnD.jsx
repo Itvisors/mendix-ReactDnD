@@ -29,6 +29,10 @@ export default class MendixReactDnD extends Component {
     DROP_STATUS_DRAGGING = "dragging";
     DROP_STATUS_DROPPED = "dropped";
 
+    DATASOURCE_STATUS_PENDING = "pending";
+    DATASOURCE_STATUS_AVAILABLE = "available";
+    DATASOURCE_STATUS_LOADED = "loaded";
+
     state = {
         rotationDegree: 0,
         originalRotation: 0,
@@ -54,13 +58,14 @@ export default class MendixReactDnD extends Component {
     // Convert from radials to degrees.
     R2D = 180 / Math.PI;
 
-    previousDataLoadMillis = 0;
     previousDataChangeDateMillis = 0;
     widgetData = null;
     datasourceItemContentMap = new Map(); // Holds the widget content for each datasource item
     cellContentMap = new Map(); // Holds the cell content (drag/drop wrappers with datasource item)
     containerCellRectMap = new Map(); // The rect for each container by rXcY
     containerCellScrollMap = new Map(); // The scroll position for each container by rXcY
+    containerDatasourceItemsMap = new Map(); // The datasource item array for each container by container ID
+    containerDatasourceStatus = this.DATASOURCE_STATUS_PENDING;
 
     render() {
         const { containerList } = this.props;
@@ -68,6 +73,9 @@ export default class MendixReactDnD extends Component {
             console.warn("MendixReactDnD: No containers");
             return null;
         }
+
+        // console.info("MendixReactDnD.render");
+
         // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
         // Entity access issues are also hard to spot as the property update is ignored without error.
         if (
@@ -99,46 +107,32 @@ export default class MendixReactDnD extends Component {
             if (dataChangeDateAttr?.status === "available") {
                 if (dataChangeDateAttr.value) {
                     // Only if the date is different to prevent processing the datasource(s) when the render is only about resizing etc.
-                    // Due to an issue with datasources, after an update with refresh in client, the datasources will return stale data.
-                    // Also, render will be called many times in a row until all updates are in.
                     // The dataChangeDateAttr value helps us to know that the backend wants the data to be reloaded.
-                    // If render gets called again shortly after the dateChangedDate value, load the data again.
-                    const currentDateMillis = new Date().getTime();
-                    let loadDataNow = false;
-                    if (this.previousDataChangeDateMillis === 0) {
-                        loadDataNow = true;
-                        // console.info("MendixReactDnD.render: no previous data changed date; load data");
-                    } else if (currentDateMillis - this.previousDataLoadMillis < 300) {
-                        loadDataNow = true;
-                        // console.info("MendixReactDnD.render: another render quickly after data load; load data");
-                    } else if (dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis) {
-                        loadDataNow = true;
-                        // console.info("MendixReactDnD.render: different data changed date; load data");
-                    }
-                    if (loadDataNow) {
-                        this.previousDataLoadMillis = currentDateMillis;
-                        // Store the date, also prevents multiple renders all triggering reload of the data.
-                        // First load the data in a new object.
-                        // If that is successful, save the new widgetData object.
-                        // This prevents flickering when a datasource item value turns out to be unavailable.
-                        const newWidgetData = new WidgetData();
-                        // console.info("MendixReactDnD.render: load data");
-                        newWidgetData.loadData(this.props);
-                        if (newWidgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
-                            this.widgetData = newWidgetData;
-                            this.cellContentMap.clear();
-                            this.loadDatasourceItemContent();
-                            this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
-                            this.selectedIDs = this.widgetData.selectedMarkerGuids;
-                            // console.info("MendixReactDnD.render: new data loaded");
+                    if (
+                        this.previousDataChangeDateMillis === 0 ||
+                        dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis
+                    ) {
+                        if (this.previousDataChangeDateMillis === 0) {
+                            // console.info("MendixReactDnD.render: no data changed date set yet");
+                        } else {
+                            // console.info("MendixReactDnD.render: different data changed date");
                         }
-                    } else {
-                        // console.info("MendixReactDnD.render: skip data load");
+                        this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_PENDING);
+                        // Store the date, also prevents multiple renders all triggering reload of the data.
+                        this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
+                    }
+                    // console.info("MendixReactDnD.render: Check datasource pending status");
+                    this.checkDatasourceStatus();
+                    if (this.containerDatasourceStatus === this.DATASOURCE_STATUS_AVAILABLE) {
+                        // console.info("MendixReactDnD.render: Datasource update complete, load data");
+                        this.loadWidgetData();
                     }
                 } else {
                     console.error("MendixReactDnD: Data changed date is not set");
                     return null;
                 }
+                // } else {
+                //     console.info("MendixReactDnD.render: data changed date not available");
             }
         }
 
@@ -148,8 +142,6 @@ export default class MendixReactDnD extends Component {
         }
 
         this.checkPendingDropPos();
-
-        // console.info("MendixReactDnD.render");
 
         const className = "widget-container " + this.props.class;
         return (
@@ -173,6 +165,79 @@ export default class MendixReactDnD extends Component {
                 </div>
             </DndProvider>
         );
+    }
+
+    setDatasourceUpdateStatus(newStatus) {
+        this.containerDatasourceStatus = newStatus;
+        for (const mapItem of this.containerDatasourceItemsMap.values()) {
+            mapItem.updatePending = newStatus;
+        }
+    }
+
+    checkDatasourceStatus() {
+        let hasAvailable = false;
+        let hasUnavailable = false;
+        for (const container of this.props.containerList) {
+            const { ds } = container;
+            const containerID = container.containerID.value;
+            if (this.containerDatasourceItemsMap.has(containerID)) {
+                const mapItem = this.containerDatasourceItemsMap.get(containerID);
+                if (ds.status === "available") {
+                    // When the datasource content has been refreshed, the items array will be a different object
+                    // So update is pending when array object is the same as the one in the map.
+                    if (ds.items === mapItem.dsItems) {
+                        // console.info("MendixReactDnD: Datasource " + containerID + ": item array already cached");
+                    } else {
+                        // console.info("MendixReactDnD: Datasource " + containerID + ": new item array received");
+                        mapItem.updatePending = this.DATASOURCE_STATUS_AVAILABLE;
+                        mapItem.dsItems = ds.items;
+                        hasAvailable = true;
+                    }
+                } else {
+                    // console.info("MendixReactDnD: Datasource " + containerID + " is not available: " + ds.status);
+                    mapItem.dsItems = ds.items;
+                    mapItem.updatePending = this.DATASOURCE_STATUS_PENDING;
+                    hasUnavailable = true;
+                }
+                this.containerDatasourceItemsMap.set(containerID, mapItem);
+            } else {
+                // console.info("MendixReactDnD: Item array not yet in map, status: " + ds.status);
+                if (ds.status === "available") {
+                    hasAvailable = true;
+                } else {
+                    hasUnavailable = true;
+                }
+                const updatePending =
+                    ds.status === "available" ? this.DATASOURCE_STATUS_AVAILABLE : this.DATASOURCE_STATUS_PENDING;
+                this.containerDatasourceItemsMap.set(containerID, {
+                    dsItems: ds.items,
+                    updatePending: updatePending
+                });
+            }
+        }
+
+        // Set the status depending on what we found.
+        if (hasUnavailable) {
+            this.containerDatasourceStatus = this.DATASOURCE_STATUS_PENDING;
+        } else if (hasAvailable) {
+            this.containerDatasourceStatus = this.DATASOURCE_STATUS_AVAILABLE;
+        }
+    }
+
+    loadWidgetData() {
+        // First load the data in a new object.
+        // If that is successful, save the new widgetData object.
+        // This prevents flickering when a datasource item value turns out to be unavailable.
+        const newWidgetData = new WidgetData();
+        newWidgetData.loadData(this.props);
+        if (newWidgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
+            this.widgetData = newWidgetData;
+            this.cellContentMap.clear();
+            this.loadDatasourceItemContent();
+            this.selectedIDs = this.widgetData.selectedMarkerGuids;
+            this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_LOADED);
+            // console.info("MendixReactDnD.render: new data loaded");
+        }
     }
 
     /**
@@ -551,9 +616,9 @@ export default class MendixReactDnD extends Component {
             }
         }
         // When using offset positions, set drop data in state for rendering while datasource has not yet updated itself
+        this.dropStatus = this.DROP_STATUS_DROPPED;
         if (this.dropWithOffset) {
             // console.info("handleDrop: store drop data in state for position info");
-            this.dropStatus = this.DROP_STATUS_DROPPED;
             this.dropClientX = offsetX;
             this.dropClientY = offsetY;
         }
