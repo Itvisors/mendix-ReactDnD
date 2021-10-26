@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
     <name>Drag-drop container</name>
     <description>Wrapper for react-dnd</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAi0lEQVRYw+2WwQ7AIAhDreH/f7k7mRijk2AIZoOTh1UfWHAgyRIYtQRHAiSAtAUA0watiSx6khdVYMxoF6uMNfpe+00TAlB7wrUCGggXgN4HOwg5zWD8ZqYBsDTnfW2obamW6TiIZoPpbZ/qbb7dXHC9As1QkqiD7zWh9VW06sMrgPwrToAESIDfAzwsEC9SZeBQXwAAAABJRU5ErkJggg==</icon>
     <properties>
 
         <propertyGroup caption="Containers">
