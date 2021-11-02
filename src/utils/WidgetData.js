@@ -16,9 +16,6 @@ export class WidgetData {
 
     _widgetProps = null;
 
-    // eslint-disable-next-line no-undef
-    callDsPropDirectly = mx.version.substring(0, 1) === "8";
-
     maxRowNumber = 0;
     maxColumnNumber = 0;
 
@@ -299,8 +296,7 @@ export class WidgetData {
         if (!prop) {
             return null;
         }
-        // For Mendix 8, use prop as a function, for Mendix 9, prop is an object, call prop.get
-        const dynamicValue = this.callDsPropDirectly ? prop(dsItem) : prop.get(dsItem);
+        const dynamicValue = prop.get(dsItem);
         if (dynamicValue.status !== "available") {
             this._dataStatus = this.DATA_INCOMPLETE;
             return null;
