@@ -76,25 +76,6 @@ export default class MendixReactDnD extends Component {
 
         // console.info("MendixReactDnD.render");
 
-        // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
-        // Entity access issues are also hard to spot as the property update is ignored without error.
-        if (
-            this.isAttributeReadOnly("eventContainerID", this.props.eventContainerID) ||
-            this.isAttributeReadOnly("selectedMarkerGuids", this.props.selectedMarkerGuids) ||
-            this.isAttributeReadOnly("selectedMarkerCount", this.props.selectedMarkerCount) ||
-            this.isAttributeReadOnly("eventClientX", this.props.eventClientX) ||
-            this.isAttributeReadOnly("eventClientY", this.props.eventClientY) ||
-            this.isAttributeReadOnly("eventOffsetX", this.props.eventOffsetX) ||
-            this.isAttributeReadOnly("eventOffsetY", this.props.eventOffsetY) ||
-            this.isAttributeReadOnly("draggedDifferenceX", this.props.draggedDifferenceX) ||
-            this.isAttributeReadOnly("draggedDifferenceY", this.props.draggedDifferenceY) ||
-            this.isAttributeReadOnly("eventGuid", this.props.eventGuid) ||
-            this.isAttributeReadOnly("dropTargetContainerID", this.props.dropTargetContainerID) ||
-            this.isAttributeReadOnly("dropTargetGuid", this.props.dropTargetGuid) ||
-            this.isAttributeReadOnly("newRotation", this.props.newRotation)
-        ) {
-            return null;
-        }
         if (!this.widgetData) {
             this.widgetData = new WidgetData();
         }
@@ -301,11 +282,17 @@ export default class MendixReactDnD extends Component {
         //         droppedItem.originalRotation
         // );
         if (newRotation) {
-            newRotation.setTextValue("" + rotationDegree);
-            eventContainerID.setValue(droppedItem.originalType);
-            eventGuid.setValue(droppedItem.originalId);
-            if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
-                onRotateAction.execute();
+            if (
+                !this.isAttributeReadOnly("eventContainerID", eventContainerID) &&
+                !this.isAttributeReadOnly("eventGuid", eventGuid) &&
+                !this.isAttributeReadOnly("newRotation", newRotation)
+            ) {
+                newRotation.setTextValue("" + rotationDegree);
+                eventContainerID.setValue(droppedItem.originalType);
+                eventGuid.setValue(droppedItem.originalId);
+                if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
+                    onRotateAction.execute();
+                }
             }
         }
     }
@@ -573,13 +560,34 @@ export default class MendixReactDnD extends Component {
         const { adjustOffset, zoomFactor } = this.widgetData;
         const { containerID } = cellContainer;
 
-        const { eventContainerID, eventGuid, dropTargetContainerID, dropTargetGuid } = this.props;
+        const {
+            eventContainerID,
+            eventGuid,
+            eventClientX,
+            eventClientY,
+            eventOffsetX,
+            eventOffsetY,
+            dropTargetContainerID,
+            dropTargetGuid
+        } = this.props;
+        if (
+            this.isAttributeReadOnly("eventContainerID", eventContainerID) ||
+            this.isAttributeReadOnly("eventClientX", eventClientX) ||
+            this.isAttributeReadOnly("eventClientY", eventClientY) ||
+            this.isAttributeReadOnly("eventOffsetX", eventOffsetX) ||
+            this.isAttributeReadOnly("eventOffsetY", eventOffsetY) ||
+            this.isAttributeReadOnly("eventGuid", eventGuid) ||
+            this.isAttributeReadOnly("dropTargetContainerID", dropTargetContainerID) ||
+            this.isAttributeReadOnly("dropTargetGuid", dropTargetGuid)
+        ) {
+            return;
+        }
+
         eventContainerID.setValue(droppedItem.type);
         eventGuid.setTextValue(droppedItem.id);
         dropTargetContainerID.setValue(containerID);
         dropTargetGuid.setTextValue(item.id);
 
-        const { eventClientX, eventClientY } = this.props;
         if (eventClientX) {
             eventClientX.setTextValue("" + positionData.dropClientX);
         }
@@ -619,7 +627,6 @@ export default class MendixReactDnD extends Component {
             this.dropClientY = offsetY;
         }
 
-        const { eventOffsetX, eventOffsetY } = this.props;
         if (eventOffsetX) {
             eventOffsetX.setTextValue("" + offsetX);
         }
@@ -810,7 +817,32 @@ export default class MendixReactDnD extends Component {
 
     handleClick(container, item, evt, offsetX, offsetY) {
         const { containerID, allowSelection, returnOnClick } = container;
-        const { eventContainerID, eventGuid } = this.props;
+        const {
+            eventContainerID,
+            eventClientX,
+            eventClientY,
+            eventOffsetX,
+            eventOffsetY,
+            shiftKeyHeld,
+            ctrlKeyHeld,
+            altKeyHeld,
+            isRightClickEvent,
+            eventGuid
+        } = this.props;
+        if (
+            this.isAttributeReadOnly("eventContainerID", eventContainerID) ||
+            this.isAttributeReadOnly("eventGuid", eventGuid) ||
+            this.isAttributeReadOnly("eventClientX", eventClientX) ||
+            this.isAttributeReadOnly("eventClientY", eventClientY) ||
+            this.isAttributeReadOnly("eventOffsetX", eventOffsetX) ||
+            this.isAttributeReadOnly("eventOffsetY", eventOffsetY) ||
+            this.isAttributeReadOnly("shiftKeyHeld", shiftKeyHeld) ||
+            this.isAttributeReadOnly("ctrlKeyHeld", ctrlKeyHeld) ||
+            this.isAttributeReadOnly("altKeyHeld", altKeyHeld) ||
+            this.isAttributeReadOnly("isRightClickEvent", isRightClickEvent)
+        ) {
+            return;
+        }
         if (returnOnClick) {
             const isRightClick = evt.button !== 0;
             // console.info("MendixReactDnD onClick on " + containerID + " offset X/Y: " + offsetX + "/" + offsetY);
@@ -870,7 +902,6 @@ export default class MendixReactDnD extends Component {
             eventGuid.setTextValue(item.id);
 
             // Client position
-            const { eventClientX, eventClientY } = this.props;
             if (eventClientX) {
                 eventClientX.setTextValue("" + Math.round(evt.clientX));
             }
@@ -880,7 +911,6 @@ export default class MendixReactDnD extends Component {
 
             // Offset
             const { adjustOffset, zoomFactor } = this.widgetData;
-            const { eventOffsetX, eventOffsetY } = this.props;
             if (adjustOffset) {
                 // Adjust offset values for zoom factor.
                 if (eventOffsetX) {
@@ -899,21 +929,17 @@ export default class MendixReactDnD extends Component {
             }
 
             // Pass the state of the shift, ctrl and alt keys, if requested
-            const { shiftKeyHeld } = this.props;
             if (shiftKeyHeld) {
                 shiftKeyHeld.setValue(evt.shiftKey);
             }
-            const { ctrlKeyHeld } = this.props;
             if (ctrlKeyHeld) {
                 ctrlKeyHeld.setValue(evt.ctrlKey);
             }
-            const { altKeyHeld } = this.props;
             if (altKeyHeld) {
                 altKeyHeld.setValue(evt.altKey);
             }
 
             // Indicate whether this is a right click event. The button value is zero for normal click.
-            const { isRightClickEvent } = this.props;
             if (isRightClickEvent) {
                 isRightClickEvent.setValue(isRightClick);
             }
@@ -947,6 +973,13 @@ export default class MendixReactDnD extends Component {
     handleRotateClick(rotatedForward, container, item) {
         const { containerID } = container;
         const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
+        if (
+            this.isAttributeReadOnly("eventContainerID", eventContainerID) ||
+            this.isAttributeReadOnly("eventGuid", eventGuid) ||
+            this.isAttributeReadOnly("newRotation", newRotation)
+        ) {
+            return;
+        }
         const { rotationButtonDegrees, addToCurrentRotation } = this.widgetData;
         if (newRotation && rotationButtonDegrees > 0) {
             // Get current rotation
@@ -996,6 +1029,8 @@ export default class MendixReactDnD extends Component {
     }
 
     isAttributeReadOnly(propName, prop) {
+        // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
+        // Entity access issues are also hard to spot as the property update is ignored without error.
         if (!prop) {
             return false;
         }
