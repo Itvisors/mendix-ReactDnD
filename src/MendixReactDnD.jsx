@@ -356,7 +356,7 @@ export default class MendixReactDnD extends Component {
         // Render one row.
         const className = "widget-row widget-row-" + rowNumber;
         return (
-            <div className={className} data-rownumber={rowNumber}>
+            <div key={"row-" + rowNumber} className={className} data-rownumber={rowNumber}>
                 {this.renderRowCells(rowNumber)}
             </div>
         );
@@ -389,6 +389,7 @@ export default class MendixReactDnD extends Component {
 
         return (
             <CellContainer
+                key={mapKey}
                 rowNumber={rowNumber}
                 columnNumber={columnNumber}
                 onBoundingClientRectUpdate={rect => {
@@ -409,6 +410,7 @@ export default class MendixReactDnD extends Component {
 
         // Render each container.
         const cellArray = [];
+        let cellIndex = 0;
         for (const cellContainer of gridMapItem.containerArray) {
             const { containerID, containerClass } = cellContainer;
             // console.info("MendixReactDnD: Render cell for column " + columnNumber + ", container ID " + containerID);
@@ -419,8 +421,9 @@ export default class MendixReactDnD extends Component {
             const className = containerClass
                 ? "widget-cell-content-container " + containerClass
                 : "widget-cell-content-container";
+            cellIndex++;
             cellArray.push(
-                <div className={className} data-containerid={containerID}>
+                <div key={"cell-" + cellIndex} className={className} data-containerid={containerID}>
                     {itemArray}
                 </div>
             );

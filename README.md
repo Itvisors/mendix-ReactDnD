@@ -119,6 +119,8 @@ The widget allows you to choose where to put each container by setting a row and
 
 Be careful when using attributes over long XPaths in a datasource. This could cause performance issues.
 
+**IMPORTANT** Make sure any datasource microflow has the context object as parameter and any XPath ties to the context object as well. Otherwise, the contents may not refresh properly.
+
 #### Child IDs
 Datasource items can be linked to a parent item. When dragging the parent, any child items will move along too.
 Note that an item ID is just the GUID.
@@ -255,7 +257,7 @@ div.parent-child {
 In this example class `parent-child` would be put on the widget in Studio Pro, to make sure only items dragged in that particular page are affected 
 
 ## Demo project
-Separate demo project in the appstore
+[Separate demo project in the appstore](https://marketplace.mendix.com/link/component/116649)
 
 ## Issues, suggestions and feature requests
 [link to GitHub issues](https://github.com/Itvisors/mendix-ReactDnD/issues)
