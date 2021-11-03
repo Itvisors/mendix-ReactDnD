@@ -661,18 +661,18 @@ export default class MendixReactDnD extends Component {
         if (dsItem && dsItem.childIDs) {
             this.childIDs = dsItem.childIDs;
         }
-        const { selectedIDs } = this;
         // Reset the selected IDs if user ctrl-clicks markers and then starts dragging another marker
-        if (selectedIDs) {
+        if (this.selectedIDs) {
             if (this.selectedIDs.indexOf(itemID) === -1) {
                 this.selectedIDs = null;
+                this.cellContentMap.clear();
             }
         }
 
         // Add child IDs of any multiselected markers
-        if (selectedIDs) {
+        if (this.selectedIDs) {
             for (const item of this.widgetData.getItemMapValues()) {
-                if (selectedIDs.indexOf(item.id) >= 0) {
+                if (this.selectedIDs.indexOf(item.id) >= 0) {
                     if (this.childIDs) {
                         this.childIDs += "," + item.childIDs;
                     } else {
@@ -689,7 +689,7 @@ export default class MendixReactDnD extends Component {
                 if (containerItem.id !== itemID) {
                     if (
                         (this.childIDs && this.childIDs.indexOf(containerItem.id) >= 0) ||
-                        (selectedIDs && selectedIDs.indexOf(containerItem.id) >= 0)
+                        (this.selectedIDs && this.selectedIDs.indexOf(containerItem.id) >= 0)
                     ) {
                         this.additionalItemInfoForDragging.push({ container, item: containerItem });
                     }
@@ -813,7 +813,15 @@ export default class MendixReactDnD extends Component {
             // console.info("MendixReactDnD onClick on " + containerID + " offset X/Y: " + offsetX + "/" + offsetY);
             // console.dir(evt);
             // Only select marker if not right-click event
-            if (!isRightClick) {
+            if (isRightClick) {
+                // Reset the selected IDs if user ctrl-clicks markers and then right-clicks another marker
+                if (this.selectedIDs) {
+                    if (this.selectedIDs.indexOf(item.id) === -1) {
+                        this.selectedIDs = null;
+                        this.cellContentMap.clear();
+                    }
+                }
+            } else {
                 // Add item ID to selected IDs for ctrl-click
                 if (allowSelection === "multiple" && evt.ctrlKey) {
                     if (this.selectedIDs) {
