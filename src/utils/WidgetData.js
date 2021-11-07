@@ -35,6 +35,7 @@ export class WidgetData {
 
     _containerMap = new Map(); // The container by container ID
     _itemMap = new Map(); // The items by <container ID>_<Item ID>
+    _selectableItemMap = new Map(); // The items by Item ID
     _gridMap = new Map(); // The grid cells by rXcY
     _rowMap = new Map(); // The row info by rX, contains max column number for that row
     _additionalMarkerClassMap = new Map(); // Additional markers class data
@@ -57,6 +58,14 @@ export class WidgetData {
 
     getItemMapValues() {
         return this._itemMap.values();
+    }
+
+    getSelectableItemMapValue(key) {
+        return this._selectableItemMap.get(key);
+    }
+
+    getSelectableItemMapValues() {
+        return this._selectableItemMap.values();
     }
 
     getGridMapValue(key) {
@@ -157,6 +166,7 @@ export class WidgetData {
         this.maxColumnNumber = 0;
         this._containerMap.clear();
         this._itemMap.clear();
+        this._selectableItemMap.clear();
         this._gridMap.clear();
         this._rowMap.clear();
 
@@ -228,6 +238,12 @@ export class WidgetData {
         const mapKey = containerData.containerID + "_" + dsItem.id;
         containerData.itemMap.set(mapKey, containerItemData);
         this._itemMap.set(mapKey, containerItemData);
+
+        // Place selectable items in a separate map for easy access
+        // Only selectable items because backgrounds etc. may be used in multiple containers.
+        if (container.allowSelection !== "none") {
+            this._selectableItemMap.set(dsItem.id, containerItemData);
+        }
 
         containerItemData.id = dsItem.id;
         containerItemData.containerID = containerData.containerID;

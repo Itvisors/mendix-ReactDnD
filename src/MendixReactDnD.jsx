@@ -680,30 +680,34 @@ export default class MendixReactDnD extends Component {
         }
 
         // Add child IDs of any multiselected markers
-        if (this.selectedIDs) {
-            for (const item of this.widgetData.getItemMapValues()) {
-                if (this.selectedIDs.indexOf(item.id) >= 0) {
-                    if (this.childIDs) {
-                        this.childIDs += "," + item.childIDs;
-                    } else {
-                        this.childIDs = item.childIDs;
-                    }
+        const selectedIDArray = this.selectedIDs ? this.selectedIDs.split(",") : [];
+        for (const selectedID of selectedIDArray) {
+            const selectedItem = this.widgetData.getSelectableItemMapValue(selectedID);
+            if (selectedItem) {
+                if (this.childIDs) {
+                    this.childIDs += "," + selectedItem.childIDs;
+                } else {
+                    this.childIDs = selectedItem.childIDs;
                 }
+            } else {
+                console.error("MendixReactDnD: Selected item not found for " + selectedID);
             }
+        }
+
+        let additionalItemIDArray = this.selectedIDs ? this.selectedIDs.split(",") : [];
+        if (this.childIDs) {
+            additionalItemIDArray = additionalItemIDArray.concat(this.childIDs.split(","));
         }
 
         // Build list with markers that should move along with the dragged marker
         this.additionalItemInfoForDragging = [];
-        for (const container of this.widgetData.getContainerMapValues()) {
-            for (const containerItem of container.getItemMapValues()) {
-                if (containerItem.id !== itemID) {
-                    if (
-                        (this.childIDs && this.childIDs.indexOf(containerItem.id) >= 0) ||
-                        (this.selectedIDs && this.selectedIDs.indexOf(containerItem.id) >= 0)
-                    ) {
-                        this.additionalItemInfoForDragging.push({ container, item: containerItem });
-                    }
-                }
+        for (const additionalItemID of additionalItemIDArray) {
+            const additionalItem = this.widgetData.getSelectableItemMapValue(additionalItemID);
+            if (additionalItem) {
+                const container = this.widgetData.getContainerMapValue(additionalItem.containerID);
+                this.additionalItemInfoForDragging.push({ container, item: additionalItem });
+            } else {
+                console.error("MendixReactDnD: Additional item not found for " + additionalItemID);
             }
         }
 
