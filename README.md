@@ -174,6 +174,19 @@ Take care when creating a palette from which the user can drag items onto the fl
 
 If you allow items to be positioned on top of each other or overlapping in any way, be sure to make the items a drop target as well. Without this, items cannot be dropped close to each other or on top of each other.
 
+### Prevent dropping outside the background image
+The background image will resize according to the zoom level, so it may be smaller than the available space. The drop target is just a `div` so by default it will take all available space, allowing markers to be dropped outside the backgroud image. To prevent this, put a class similar to this one on your background container:
+
+```
+    div.widget-cell-content-container.floorplanContainer {
+        display: inline-block;
+    }
+```
+
+The demo app has this class applied to the background.
+
+**Only put this class on the background container!** If this class is put on draggable items, these will not be positioned correctly anymore!
+
 ### Marker selection
 
 The styling tab has additional options for marker selection, intended only for positioning items on a floorplan.
