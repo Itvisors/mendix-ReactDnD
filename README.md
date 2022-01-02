@@ -132,7 +132,7 @@ When X and Y offset are set, position absolute is also set on the item.
 
 Use CommunityCommons.GetImageDimensions to save the image dimensions on your image objects. 
 
-To create a sidebar with templates, use a separate container to show the template items. Mark these as template using the `Is template item` property and set a maximum width on them. This ensures that the template bar does not scale with the zoom factor and the items are not wider than the sidebar. If the item you create from the template will scale with the floorplan or background, set the value on the template as well. As a result, while dragging the template onto the background, the template will appear correctly sized for the current zoom level so it may be placed on the background correctly. 
+To create a sidebar with templates, use a separate container to show the template items. Mark these as template using the `Is template item` property and set the `maximum template width` property on them. This ensures that the template bar does not scale with the zoom factor and the items are not wider than the sidebar. If the item you create from the template will scale with the floorplan or background, set the value on the template as well. As a result, while dragging the template onto the background, the template will appear correctly sized for the current zoom level so it may be placed on the background correctly. 
 
 | Property            | Type        | Req. | Remarks
 |---------------------|-------------|:----:|---------
