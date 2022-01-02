@@ -28,11 +28,12 @@ export class ContainerItemData {
     imageHeight = 0;
     imageWidth = 0;
     scaleImage = false;
-    adjustOffsetOnDrop = false;
     imageRotation = 0;
     allowRotate = false;
     showGrid = false;
     gridSize = 5;
+    isTemplateItem = false;
+    maxTemplateWidth = 0;
 
     // Styling, expression
     containerClass = null;
@@ -65,12 +66,13 @@ export class ContainerItemData {
             otherItem.imageHeight !== this.imageHeight ||
             otherItem.imageWidth !== this.imageWidth ||
             otherItem.scaleImage !== this.scaleImage ||
-            otherItem.adjustOffsetOnDrop !== this.adjustOffsetOnDrop ||
             otherItem.imageRotation !== this.imageRotation ||
             otherItem.allowRotate !== this.allowRotate ||
             otherItem.showGrid !== this.showGrid ||
             otherItem.gridSize !== this.gridSize ||
-            otherItem.containerClass !== this.containerClass
+            otherItem.containerClass !== this.containerClass ||
+            otherItem.isTemplateItem !== this.isTemplateItem ||
+            otherItem.maxTemplateWidth !== this.maxTemplateWidth
         );
     }
 }

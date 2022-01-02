@@ -25,7 +25,6 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
             id: item.id,
             imageHeight: item.imageHeight,
             imageWidth: item.imageWidth,
-            adjustOffsetOnDrop: item.adjustOffsetOnDrop,
             itemWidth: elementRect ? elementRect.width : undefined,
             itemHeight: elementRect ? elementRect.height : undefined
         },

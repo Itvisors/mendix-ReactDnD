@@ -282,9 +282,6 @@ export class WidgetData {
         const dsScaleImage = this._getDsItemPropertyValue(dsItem, container.dsScaleImage);
         containerItemData.scaleImage = dsScaleImage ? !!dsScaleImage.value : false;
 
-        const dsAdjustOffsetOnDrop = this._getDsItemPropertyValue(dsItem, container.dsAdjustOffsetOnDrop);
-        containerItemData.adjustOffsetOnDrop = dsAdjustOffsetOnDrop ? !!dsAdjustOffsetOnDrop.value : false;
-
         const dsImageRotation = this._getDsItemPropertyValue(dsItem, container.dsImageRotation);
         containerItemData.imageRotation = this._getNumberValue(dsImageRotation);
 
@@ -298,6 +295,15 @@ export class WidgetData {
         containerItemData.gridSize = this._getNumberValue(dsGridSize);
         if (containerItemData.gridSize < 5) {
             containerItemData.gridSize = 5;
+        }
+
+        const dsIsTemplateItem = this._getDsItemPropertyValue(dsItem, container.dsIsTemplateItem);
+        containerItemData.isTemplateItem = dsIsTemplateItem ? !!dsIsTemplateItem.value : false;
+
+        const dsMaxTemplateWidth = this._getDsItemPropertyValue(dsItem, container.dsMaxTemplateWidth);
+        containerItemData.maxTemplateWidth = this._getNumberValue(dsMaxTemplateWidth);
+        if (containerItemData.maxTemplateWidth < 0) {
+            containerItemData.maxTemplateWidth = 0;
         }
 
         containerData.containerClass = container.containerClass ? container.containerClass.value : null;

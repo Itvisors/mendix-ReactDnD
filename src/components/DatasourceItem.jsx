@@ -28,6 +28,7 @@ export class DatasourceItem extends Component {
             cellContainer,
             item,
             isSelected,
+            isDragging,
             draggedRotationDegree,
             zoomPercentage,
             additionalMarkerClasses,
@@ -90,6 +91,7 @@ export class DatasourceItem extends Component {
                     draggedRotationDegree={draggedRotationDegree}
                     zoomPercentage={zoomPercentage}
                     isSelected={isSelected}
+                    isDragging={isDragging}
                     selectedMarkerBorderSize={selectedMarkerBorderSize}
                     onRotateClick={onRotateClick}
                 />

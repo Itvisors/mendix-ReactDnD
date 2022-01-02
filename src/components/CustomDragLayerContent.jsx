@@ -41,6 +41,7 @@ export class CustomDragLayerContent extends Component {
                         key={this.props.item.id}
                         cellContainer={this.props.container}
                         item={this.props.item}
+                        isDragging={true}
                         draggedRotationDegree={0}
                         renderWidgetContent={this.props.renderWidgetContent}
                         zoomPercentage={this.props.widgetData.zoomPercentage}

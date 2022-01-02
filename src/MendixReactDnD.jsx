@@ -610,14 +610,6 @@ export default class MendixReactDnD extends Component {
             // Adjust offset values for zoom factor.
             offsetX = Math.round(offsetX / zoomFactor);
             offsetY = Math.round(offsetY / zoomFactor);
-            // Adjust offset on drop when requested.
-            const { imageWidth, imageHeight, adjustOffsetOnDrop } = droppedItem;
-            if (adjustOffsetOnDrop && imageHeight && imageWidth && zoomFactor !== 1) {
-                const widthDifference = Math.round(imageWidth - imageWidth * zoomFactor);
-                const heightDifference = Math.round(imageHeight - imageHeight * zoomFactor);
-                offsetX = Math.round(offsetX + widthDifference / 2);
-                offsetY = Math.round(offsetY + heightDifference / 2);
-            }
         }
         // When using offset positions, set drop data in state for rendering while datasource has not yet updated itself
         this.dropStatus = this.DROP_STATUS_DROPPED;

@@ -9,6 +9,7 @@ export function DatasourceItemImage({
     draggedRotationDegree,
     zoomPercentage,
     isSelected,
+    isDragging,
     selectedMarkerBorderSize,
     onRotateClick
 }) {
@@ -17,9 +18,27 @@ export function DatasourceItemImage({
     if (!imageUrl) {
         return null;
     }
-    const zoomFactor = calculateZoomFactor(zoomPercentage, item.scaleImage);
-    const imageWidthValue = Math.round(imageWidth * zoomFactor);
-    const imageHeightValue = Math.round(imageHeight * zoomFactor);
+
+    // If item is a template item and it is not being dragged, take maximum template width into account to determine the image width.
+    // Use item dimensions otherwise.
+    let imageWidthValue = 0;
+    let imageHeightValue = 0;
+    const isTemplateItem = item.isTemplateItem && item.maxTemplateWidth > 0;
+    if (isTemplateItem && !isDragging) {
+        if (imageWidth < item.maxTemplateWidth) {
+            imageWidthValue = imageWidth;
+            imageHeightValue = imageHeight;
+        } else {
+            imageWidthValue = item.maxTemplateWidth;
+            imageHeightValue = Math.round(imageHeight * (item.maxTemplateWidth / imageWidth));
+        }
+    } else {
+        const zoomFactor = calculateZoomFactor(zoomPercentage, item.scaleImage);
+        imageWidthValue = Math.round(imageWidth * zoomFactor);
+        imageHeightValue = Math.round(imageHeight * zoomFactor);
+    }
+
+    // Rotation value, including current rotation drag value, can be zero.
     const imageRotationValue = imageRotation + draggedRotationDegree;
 
     // Image is rotated around the center. Rotation handle is on the right. Pass half the image width as offset to the rotation handle.

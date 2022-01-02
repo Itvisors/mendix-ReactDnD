@@ -132,6 +132,8 @@ When X and Y offset are set, position absolute is also set on the item.
 
 Use CommunityCommons.GetImageDimensions to save the image dimensions on your image objects. 
 
+To create a sidebar with templates, use a separate container to show the template items. Mark these as template using the `Is template item` property and set a maximum width on them. This ensures that the template bar does not scale with the zoom factor and the items are not wider than the sidebar. If the item you create from the template will scale with the floorplan or background, set the value on the template as well. As a result, while dragging the template onto the background, the template will appear correctly sized for the current zoom level so it may be placed on the background correctly. 
+
 | Property            | Type        | Req. | Remarks
 |---------------------|-------------|:----:|---------
 | Offset X            | Integer     |      | Offset X position for the item.
@@ -140,11 +142,12 @@ Use CommunityCommons.GetImageDimensions to save the image dimensions on your ima
 | Image height        | Integer     | Y    | Image height, in pixels
 | Image width         | Integer     | Y    | Image width, in pixels
 | Scale image         | Boolean     |      | Scale image with the floorplan.
-| Adjust drop offset  | Boolean     |      | When dropping an image from a palette that is not scaled onto a canvas that can scale, set this to true to adjust the drop offset for the zomm percentage.
 | Rotation            | Integer     |      | The current rotation of the image. Required when the user is allowed to rotate the image
 | Allow rotate        | Boolean     |      | Whether user may rotate the image. Only when image is rendered. If true, a rotation handle will be shown when the user hovers over the image.
 | Show grid           | Boolean     |      | Show a grid over this item
 | Grid size           | Integer     |      | Size of a grid cell. Note that the snap to grid feature has a separate snap to size
+| Is template item    | Boolean     |      | Is this a template to create items by dropping this one on the background?
+| Max. template width | Integer     |      | Maximum width of the template item as shown in the sidebar.
 
 ### Styling the container and its items
 
