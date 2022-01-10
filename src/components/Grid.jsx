@@ -5,7 +5,7 @@ export function Grid({ gridSize, gridWidth, gridHeight }) {
     const smallPath = "M " + gridSize + " 0 L 0 0 0 " + gridSize + "";
     const largePath = "M " + largeSize + " 0 L 0 0 0 " + largeSize + "";
     return (
-        <div style={{ width: gridWidth, height: gridHeight }} className="gridContainer">
+        <div style={{ width: gridWidth, height: gridHeight }} className="grid-container">
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="smallGrid" width={gridSize} height={gridSize} patternUnits="userSpaceOnUse">

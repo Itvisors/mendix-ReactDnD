@@ -1,4 +1,5 @@
 /*global mx */
+import { DragToSelect } from "./DragToSelect";
 import { Grid } from "./Grid";
 import { RotationHandle } from "./RotationHandle";
 import { calculateZoomFactor } from "../utils/Utils";
@@ -61,7 +62,7 @@ export function DatasourceItemImage({
                 </div>
             </div>
         );
-    } else if (item.showGrid) {
+    } else if (item.showGrid || item.allowDragToSelect) {
         return (
             <div style={{ width: imageWidthValue, height: imageHeightValue }}>
                 {renderImage(
@@ -72,7 +73,8 @@ export function DatasourceItemImage({
                     isSelected,
                     selectedMarkerBorderSize
                 )}
-                <Grid gridSize={item.gridSize} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />
+                {renderGrid(item, imageWidthValue, imageHeightValue)}
+                {renderDragToSelect(item, imageWidthValue, imageHeightValue)}
             </div>
         );
     } else {
@@ -136,4 +138,20 @@ function getUri(imageUrl) {
         return imageUrl;
     }
     return mx.remoteUrl + imageUrl;
+}
+
+function renderGrid(item, imageWidthValue, imageHeightValue) {
+    if (item.showGrid) {
+        return <Grid gridSize={item.gridSize} gridWidth={imageWidthValue} gridHeight={imageHeightValue} />;
+    } else {
+        return null;
+    }
+}
+
+function renderDragToSelect(item, imageWidthValue, imageHeightValue) {
+    if (item.allowDragToSelect) {
+        return <DragToSelect itemData={item} containerWidth={imageWidthValue} containerHeight={imageHeightValue} />;
+    } else {
+        return null;
+    }
 }

@@ -22,6 +22,7 @@ export default class MendixReactDnD extends Component {
         this.handleDragEnd = this.handleDragEnd.bind(this);
         this.handleRotateHover = this.handleRotateHover.bind(this);
         this.handleRotateDrop = this.handleRotateDrop.bind(this);
+        this.handleDragToSelectDrop = this.handleDragToSelectDrop.bind(this);
         this.handleDragging = this.handleDragging.bind(this);
     }
 
@@ -132,6 +133,7 @@ export default class MendixReactDnD extends Component {
                         containerList={this.widgetData.getContainerMapValues()}
                         onRotateHover={this.handleRotateHover}
                         onRotateDrop={this.handleRotateDrop}
+                        onDragToSelectDrop={this.handleDragToSelectDrop}
                     >
                         {this.renderGrid()}
                     </GlobalDropWrapper>
@@ -305,6 +307,20 @@ export default class MendixReactDnD extends Component {
             rotationDegree = snapToRotation(rotationDegree, rotationDragDegrees);
         }
         return rotationDegree;
+    }
+
+    /**
+     * Handle drop for drag to select
+     * @param {*} droppedItem The item the drag to select was performed on, a background or floorplan
+     * @param {*} positionData The position of the drop
+     */
+    handleDragToSelectDrop(droppedItem, positionData) {
+        console.info(
+            "handleDragToSelectDrop, item: " +
+                droppedItem.originalId +
+                ", position data: " +
+                JSON.stringify(positionData)
+        );
     }
 
     checkPendingDropPos() {

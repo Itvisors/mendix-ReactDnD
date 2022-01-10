@@ -19,6 +19,7 @@ export class ContainerItemData {
     nameAttributeValue = null;
     markerClass = null;
     childIDs = null;
+    allowDragToSelect = false;
 
     // Image item
     hasOffset = false;

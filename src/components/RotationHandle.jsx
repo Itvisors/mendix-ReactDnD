@@ -11,6 +11,7 @@ export function RotationHandle({ offsetX, imageRotation, itemData }) {
         item: {
             type: rotationHandleDragType,
             id: itemData.itemID + Constants.ROTATION_HANDLE_ID_SUFFIX,
+            dragType: Constants.DRAG_TYPE_ROTATE,
             originalType: itemData.containerID,
             originalId: itemData.id,
             originalRotation: imageRotation,

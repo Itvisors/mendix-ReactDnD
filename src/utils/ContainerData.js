@@ -7,6 +7,7 @@ export class ContainerData {
     columnNumber = 0;
     dragDropType = null;
     allowSelection = null;
+    allowDragToSelect = false;
     returnOnClick = false;
     acceptsContainerIDs = null;
 

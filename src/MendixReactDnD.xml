@@ -52,6 +52,10 @@
                             <description>Whether OnClick events should be returned for the container. Useful for getting the exact click coordinate on the container.</description>
                             <returnType type="Boolean" />
                         </property>
+                        <property key="allowDragToSelect" type="boolean" defaultValue="false">
+                            <caption>Allow drag to select</caption>
+                            <description>Allow dragging across the background/floorplan to select items by drawing a selection area. Only makes sense when multi-select is allowed on items in the same row/column combination.</description>
+                        </property>
                         <property key="acceptsContainerIDs" type="expression" required="false">
                             <caption>Accepts IDs</caption>
                             <description>One or more key values of the enumeration used for the Container ID. Separate values using a comma.</description>

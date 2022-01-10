@@ -197,6 +197,7 @@ export class WidgetData {
         }
         containerData.dragDropType = container.dragDropType;
         containerData.allowSelection = container.allowSelection;
+        containerData.allowDragToSelect = !!container.allowDragToSelect;
         containerData.returnOnClick = !!container.returnOnClick.value;
         containerData.acceptsContainerIDs = container.acceptsContainerIDs ? container.acceptsContainerIDs.value : null;
         this._containerMap.set(containerID, containerData);
@@ -259,6 +260,9 @@ export class WidgetData {
 
         const dsChildIDs = this._getDsItemPropertyValue(dsItem, container.dsChildIDs);
         containerItemData.childIDs = dsChildIDs?.value;
+
+        // Duplicate container value as it is required while rendering the item image
+        containerItemData.allowDragToSelect = containerData.allowDragToSelect;
 
         // Not only get the offset data but also whether there is an offset expression at all.
         if (container.dsOffsetX && container.dsOffsetY) {

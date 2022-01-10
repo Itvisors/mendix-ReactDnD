@@ -129,8 +129,20 @@ div.widget-container.drag-shadow div.custom-draglayer div.custom-draglayer-item 
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-div.gridContainer {
+div.grid-container {
     position: absolute;
     top: 0px;
     left: 0px;
+}
+
+div.drag-to-select-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+div.custom-draglayer-selection {
+    position: absolute;
+    border: 1px solid #00BFFF;
+    background-color: #00BFFF50;
 }

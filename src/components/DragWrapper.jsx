@@ -1,4 +1,5 @@
 import { createElement, useEffect, useRef, useState } from "react";
+import { Constants } from "../utils/Constants";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
@@ -11,6 +12,7 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
             onDragStart({
                 containerID: item.containerID,
                 itemID: item.id,
+                dragType: Constants.DRAG_TYPE_NORMAL,
                 itemOffsetX: item.hasOffset ? item.offsetX : undefined,
                 itemOffsetY: item.hasOffset ? item.offsetY : undefined
             });
