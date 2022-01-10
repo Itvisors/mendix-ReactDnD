@@ -7,15 +7,6 @@ export function CustomDragLayerDragToSelect({
     initialClientOffset,
     clientOffset
 }) {
-    /*
-
-            // Calculate left and top position, taking into account the container offset and scroll position
-            const left =
-                Math.round(item.offsetX * zoomFactor) + this.draggedDifferenceX + containerLeft - containerScrollLeft;
-            const top =
-                Math.round(item.offsetY * zoomFactor) + this.draggedDifferenceY + containerTop - containerScrollTop;
-
-*/
     const mapKey = "r" + item.rowNumber + "c" + item.columnNumber;
 
     // Get the absolute offset of the container

@@ -315,12 +315,68 @@ export default class MendixReactDnD extends Component {
      * @param {*} positionData The position of the drop
      */
     handleDragToSelectDrop(droppedItem, positionData) {
+        const mapKey = "r" + droppedItem.rowNumber + "c" + droppedItem.columnNumber;
+
+        // Get the absolute offset of the container
+        const containerRect = this.containerCellRectMap.get(mapKey);
+        const containerLeft = Math.round(containerRect ? containerRect.left : 0);
+        const containerTop = Math.round(containerRect ? containerRect.top : 0);
+
+        // Get the current scroll position of the container
+        const containerScrollInfo = this.containerCellScrollMap.get(mapKey);
+        const containerScrollTop = Math.round(containerScrollInfo ? containerScrollInfo.scrollTop : 0);
+        const containerScrollLeft = Math.round(containerScrollInfo ? containerScrollInfo.scrollLeft : 0);
+
+        // When dragging from top to bottom or from left to right, the dX/dY value will be positive, negative otherwise.
+        // The values on the dropped item are screen values so the zoom factor must be applied on them.
+        let selectionTop =
+            Math.round(positionData.initialY * this.widgetData.zoomFactor) - containerTop + containerScrollTop;
+        let selectionLeft =
+            Math.round(positionData.initialX * this.widgetData.zoomFactor) - containerLeft + containerScrollLeft;
+        let selectionRight = selectionLeft;
+        let selectionBottom = selectionTop;
+        if (positionData.dX > 0) {
+            selectionRight += Math.round(positionData.dX * this.widgetData.zoomFactor);
+        } else {
+            selectionLeft += Math.round(positionData.dX * this.widgetData.zoomFactor);
+        }
+        if (positionData.dY > 0) {
+            selectionBottom += Math.round(positionData.dY * this.widgetData.zoomFactor);
+        } else {
+            selectionTop += Math.round(positionData.dY * this.widgetData.zoomFactor);
+        }
+        if (selectionTop < 0) {
+            selectionTop = 0;
+        }
+        if (selectionLeft < 0) {
+            selectionLeft = 0;
+        }
+        let selectionHeight = selectionBottom - selectionTop;
+        let selectionWidth = selectionRight - selectionLeft;
+        if (selectionWidth > droppedItem.imageWidth) {
+            selectionWidth = droppedItem.imageWidth;
+        }
+        if (selectionHeight > droppedItem.imageHeight) {
+            selectionHeight = droppedItem.imageHeight;
+        }
         console.info(
-            "handleDragToSelectDrop, item: " +
-                droppedItem.originalId +
-                ", position data: " +
-                JSON.stringify(positionData)
+            "handleDragToSelectDrop, top: " +
+                selectionTop +
+                ", left: " +
+                selectionLeft +
+                ", right: " +
+                selectionRight +
+                ", bottom: " +
+                selectionBottom +
+                ", width: " +
+                selectionWidth +
+                ", height: " +
+                selectionHeight
         );
+
+        // const gridMapItem = this.widgetData.getGridMapValue(mapKey);
+        // for (const cellContainer of gridMapItem.containerArray) {
+        // }
     }
 
     checkPendingDropPos() {
