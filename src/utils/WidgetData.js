@@ -249,6 +249,10 @@ export class WidgetData {
         containerItemData.id = dsItem.id;
         containerItemData.containerID = containerData.containerID;
 
+        // Duplicate the row/col info for drag layer.
+        containerItemData.rowNumber = containerData.rowNumber;
+        containerItemData.columnNumber = containerData.columnNumber;
+
         const dsDisableDrag = this._getDsItemPropertyValue(dsItem, container.dsDisableDrag);
         containerItemData.disableDrag = dsDisableDrag ? !!dsDisableDrag.value : false;
 

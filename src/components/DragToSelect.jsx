@@ -9,6 +9,8 @@ export function DragToSelect({ itemData, containerWidth, containerHeight }) {
             type: itemData.containerID + Constants.DRAG_TO_SELECT_ID_SUFFIX,
             id: itemData.id + Constants.DRAG_TO_SELECT_ID_SUFFIX,
             dragType: Constants.DRAG_TYPE_DRAG_TO_SELECT,
+            rowNumber: itemData.rowNumber,
+            columnNumber: itemData.columnNumber,
             originalType: itemData.containerID,
             originalId: itemData.id,
             imageHeight: itemData.imageHeight,

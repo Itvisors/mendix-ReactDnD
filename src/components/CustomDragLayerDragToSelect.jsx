@@ -1,19 +1,59 @@
 import { createElement } from "react";
 
 export function CustomDragLayerDragToSelect({
-    widgetData,
+    item,
     containerCellRectMap,
     containerCellScrollMap,
     initialClientOffset,
     clientOffset
 }) {
-    const top = Math.round(initialClientOffset.y < clientOffset.y ? initialClientOffset.y : clientOffset.y);
-    const left = Math.round(initialClientOffset.x < clientOffset.x ? initialClientOffset.x : clientOffset.x);
-    const bottom = Math.round(initialClientOffset.y > clientOffset.y ? initialClientOffset.y : clientOffset.y);
-    const right = Math.round(initialClientOffset.x > clientOffset.x ? initialClientOffset.x : clientOffset.x);
-    const width = right - left;
-    const height = bottom - top;
-    const dragToSelectStyle = { top: top + "px", left: left + "px", width: width + "px", height: height + "px" };
+    /*
+
+            // Calculate left and top position, taking into account the container offset and scroll position
+            const left =
+                Math.round(item.offsetX * zoomFactor) + this.draggedDifferenceX + containerLeft - containerScrollLeft;
+            const top =
+                Math.round(item.offsetY * zoomFactor) + this.draggedDifferenceY + containerTop - containerScrollTop;
+
+*/
+    const mapKey = "r" + item.rowNumber + "c" + item.columnNumber;
+
+    // Get the absolute offset of the container
+    const containerRect = containerCellRectMap.get(mapKey);
+    const containerLeft = containerRect ? containerRect.left : 0;
+    const containerTop = containerRect ? containerRect.top : 0;
+
+    // Get the current scroll position of the container
+    const containerScrollInfo = containerCellScrollMap.get(mapKey);
+    const containerScrollTop = containerScrollInfo ? containerScrollInfo.scrollTop : 0;
+    const containerScrollLeft = containerScrollInfo ? containerScrollInfo.scrollLeft : 0;
+
+    const minTop = containerTop - containerScrollTop;
+    const minLeft = containerLeft - containerScrollLeft;
+    const maxBottom = containerTop - containerScrollTop + item.itemHeight;
+    const maxRight = containerLeft - containerScrollLeft + item.itemWidth;
+
+    let divTop = Math.round(initialClientOffset.y < clientOffset.y ? initialClientOffset.y : clientOffset.y);
+    let divLeft = Math.round(initialClientOffset.x < clientOffset.x ? initialClientOffset.x : clientOffset.x);
+    let divBottom = Math.round(initialClientOffset.y > clientOffset.y ? initialClientOffset.y : clientOffset.y);
+    let divRight = Math.round(initialClientOffset.x > clientOffset.x ? initialClientOffset.x : clientOffset.x);
+
+    if (divTop < minTop) {
+        divTop = minTop;
+    }
+    if (divLeft < minLeft) {
+        divLeft = minLeft;
+    }
+    if (divBottom > maxBottom) {
+        divBottom = maxBottom;
+    }
+    if (divRight > maxRight) {
+        divRight = maxRight;
+    }
+
+    const width = divRight - divLeft;
+    const height = divBottom - divTop;
+    const dragToSelectStyle = { top: divTop + "px", left: divLeft + "px", width: width + "px", height: height + "px" };
     return (
         <div className="custom-draglayer">
             <div className="custom-draglayer-selection" style={dragToSelectStyle}></div>

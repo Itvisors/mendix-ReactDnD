@@ -15,6 +15,8 @@ export class ContainerItemData {
     // Common
     containerID = null;
     id = null;
+    rowNumber = 0;
+    columnNumber = 0;
     disableDrag = false;
     nameAttributeValue = null;
     markerClass = null;

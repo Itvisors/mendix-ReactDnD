@@ -44,7 +44,7 @@ export function CustomDragLayer({
     if (itemType.endsWith(Constants.DRAG_TO_SELECT_ID_SUFFIX)) {
         return (
             <CustomDragLayerDragToSelect
-                widgetData={widgetData}
+                item={item}
                 containerCellRectMap={containerCellRectMap}
                 containerCellScrollMap={containerCellScrollMap}
                 initialClientOffset={initialClientOffset}
