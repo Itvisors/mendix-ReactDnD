@@ -374,9 +374,34 @@ export default class MendixReactDnD extends Component {
                 selectionHeight
         );
 
-        // const gridMapItem = this.widgetData.getGridMapValue(mapKey);
-        // for (const cellContainer of gridMapItem.containerArray) {
-        // }
+        // Get the containers in the same grid cell.
+        // Only process those with multiple selection allowed. (Background, current 'dropped' item will be skipped automatically)
+        // Search for image items that fit in the selection area
+        const gridMapItem = this.widgetData.getGridMapValue(mapKey);
+        this.selectedIDs = null;
+        for (const cellContainer of gridMapItem.containerArray) {
+            if (cellContainer.allowSelection === "multiple") {
+                for (const item of cellContainer.getItemMapValues()) {
+                    if (item.imageUrl && item.hasOffset) {
+                        const checkWidth = item.offsetX + item.imageWidth;
+                        const checkHeight = item.offsetY + item.imageHeight;
+                        if (
+                            item.offsetX > selectionLeft &&
+                            item.offsetY > selectionTop &&
+                            checkWidth < selectionRight &&
+                            checkHeight < selectionBottom
+                        ) {
+                            if (this.selectedIDs) {
+                                this.selectedIDs += "," + item.id;
+                            } else {
+                                this.selectedIDs = item.id;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.updateSelectionInContext();
     }
 
     checkPendingDropPos() {
