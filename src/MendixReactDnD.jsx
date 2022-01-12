@@ -351,28 +351,16 @@ export default class MendixReactDnD extends Component {
         if (selectionLeft < 0) {
             selectionLeft = 0;
         }
-        let selectionHeight = selectionBottom - selectionTop;
-        let selectionWidth = selectionRight - selectionLeft;
-        if (selectionWidth > droppedItem.imageWidth) {
-            selectionWidth = droppedItem.imageWidth;
-        }
-        if (selectionHeight > droppedItem.imageHeight) {
-            selectionHeight = droppedItem.imageHeight;
-        }
-        console.info(
-            "handleDragToSelectDrop, top: " +
-                selectionTop +
-                ", left: " +
-                selectionLeft +
-                ", right: " +
-                selectionRight +
-                ", bottom: " +
-                selectionBottom +
-                ", width: " +
-                selectionWidth +
-                ", height: " +
-                selectionHeight
-        );
+        // console.info(
+        //     "handleDragToSelectDrop, top: " +
+        //         selectionTop +
+        //         ", left: " +
+        //         selectionLeft +
+        //         ", right: " +
+        //         selectionRight +
+        //         ", bottom: " +
+        //         selectionBottom
+        // );
 
         // Get the containers in the same grid cell.
         // Only process those with multiple selection allowed. (Background, current 'dropped' item will be skipped automatically)
@@ -383,13 +371,14 @@ export default class MendixReactDnD extends Component {
             if (cellContainer.allowSelection === "multiple") {
                 for (const item of cellContainer.getItemMapValues()) {
                     if (item.imageUrl && item.hasOffset) {
-                        const checkWidth = item.offsetX + item.imageWidth;
-                        const checkHeight = item.offsetY + item.imageHeight;
                         if (
-                            item.offsetX > selectionLeft &&
-                            item.offsetY > selectionTop &&
-                            checkWidth < selectionRight &&
-                            checkHeight < selectionBottom
+                            this.isItemInSelectionArea(
+                                item,
+                                selectionTop,
+                                selectionLeft,
+                                selectionRight,
+                                selectionBottom
+                            )
                         ) {
                             if (this.selectedIDs) {
                                 this.selectedIDs += "," + item.id;
@@ -402,6 +391,95 @@ export default class MendixReactDnD extends Component {
             }
         }
         this.updateSelectionInContext();
+    }
+
+    isItemInSelectionArea(item, selectionTop, selectionLeft, selectionRight, selectionBottom) {
+        // No rotation, easy
+        const checkWidth = item.offsetX + item.imageWidth;
+        const checkHeight = item.offsetY + item.imageHeight;
+        if (item.imageRotation === 0) {
+            return (
+                item.offsetX > selectionLeft &&
+                item.offsetY > selectionTop &&
+                checkWidth < selectionRight &&
+                checkHeight < selectionBottom
+            );
+        }
+
+        // Rotation, difficult.
+        // 1. Determine the center coordinate of the image rect.
+        // 2. Calculate the coordinate of each corner of the rotated image rect.
+        // 3. Determine whether the rotated image fits in the selection area
+        // Source: https://stackoverflow.com/questions/41898990/find-corners-of-a-rotated-rectangle-given-its-center-point-and-rotation
+
+        /*
+        Center point = (center.x, center.y)
+        Angle        = angle
+        Height       = height
+        Width        = width
+
+        TOP RIGHT VERTEX:
+        Top_Right.x = center.x + ((width / 2) * cos(angle)) - ((height / 2) * sin(angle))
+        Top_Right.y = center.y + ((width / 2) * sin(angle)) + ((height / 2) * cos(angle))
+
+        TOP LEFT VERTEX:
+        Top_Left.x = center.x - ((width / 2) * cos(angle)) - ((height / 2) * sin(angle))
+        Top_Left.y = center.y - ((width / 2) * sin(angle)) + ((height / 2) * cos(angle))
+
+        BOTTOM LEFT VERTEX:
+        Bot_Left.x = center.x - ((width / 2) * cos(angle)) + ((height / 2) * sin(angle))
+        Bot_Left.y = center.y - ((width / 2) * sin(angle)) - ((height / 2) * cos(angle))
+
+        BOTTOM RIGHT VERTEX:
+        Bot_Right.x = center.x + ((width / 2) * cos(angle)) + ((height / 2) * sin(angle))
+        Bot_Right.y = center.y + ((width / 2) * sin(angle)) - ((height / 2) * cos(angle))
+        */
+
+        // Calculate half of width/height values, used a lot.
+        const halfWidth = item.imageWidth / 2;
+        const halfHeight = item.imageHeight / 2;
+
+        // Determine the center coordinate
+        const centerX = item.offsetX + halfWidth;
+        const centerY = item.offsetY + halfHeight;
+
+        // The cos and sin values are used a lot so calculate them only once.
+        const sinAngle = Math.sin(item.imageRotation);
+        const cosAngle = Math.cos(item.imageRotation);
+
+        // Determine coordinates after rotation
+        const topRightX = Math.round(centerX + halfWidth * cosAngle - halfHeight * sinAngle);
+        const topRightY = Math.round(centerY + halfWidth * sinAngle + halfHeight * cosAngle);
+
+        const topLeftX = Math.round(centerX - halfWidth * cosAngle - halfHeight * sinAngle);
+        const topLeftY = Math.round(centerY - halfWidth * sinAngle + halfHeight * cosAngle);
+
+        const bottomLeftX = Math.round(centerX - halfWidth * cosAngle + halfHeight * sinAngle);
+        const bottomLeftY = Math.round(centerY - halfWidth * sinAngle - halfHeight * cosAngle);
+
+        const bottomRightX = Math.round(centerX + halfWidth * cosAngle + halfHeight * sinAngle);
+        const bottomRightY = Math.round(centerY + halfWidth * sinAngle - halfHeight * cosAngle);
+
+        const xValues = [topRightX, topLeftX, bottomLeftX, bottomRightX];
+        const yValues = [topRightY, topLeftY, bottomLeftY, bottomRightY];
+
+        const minX = xValues.reduce((previousValue, currentValue) =>
+            currentValue < previousValue ? currentValue : previousValue
+        );
+
+        const minY = yValues.reduce((previousValue, currentValue) =>
+            currentValue < previousValue ? currentValue : previousValue
+        );
+
+        const maxX = xValues.reduce((previousValue, currentValue) =>
+            currentValue > previousValue ? currentValue : previousValue
+        );
+
+        const maxY = yValues.reduce((previousValue, currentValue) =>
+            currentValue > previousValue ? currentValue : previousValue
+        );
+
+        return minX > selectionLeft && minY > selectionTop && maxX < selectionRight && maxY < selectionBottom;
     }
 
     checkPendingDropPos() {
