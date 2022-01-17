@@ -334,22 +334,22 @@ export default class MendixReactDnD extends Component {
         const containerScrollLeft = Math.round(containerScrollInfo ? containerScrollInfo.scrollLeft : 0);
 
         // When dragging from top to bottom or from left to right, the dX/dY value will be positive, negative otherwise.
-        // The values on the dropped item are screen values so the zoom factor must be applied on them.
-        let selectionTop =
-            Math.round(positionData.initialY * this.widgetData.zoomFactor) - containerTop + containerScrollTop;
-        let selectionLeft =
-            Math.round(positionData.initialX * this.widgetData.zoomFactor) - containerLeft + containerScrollLeft;
+        // The values are screen values so the zoom factor must be applied on them.
+        let selectionTop = positionData.initialY - containerTop + containerScrollTop;
+        selectionTop = Math.round(selectionTop / this.widgetData.zoomFactor);
+        let selectionLeft = positionData.initialX - containerLeft + containerScrollLeft;
+        selectionLeft = Math.round(selectionLeft / this.widgetData.zoomFactor);
         let selectionRight = selectionLeft;
         let selectionBottom = selectionTop;
         if (positionData.dX > 0) {
-            selectionRight += Math.round(positionData.dX * this.widgetData.zoomFactor);
+            selectionRight += Math.round(positionData.dX / this.widgetData.zoomFactor);
         } else {
-            selectionLeft += Math.round(positionData.dX * this.widgetData.zoomFactor);
+            selectionLeft += Math.round(positionData.dX / this.widgetData.zoomFactor);
         }
         if (positionData.dY > 0) {
-            selectionBottom += Math.round(positionData.dY * this.widgetData.zoomFactor);
+            selectionBottom += Math.round(positionData.dY / this.widgetData.zoomFactor);
         } else {
-            selectionTop += Math.round(positionData.dY * this.widgetData.zoomFactor);
+            selectionTop += Math.round(positionData.dY / this.widgetData.zoomFactor);
         }
         if (selectionTop < 0) {
             selectionTop = 0;
