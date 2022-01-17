@@ -58,6 +58,8 @@ export default class MendixReactDnD extends Component {
 
     // Convert from radials to degrees.
     R2D = 180 / Math.PI;
+    // Convert from degrees to radials.
+    D2R = Math.PI / 180;
 
     previousDataChangeDateMillis = 0;
     widgetData = null;
@@ -452,9 +454,9 @@ export default class MendixReactDnD extends Component {
         const centerX = item.offsetX + halfWidth;
         const centerY = item.offsetY + halfHeight;
 
-        // The cos and sin values are used a lot so calculate them only once.
-        const sinAngle = Math.sin(item.imageRotation);
-        const cosAngle = Math.cos(item.imageRotation);
+        // The cos and sin values are used a lot so calculate them only once. (Need to convert to radians!)
+        const sinAngle = Math.sin(item.imageRotation * this.D2R);
+        const cosAngle = Math.cos(item.imageRotation * this.D2R);
 
         // Determine coordinates after rotation
         const topRightX = Math.round(centerX + halfWidth * cosAngle - halfHeight * sinAngle);
