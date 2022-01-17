@@ -388,6 +388,10 @@
                 <caption>On rotate action</caption>
                 <description>Optional. On rotate action. Required when allowing users to rotate items.</description>
             </property>
+            <property key="onDragToSelect" type="action" required="false">
+                <caption>On drag to select</caption>
+                <description>Optional. Called when user selects multiple markers by dragging a selection area. Required only when allowing users to do so.</description>
+            </property>
         </propertyGroup>
 
         <propertyGroup caption="Styling">

@@ -49,9 +49,6 @@ All event handling is done by setting values on the context object.
 | Drop target ID          | Enumeration | Req. | Req.               | When an object was dragged onto another object, contains the container ID of the drop target
 | GUID of drop target     | String      | Req. | Req.               | When an object was dragged onto another object, contains the GUID of the drop target
 | New rotation            | Integer     |      | Req.               | New rotation for the object. Required when allowing users to rotate items.
-| On click action         | Action      |      | Opt.               | Action to call after an item was clicked. See below.
-| On drop action          | Action      | Req. | Req.               | Action to call after an item was dropped.
-| On rotate action        | Action      |      | Opt.               | On rotate action. Required when allowing users to rotate items.
 | Data change date        | Date        | Req. | Req.               | Update the date in your logic to make the widget update the table. (Pluggable widgets are rendered VERY often!)
 | Zoom %                  | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
 | Adjust offset           | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
@@ -67,6 +64,15 @@ All event handling is done by setting values on the context object.
 | Is right click          | Boolean     |      |                    | Whether the click event is a right click. (Not applicable for drop events)
 | Selected marker GUIDs   | String      |      |                    | The selected marker(s). Comma separated list of GUIDs.
 | Selected marker count   | Integer     |      |                    | Optional. Number of selected markers. Only relevant when multiselect of markers is allowed at one or more containers.
+
+## Events
+
+| Action                  | Drop | Drop with position | Remarks
+|-------------------------|:----:|:------------------:|---------
+| On click action         |      | Opt.               | Action to call after an item was clicked. See below.
+| On drop action          | Req. | Req.               | Action to call after an item was dropped.
+| On rotate action        |      | Opt.               | On rotate action. Required when allowing users to rotate items.
+| On drag to select       |      | Opt.               | Action to call after user selects multiple markers by dragging a selection area. Use this to update the list of selected markers.
 
 ### The Data changed date attribute
 Pluggable widgets are rendered **really** often due to the way React and Mendix work. Clicking buttons, conditional visibility elsewhere on the page, changing the context object or opening a popup are examples. 
@@ -96,15 +102,16 @@ The widget allows you to choose where to put each container by setting a row and
 
 ### General container configuration
 
-| Property            | Type        | Remarks
-|---------------------|-------------|---------
-| Container ID        | String      | Expression, usually toString() of an enumeration value you defined earlier. This value will be used in the events
-| Row number          | Integer     | Row number, numbering starts at 1
-| Column number       | Integer     | Column number, numbering starts at 1
-| DnD type            | Enumeration | Drag/drop type.
-| Allow selection     | Enumeration | Whether markers may be selected. For single selection, the marker will be selected and the onClick action will be called.
-| Return OnClick      | Boolean     | Whether OnClick events should be returned for the container.
-| Accepts IDs         | String      | For drop targets. The IDs of containers for which items may be dropped onto this container. Usually toString() of an enumeration value you defined earlier. Separate multiple values using a comma (,).
+| Property             | Type        | Remarks
+|----------------------|-------------|---------
+| Container ID         | String      | Expression, usually toString() of an enumeration value you defined earlier. This value will be used in the events
+| Row number           | Integer     | Row number, numbering starts at 1
+| Column number        | Integer     | Column number, numbering starts at 1
+| DnD type             | Enumeration | Drag/drop type.
+| Allow selection      | Enumeration | Whether markers may be selected. For single selection, the marker will be selected and the onClick action will be called.
+| Return OnClick       | Boolean     | Whether OnClick events should be returned for the container.
+| Allow drag to select | Boolean     | Whether the user can drag a selection area to select multiple markers. Only makes sense when multi-select is allowed on items in the same row/column combination.
+| Accepts IDs          | String      | For drop targets. The IDs of containers for which items may be dropped onto this container. Usually toString() of an enumeration value you defined earlier. Separate multiple values using a comma (,).
 
 ### The datasource for the container
 

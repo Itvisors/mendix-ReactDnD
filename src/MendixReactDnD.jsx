@@ -80,8 +80,12 @@ export default class MendixReactDnD extends Component {
         if (!this.widgetData) {
             this.widgetData = new WidgetData();
         }
-        const { dataChangeDateAttr, onClickAction, onDropAction, onRotateAction } = this.props;
-        const actionExecuting = onClickAction?.isExecuting || onDropAction?.isExecuting || onRotateAction?.isExecuting;
+        const { dataChangeDateAttr, onClickAction, onDropAction, onRotateAction, onDragToSelect } = this.props;
+        const actionExecuting =
+            onClickAction?.isExecuting ||
+            onDropAction?.isExecuting ||
+            onRotateAction?.isExecuting ||
+            onDragToSelect?.isExecuting;
         // if (actionExecuting) {
         //     console.info("MendixReactDnD.render: action still executing");
         // }
@@ -391,6 +395,11 @@ export default class MendixReactDnD extends Component {
             }
         }
         this.updateSelectionInContext();
+
+        const { onDragToSelect } = this.props;
+        if (onDragToSelect && onDragToSelect.canExecute && !onDragToSelect.isExecuting) {
+            onDragToSelect.execute();
+        }
     }
 
     isItemInSelectionArea(item, selectionTop, selectionLeft, selectionRight, selectionBottom) {
