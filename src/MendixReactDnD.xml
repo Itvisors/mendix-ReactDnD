@@ -204,6 +204,11 @@
         </propertyGroup>
 
         <propertyGroup caption="Configuration">
+            <property key="useTouchBackend" type="expression" required="false">
+                <caption>Use touch backend</caption>
+                <description>When true, the touch backend will be used for drag/drop operations.</description>
+                <returnType type="Boolean" />
+            </property>
             <property key="dataChangeDateAttr" type="attribute">
                 <caption>Data change date</caption>
                 <description>Update the date in your logic to make the widget update the table. (Pluggable widgets are rendered VERY often!)</description>

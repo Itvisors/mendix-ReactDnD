@@ -7,6 +7,7 @@ import { DragWrapper } from "./components/DragWrapper";
 import { DropWrapper } from "./components/DropWrapper";
 import { GlobalDropWrapper } from "./components/GlobalDropWrapper";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
 import { WidgetData } from "./utils/WidgetData";
 import { snapToRotation } from "./utils/Utils";
 
@@ -131,9 +132,11 @@ export default class MendixReactDnD extends Component {
 
         this.checkPendingDropPos();
 
+        const backend = this.props.useTouchBackend?.value ? TouchBackend : HTML5Backend;
+
         const className = "widget-container " + this.props.class;
         return (
-            <DndProvider backend={HTML5Backend}>
+            <DndProvider backend={backend}>
                 <div className={className}>
                     <GlobalDropWrapper
                         containerList={this.widgetData.getContainerMapValues()}

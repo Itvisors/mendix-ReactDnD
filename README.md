@@ -33,6 +33,21 @@ Take the sample project as a starting point!
 - Create a microflow that handles the drop.
 - Optionally configure an onClick action.
 
+## Drag/drop backend
+The react-dnd library can use the HTML5 and touch backends for drag/drop operations. The default is to use the HTML5 backend.
+
+The basic rule: Use the HTML5 backend for laptops and desktops, use the touch backends for tablets and smartphones. 
+
+However, there are many devices that can be used in different ways:
+- Surface devices that can be used with a mouse or as tablet.
+- Many laptops have a touch screen
+- Separate touch screen attached to a laptop or desktop
+- Windows has a tablet mode.
+
+The widget makes no attempt to guess the device type. It is up to you to choose the right backend for your application.
+
+Be sure to test this with the actual devices! 
+
 ## The context object
 All event handling is done by setting values on the context object.
 
@@ -50,6 +65,7 @@ All event handling is done by setting values on the context object.
 | GUID of drop target     | String      | Req. | Req.               | When an object was dragged onto another object, contains the GUID of the drop target
 | New rotation            | Integer     |      | Req.               | New rotation for the object. Required when allowing users to rotate items.
 | Data change date        | Date        | Req. | Req.               | Update the date in your logic to make the widget update the table. (Pluggable widgets are rendered VERY often!)
+| Use touch backend       | Boolean     |      |                    | When set to true, the touch backend is used for drag/drop operations. For tablets and smartphones.
 | Zoom %                  | Integer     |      |                    | Zoom percentage, when set, will be used to correct X/Y offset for the zoom percentage
 | Adjust offset           | Boolean     |      |                    | Adjust offset for zoom position. Turn off if you want to make the calculation yourself.
 | Snap to grid            | Boolean     |      |                    | Snap to grid while dragging
