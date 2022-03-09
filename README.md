@@ -36,7 +36,7 @@ Take the sample project as a starting point!
 ## Drag/drop backend
 The react-dnd library can use the HTML5 and touch backends for drag/drop operations. The default is to use the HTML5 backend.
 
-The basic rule: Use the HTML5 backend for laptops and desktops, use the touch backends for tablets and smartphones. 
+The basic rule: Use the HTML5 backend for laptops and desktops, use the touch backend for tablets and smartphones. 
 
 However, there are many devices that can be used in different ways:
 - Surface devices that can be used with a mouse or as tablet.
