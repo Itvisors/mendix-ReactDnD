@@ -4,9 +4,11 @@ import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
 export function DragToSelect({ itemData, containerWidth, containerHeight }) {
-    const [{ isDragging }, drag, preview] = useDrag({
+    const itemType = itemData.containerID + Constants.DRAG_TO_SELECT_ID_SUFFIX;
+    const [{ isDragging }, drag, preview] = useDrag(() => ({
+        type: itemType,
         item: {
-            type: itemData.containerID + Constants.DRAG_TO_SELECT_ID_SUFFIX,
+            type: itemType,
             id: itemData.id + Constants.DRAG_TO_SELECT_ID_SUFFIX,
             dragType: Constants.DRAG_TYPE_DRAG_TO_SELECT,
             rowNumber: itemData.rowNumber,
@@ -22,7 +24,7 @@ export function DragToSelect({ itemData, containerWidth, containerHeight }) {
             isDragging: !!monitor.isDragging(),
             didDrop: !!monitor.didDrop()
         })
-    });
+    }));
 
     // Turn off the default drag preview that the browser renders as we render our own in CustomDragLayer.
     useEffect(() => {

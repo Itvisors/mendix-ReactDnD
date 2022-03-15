@@ -68,11 +68,11 @@ export function GlobalDropWrapper({ containerList, onRotateHover, onRotateDrop, 
 
     // Without collectedProps it no longer works
     // eslint-disable-next-line no-unused-vars
-    const [collectedProps, drop] = useDrop({
+    const [collectedProps, drop] = useDrop(() => ({
         accept: acceptArray,
         hover: handleHover,
         drop: handleDrop
-    });
+    }));
 
     return (
         <div ref={drop} className="globalDropWrapper">

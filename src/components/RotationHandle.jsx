@@ -7,7 +7,8 @@ export function RotationHandle({ offsetX, imageRotation, itemData }) {
     // type and id must be unique so use a suffix
     // Also store original type, id and rotation in the item
     const rotationHandleDragType = itemData.containerID + Constants.ROTATION_HANDLE_ID_SUFFIX;
-    const [{ isDragging }, drag, preview] = useDrag({
+    const [{ isDragging }, drag, preview] = useDrag(() => ({
+        type: rotationHandleDragType,
         item: {
             type: rotationHandleDragType,
             id: itemData.itemID + Constants.ROTATION_HANDLE_ID_SUFFIX,
@@ -20,7 +21,7 @@ export function RotationHandle({ offsetX, imageRotation, itemData }) {
         collect: monitor => ({
             isDragging: !!monitor.isDragging()
         })
-    });
+    }));
 
     // Turn off the default drag preview that the browser renders as we render our own in CustomDragLayer.
     useEffect(() => {

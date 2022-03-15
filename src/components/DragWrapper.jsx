@@ -7,7 +7,9 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
 
-    const startDrag = () => {
+    // Include width and height from state elementRect so drag layer can render element correctly.
+    // Without these values, the dragged item would always extend to the right end of the viewport.
+    const [{ isDragging }, drag, preview] = useDrag(() => {
         if (onDragStart) {
             onDragStart({
                 containerID: item.containerID,
@@ -17,32 +19,30 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
                 itemOffsetY: item.hasOffset ? item.offsetY : undefined
             });
         }
-    };
 
-    // Include widht and height from state elementRect so drag layer can render element correctly.
-    // Without these values, the dragged item would always extend to the right end of the viewport.
-    const [{ isDragging }, drag, preview] = useDrag({
-        item: {
+        return {
             type: item.containerID,
-            id: item.id,
-            imageHeight: item.imageHeight,
-            imageWidth: item.imageWidth,
-            itemWidth: elementRect ? elementRect.width : undefined,
-            itemHeight: elementRect ? elementRect.height : undefined
-        },
-        begin: startDrag,
-        end: (draggedItem, monitor) => {
-            onDragEnd({
-                containerID: item.containerID,
-                itemID: item.id,
-                didDrop: monitor.didDrop()
-            });
-        },
-        canDrag: !item.disableDrag,
-        collect: monitor => ({
-            isDragging: !!monitor.isDragging(),
-            didDrop: !!monitor.didDrop()
-        })
+            item: {
+                type: item.containerID,
+                id: item.id,
+                imageHeight: item.imageHeight,
+                imageWidth: item.imageWidth,
+                itemWidth: elementRect ? elementRect.width : undefined,
+                itemHeight: elementRect ? elementRect.height : undefined
+            },
+            end: (draggedItem, monitor) => {
+                onDragEnd({
+                    containerID: item.containerID,
+                    itemID: item.id,
+                    didDrop: monitor.didDrop()
+                });
+            },
+            canDrag: !item.disableDrag,
+            collect: monitor => ({
+                isDragging: !!monitor.isDragging(),
+                didDrop: !!monitor.didDrop()
+            })
+        };
     });
 
     useEffect(() => {

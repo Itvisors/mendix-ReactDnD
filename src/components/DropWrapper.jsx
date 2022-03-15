@@ -33,14 +33,14 @@ export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSiz
         }
     }, []);
 
-    const [{ canDrop, isOver }, drop] = useDrop({
+    const [{ canDrop, isOver }, drop] = useDrop(() => ({
         accept: acceptArray,
         drop: handleDrop,
         collect: monitor => ({
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop()
         })
-    });
+    }));
 
     const isActive = canDrop && isOver;
 
