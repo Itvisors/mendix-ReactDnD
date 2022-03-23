@@ -102,18 +102,18 @@ export default class MendixReactDnD extends Component {
                         dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis
                     ) {
                         if (this.previousDataChangeDateMillis === 0) {
-                            // console.info("MendixReactDnD.render: no data changed date set yet");
+                            console.info("MendixReactDnD.render: no data changed date set yet");
                         } else {
-                            // console.info("MendixReactDnD.render: different data changed date");
+                            console.info("MendixReactDnD.render: different data changed date");
                         }
                         this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_PENDING);
                         // Store the date, also prevents multiple renders all triggering reload of the data.
                         this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
                     }
-                    // console.info("MendixReactDnD.render: Check datasource pending status");
+                    console.info("MendixReactDnD.render: Check datasource pending status");
                     this.checkDatasourceStatus();
                     if (this.containerDatasourceStatus === this.DATASOURCE_STATUS_AVAILABLE) {
-                        // console.info("MendixReactDnD.render: Datasource update complete, load data");
+                        console.info("MendixReactDnD.render: Datasource update complete, load data");
                         this.loadWidgetData();
                     }
                 } else {
@@ -180,20 +180,20 @@ export default class MendixReactDnD extends Component {
                     if (ds.items === mapItem.dsItems) {
                         // console.info("MendixReactDnD: Datasource " + containerID + ": item array already cached");
                     } else {
-                        // console.info("MendixReactDnD: Datasource " + containerID + ": new item array received");
+                        console.info("MendixReactDnD: Datasource " + containerID + ": new item array received");
                         mapItem.updatePending = this.DATASOURCE_STATUS_AVAILABLE;
                         mapItem.dsItems = ds.items;
                         hasAvailable = true;
                     }
                 } else {
-                    // console.info("MendixReactDnD: Datasource " + containerID + " is not available: " + ds.status);
+                    console.info("MendixReactDnD: Datasource " + containerID + " is not available: " + ds.status);
                     mapItem.dsItems = ds.items;
                     mapItem.updatePending = this.DATASOURCE_STATUS_PENDING;
                     hasUnavailable = true;
                 }
                 this.containerDatasourceItemsMap.set(containerID, mapItem);
             } else {
-                // console.info("MendixReactDnD: Item array not yet in map, status: " + ds.status);
+                console.info("MendixReactDnD: Item array not yet in map, status: " + ds.status);
                 if (ds.status === "available") {
                     hasAvailable = true;
                 } else {
@@ -228,7 +228,7 @@ export default class MendixReactDnD extends Component {
             this.loadDatasourceItemContent();
             this.selectedIDs = this.widgetData.selectedMarkerGuids;
             this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_LOADED);
-            // console.info("MendixReactDnD.render: new data loaded");
+            console.info("MendixReactDnD.render: new data loaded");
         }
     }
 
@@ -507,11 +507,11 @@ export default class MendixReactDnD extends Component {
             if (this.dropWithOffset) {
                 // When the datasource item no longer has the old values
                 if (this.originalOffsetX !== item.offsetX || this.originalOffsetY !== item.offsetY) {
-                    // console.info("checkPendingDropPos: clear drop state with position offset");
+                    console.info("checkPendingDropPos: clear drop state with position offset");
                     this.clearDropState();
                 }
             } else {
-                // console.info("checkPendingDropPos: clear drop state without postion offset");
+                console.info("checkPendingDropPos: clear drop state without postion offset");
                 this.clearDropState();
             }
         }
@@ -671,7 +671,7 @@ export default class MendixReactDnD extends Component {
         if (this.dropStatus === this.DROP_STATUS_DRAGGING && item.id !== this.dropItemID) {
             const { selectedIDs, childIDs } = this;
             if ((childIDs && childIDs.indexOf(item.id) >= 0) || (selectedIDs && selectedIDs.indexOf(item.id) >= 0)) {
-                // console.info("MendixReactDnD.renderBothWrappers: Do not render " + item.nameAttributeValue);
+                console.info("MendixReactDnD.renderBothWrappers: Do not render " + item.nameAttributeValue);
                 return null;
             }
         }
@@ -736,16 +736,16 @@ export default class MendixReactDnD extends Component {
     }
 
     handleDrop(droppedItem, positionData, cellContainer, item) {
-        // console.info(
-        //     "handleDrop: item: " +
-        //         JSON.stringify(droppedItem) +
-        //         " dropped on container " +
-        //         cellContainer.containerID +
-        //         ", item " +
-        //         (item ? JSON.stringify(item) : "(none)") +
-        //         ", positionData: " +
-        //         JSON.stringify(positionData)
-        // );
+        console.info(
+            "handleDrop: item: " +
+                JSON.stringify(droppedItem) +
+                " dropped on container " +
+                cellContainer.containerID +
+                ", item " +
+                (item ? JSON.stringify(item) : "(none)") +
+                ", positionData: " +
+                JSON.stringify(positionData)
+        );
         const { adjustOffset, zoomFactor } = this.widgetData;
         const { containerID } = cellContainer;
 
@@ -803,7 +803,7 @@ export default class MendixReactDnD extends Component {
         // When using offset positions, set drop data in state for rendering while datasource has not yet updated itself
         this.dropStatus = this.DROP_STATUS_DROPPED;
         if (this.dropWithOffset) {
-            // console.info("handleDrop: store drop data in state for position info");
+            console.info("handleDrop: store drop data in state for position info");
             this.dropClientX = offsetX;
             this.dropClientY = offsetY;
         }
@@ -815,14 +815,14 @@ export default class MendixReactDnD extends Component {
             eventOffsetY.setTextValue("" + offsetY);
         }
 
-        // console.info(
-        //     "handleDrop dragged difference this X/Y " +
-        //         this.draggedDifferenceX +
-        //         "/" +
-        //         this.draggedDifferenceY +
-        //         ", position data: " +
-        //         JSON.stringify(positionData)
-        // );
+        console.info(
+            "handleDrop dragged difference this X/Y " +
+                this.draggedDifferenceX +
+                "/" +
+                this.draggedDifferenceY +
+                ", position data: " +
+                JSON.stringify(positionData)
+        );
         const { draggedDifferenceX, draggedDifferenceY } = this.props;
         if (draggedDifferenceX) {
             draggedDifferenceX.setTextValue("" + this.draggedDifferenceX);
@@ -840,7 +840,7 @@ export default class MendixReactDnD extends Component {
     }
 
     handleDragStart({ containerID, itemID, itemOffsetX, itemOffsetY }) {
-        // console.info("handleDragStart: " + containerID + " - " + itemID);
+        console.info("handleDragStart: " + containerID + " - " + itemID);
         this.dropStatus = this.DROP_STATUS_DRAGGING;
         this.dropContainerID = containerID;
         this.dropItemID = itemID;
@@ -931,7 +931,7 @@ export default class MendixReactDnD extends Component {
                 x: item.offsetX + this.draggedDifferenceX,
                 y: item.offsetY + this.draggedDifferenceY
             };
-            // console.info("getPendingDropPos: additional item pending drop offset X/Y: " + JSON.stringify(dropPos));
+            console.info("getPendingDropPos: additional item pending drop offset X/Y: " + JSON.stringify(dropPos));
             return dropPos;
         }
 
@@ -942,7 +942,7 @@ export default class MendixReactDnD extends Component {
                 x: item.offsetX + this.draggedDifferenceX,
                 y: item.offsetY + this.draggedDifferenceY
             };
-            // console.info("getPendingDropPos: dropped item pending drop offset X/Y: " + JSON.stringify(dropPos));
+            console.info("getPendingDropPos: dropped item pending drop offset X/Y: " + JSON.stringify(dropPos));
         }
         return dropPos;
     }

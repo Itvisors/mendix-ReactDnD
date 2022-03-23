@@ -1,11 +1,10 @@
-import { createElement, useEffect, useRef, useState } from "react";
+import { createElement, useRef } from "react";
 import { snapOffsetToGrid } from "../utils/Utils";
 import { useDrop } from "react-dnd";
 
 /** Drop target wrapper. */
 export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSize, children }) {
     const layoutRef = useRef(null);
-    const [elementRect, setElementRect] = useState(null);
 
     const acceptArray = cellContainer.acceptsContainerIDs.split(",");
 
@@ -17,21 +16,17 @@ export function DropWrapper({ cellContainer, item, onDrop, snapToGrid, snapToSiz
             dropClientX = snapOffsetToGrid(dropClientX, snapToSize);
             dropClientY = snapOffsetToGrid(dropClientY, snapToSize);
         }
+        const rect = layoutRef.current ? layoutRef.current.getBoundingClientRect() : undefined;
+        const left = rect ? rect.left : 0;
+        const top = rect ? rect.top : 0;
         const positionData = {
             dropClientX,
             dropClientY,
-            dropOffsetX: Math.round(dropClientX - elementRect.left),
-            dropOffsetY: Math.round(dropClientY - elementRect.top)
+            dropOffsetX: Math.round(dropClientX - left),
+            dropOffsetY: Math.round(dropClientY - top)
         };
         onDrop(droppedItem, positionData);
     };
-
-    useEffect(() => {
-        if (layoutRef.current) {
-            const rect = layoutRef.current.getBoundingClientRect();
-            setElementRect(rect);
-        }
-    }, []);
 
     const [{ canDrop, isOver }, drop] = useDrop(() => ({
         accept: acceptArray,
