@@ -1,70 +1,54 @@
-import React, { Component, createElement } from "react";
+import { createElement, useCallback, useLayoutEffect, useRef, useState } from "react";
 
-export class CellContainer extends Component {
-    constructor(props) {
-        super(props);
+export function CellContainer(props) {
+    const [layoutRect, setLayoutRect] = useState(null);
 
-        this.layoutRef = React.createRef();
+    const layoutRef = useRef(null);
 
-        this.handleScroll = this.handleScroll.bind(this);
-    }
+    const { onBoundingClientRectUpdate, onContainerScroll } = props;
 
-    // Keep track of container absolute position and size for use in the custom drag layer.
-    currentRect = null;
-
-    componentDidMount() {
-        const { onBoundingClientRectUpdate } = this.props;
-        if (onBoundingClientRectUpdate && this.layoutRef.current) {
-            this.rect = this.layoutRef.current.getBoundingClientRect();
-            onBoundingClientRectUpdate(this.rect);
-        }
-    }
-
-    componentDidUpdate() {
-        const { onBoundingClientRectUpdate } = this.props;
-        if (onBoundingClientRectUpdate && this.layoutRef.current) {
-            const newRect = this.layoutRef.current.getBoundingClientRect();
+    useLayoutEffect(() => {
+        if (layoutRef.current) {
+            const newRect = layoutRef.current.getBoundingClientRect();
             if (
-                newRect.top !== this.rect.top ||
-                newRect.left !== this.rect.left ||
-                newRect.width !== this.rect.width ||
-                newRect.height !== this.rect.height
+                !layoutRect ||
+                newRect.top !== layoutRect.top ||
+                newRect.left !== layoutRect.left ||
+                newRect.width !== layoutRect.width ||
+                newRect.height !== layoutRect.height
             ) {
-                this.rect = newRect;
-                onBoundingClientRectUpdate(this.rect);
+                setLayoutRect(newRect);
+                onBoundingClientRectUpdate(newRect);
             }
         }
-    }
+    }, [layoutRect, onBoundingClientRectUpdate]);
 
-    render() {
-        const { rowNumber, columnNumber } = this.props;
-        const className = "widget-cell widget-cell-r" + rowNumber + "-c" + columnNumber;
-
-        return (
-            <div
-                ref={this.layoutRef}
-                className={className}
-                data-rownumber={rowNumber}
-                data-columnnumber={columnNumber}
-                onScroll={this.handleScroll}
-            >
-                {this.props.children}
-            </div>
-        );
-    }
-
-    handleScroll() {
-        if (this.layoutRef.current) {
+    const handleScroll = useCallback(() => {
+        if (layoutRef.current) {
             // console.info(
             //     "handleScroll T/L: " + this.layoutRef.current.scrollTop + "/" + this.layoutRef.current.scrollLeft
             // );
-            const { onContainerScroll } = this.props;
             if (onContainerScroll) {
                 onContainerScroll({
-                    scrollTop: this.layoutRef.current.scrollTop,
-                    scrollLeft: this.layoutRef.current.scrollLeft
+                    scrollTop: layoutRef.current.scrollTop,
+                    scrollLeft: layoutRef.current.scrollLeft
                 });
             }
         }
-    }
+    }, [layoutRef, onContainerScroll]);
+
+    const { rowNumber, columnNumber } = props;
+    const className = "widget-cell widget-cell-r" + rowNumber + "-c" + columnNumber;
+
+    return (
+        <div
+            ref={layoutRef}
+            className={className}
+            data-rownumber={rowNumber}
+            data-columnnumber={columnNumber}
+            onScroll={handleScroll}
+        >
+            {props.children}
+        </div>
+    );
 }
