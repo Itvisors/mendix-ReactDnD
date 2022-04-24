@@ -3,11 +3,6 @@ import { DatasourceItem } from "./DatasourceItem";
 import { snapOffsetToGrid } from "../utils/Utils";
 
 export class CustomDragLayerContent extends Component {
-    // Preparation to move additional markers only every few times to prevent a LOT of state updates, renders and possibly loops.
-    onDragStatusMillis = 0;
-    draggedDifferenceX = 0;
-    draggedDifferenceY = 0;
-
     render() {
         // Render the drag preview ourselves.
         // Take height and width from dragged item to render with correct width and height.
@@ -26,13 +21,6 @@ export class CustomDragLayerContent extends Component {
         };
 
         const hasAdditionalItems = this.props.additionalItemInfoForDragging.length > 0;
-
-        // If performance becomes an issue, insert logic here to update the values every x ms, resulting in the same positions for x ms.
-        // Currently performance seems no issue here.
-        if (hasAdditionalItems) {
-            this.draggedDifferenceX = this.props.differenceFromInitialOffset.x;
-            this.draggedDifferenceY = this.props.differenceFromInitialOffset.y;
-        }
 
         return (
             <div className="custom-draglayer">
@@ -71,10 +59,10 @@ export class CustomDragLayerContent extends Component {
             const containerScrollLeft = containerScrollInfo ? containerScrollInfo.scrollLeft : 0;
 
             // Calculate left and top position, taking into account the container offset and scroll position
-            const left =
-                Math.round(item.offsetX * zoomFactor) + this.draggedDifferenceX + containerLeft - containerScrollLeft;
-            const top =
-                Math.round(item.offsetY * zoomFactor) + this.draggedDifferenceY + containerTop - containerScrollTop;
+            const offsetX = this.props.differenceFromInitialOffset.x;
+            const offsetY = this.props.differenceFromInitialOffset.y;
+            const left = Math.round(item.offsetX * zoomFactor) + offsetX + containerLeft - containerScrollLeft;
+            const top = Math.round(item.offsetY * zoomFactor) + offsetY + containerTop - containerScrollTop;
             const style = {
                 top: top + "px",
                 left: left + "px"
