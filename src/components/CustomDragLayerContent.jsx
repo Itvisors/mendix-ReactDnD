@@ -1,11 +1,11 @@
+import { createElement, useMemo } from "react";
 import { DatasourceItem } from "./DatasourceItem";
-import { createElement } from "react";
 import { snapOffsetToGrid } from "../utils/Utils";
 
 export function CustomDragLayerContent(props) {
+    const { zoomFactor } = props.widgetData;
     const renderAdditionalItems = () => {
         const additionalItems = [];
-        const { zoomFactor } = props.widgetData;
 
         for (const itemInfo of props.additionalItemInfoForDragging) {
             const { container, item } = itemInfo;
@@ -50,38 +50,52 @@ export function CustomDragLayerContent(props) {
         return additionalItems;
     };
 
-    // Render the drag preview ourselves.
-    // Take height and width from dragged item to render with correct width and height.
-    let dragX = props.sourceClientOffset.x;
-    let dragY = props.sourceClientOffset.y;
-    if (props.widgetData.snapToSize >= 5 && props.widgetData.snapToGrid) {
-        dragX = snapOffsetToGrid(dragX, props.widgetData.snapToSize);
-        dragY = snapOffsetToGrid(dragY, props.widgetData.snapToSize);
-    }
-
-    const { itemWidth, itemHeight } = props.dragEventItem;
-    const style = {
-        transform: "translate(" + dragX + "px, " + dragY + "px)",
-        width: itemWidth + "px",
-        height: itemHeight + "px"
-    };
-
+    const { item, container, dragEventItem, renderWidgetContent, sourceClientOffset } = props;
+    const { snapToGrid, snapToSize, zoomPercentage } = props.widgetData;
     const hasAdditionalItems = props.additionalItemInfoForDragging.length > 0;
 
-    return (
-        <div className="custom-draglayer">
-            <div className="custom-draglayer-item" style={style}>
-                <DatasourceItem
-                    key={props.item.id}
-                    cellContainer={props.container}
-                    item={props.item}
-                    isDragging={true}
-                    draggedRotationDegree={0}
-                    renderWidgetContent={props.renderWidgetContent}
-                    zoomPercentage={props.widgetData.zoomPercentage}
-                />
+    // Render the drag preview ourselves.
+    // Take height and width from dragged item to render with correct width and height.
+    let dragX = sourceClientOffset.x;
+    let dragY = sourceClientOffset.y;
+    if (snapToSize >= 5 && snapToGrid) {
+        dragX = snapOffsetToGrid(dragX, snapToSize);
+        dragY = snapOffsetToGrid(dragY, snapToSize);
+    }
+
+    return useMemo(() => {
+        const { itemWidth, itemHeight } = dragEventItem;
+        const style = {
+            transform: "translate(" + dragX + "px, " + dragY + "px)",
+            width: itemWidth + "px",
+            height: itemHeight + "px"
+        };
+
+        return (
+            <div className="custom-draglayer">
+                <div className="custom-draglayer-item" style={style}>
+                    <DatasourceItem
+                        key={item.id}
+                        cellContainer={container}
+                        item={item}
+                        isDragging={true}
+                        draggedRotationDegree={0}
+                        renderWidgetContent={renderWidgetContent}
+                        zoomPercentage={zoomPercentage}
+                    />
+                </div>
+                {hasAdditionalItems && renderAdditionalItems()}
             </div>
-            {hasAdditionalItems && renderAdditionalItems()}
-        </div>
-    );
+        );
+    }, [
+        container,
+        dragEventItem,
+        dragX,
+        dragY,
+        hasAdditionalItems,
+        item,
+        renderAdditionalItems,
+        renderWidgetContent,
+        zoomPercentage
+    ]);
 }
