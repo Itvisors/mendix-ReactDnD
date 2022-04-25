@@ -18,19 +18,6 @@ export function DatasourceItem({
 }) {
     const itemDivRef = useRef(null);
 
-    // shouldComponentUpdate(nextProps) {
-    //     return (
-    //         nextProps.item.shouldRender(props.item) ||
-    //         nextProps.cellContainer.containerID !== props.cellContainer.containerID ||
-    //         nextProps.cellContainer.allowSelection !== props.cellContainer.allowSelection ||
-    //         nextProps.cellContainer.returnOnClick !== props.cellContainer.returnOnClick ||
-    //         nextProps.isSelected !== props.isSelected ||
-    //         nextProps.draggedRotationDegree !== props.draggedRotationDegree ||
-    //         nextProps.zoomPercentage !== props.zoomPercentage ||
-    //         nextProps.additionalMarkerClasses !== props.additionalMarkerClasses
-    //     );
-    // }
-
     const onClickHandler = useCallback(
         evt => {
             // Persist the event or it will be nullified and reused.
