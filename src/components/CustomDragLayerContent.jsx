@@ -1,29 +1,37 @@
-import { createElement, useMemo } from "react";
+import { createElement, useCallback, useMemo } from "react";
 import { DatasourceItem } from "./DatasourceItem";
 import { snapOffsetToGrid } from "../utils/Utils";
 
 export function CustomDragLayerContent(props) {
-    const { zoomFactor } = props.widgetData;
-    const renderAdditionalItems = () => {
+    const {
+        additionalItemInfoForDragging,
+        containerCellRectMap,
+        containerCellScrollMap,
+        differenceFromInitialOffset,
+        renderWidgetContent
+    } = props;
+
+    const { zoomFactor, zoomPercentage } = props.widgetData;
+    const renderAdditionalItems = useCallback(() => {
         const additionalItems = [];
 
-        for (const itemInfo of props.additionalItemInfoForDragging) {
+        for (const itemInfo of additionalItemInfoForDragging) {
             const { container, item } = itemInfo;
             const mapKey = "r" + container.rowNumber + "c" + container.columnNumber;
 
             // Get the absolute offset of the container
-            const containerRect = props.containerCellRectMap.get(mapKey);
+            const containerRect = containerCellRectMap.get(mapKey);
             const containerLeft = containerRect ? containerRect.left : 0;
             const containerTop = containerRect ? containerRect.top : 0;
 
             // Get the current scroll position of the container
-            const containerScrollInfo = props.containerCellScrollMap.get(mapKey);
+            const containerScrollInfo = containerCellScrollMap.get(mapKey);
             const containerScrollTop = containerScrollInfo ? containerScrollInfo.scrollTop : 0;
             const containerScrollLeft = containerScrollInfo ? containerScrollInfo.scrollLeft : 0;
 
             // Calculate left and top position, taking into account the container offset and scroll position
-            const offsetX = props.differenceFromInitialOffset.x;
-            const offsetY = props.differenceFromInitialOffset.y;
+            const offsetX = differenceFromInitialOffset.x;
+            const offsetY = differenceFromInitialOffset.y;
             const left = Math.round(item.offsetX * zoomFactor) + offsetX + containerLeft - containerScrollLeft;
             const top = Math.round(item.offsetY * zoomFactor) + offsetY + containerTop - containerScrollTop;
             const style = {
@@ -39,8 +47,8 @@ export function CustomDragLayerContent(props) {
                         cellContainer={container}
                         item={item}
                         draggedRotationDegree={0}
-                        renderWidgetContent={props.renderWidgetContent}
-                        zoomPercentage={props.widgetData.zoomPercentage}
+                        renderWidgetContent={renderWidgetContent}
+                        zoomPercentage={zoomPercentage}
                     />
                 </div>
             );
@@ -48,10 +56,19 @@ export function CustomDragLayerContent(props) {
         }
 
         return additionalItems;
-    };
+    }, [
+        additionalItemInfoForDragging,
+        containerCellRectMap,
+        containerCellScrollMap,
+        differenceFromInitialOffset.x,
+        differenceFromInitialOffset.y,
+        renderWidgetContent,
+        zoomPercentage,
+        zoomFactor
+    ]);
 
-    const { item, container, dragEventItem, renderWidgetContent, sourceClientOffset } = props;
-    const { snapToGrid, snapToSize, zoomPercentage } = props.widgetData;
+    const { item, container, dragEventItem, sourceClientOffset } = props;
+    const { snapToGrid, snapToSize } = props.widgetData;
     const hasAdditionalItems = props.additionalItemInfoForDragging.length > 0;
 
     // Render the drag preview ourselves.
