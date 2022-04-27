@@ -5,7 +5,7 @@ export function CellContainer(props) {
 
     const layoutRef = useRef(null);
 
-    const { onBoundingClientRectUpdate, onContainerScroll } = props;
+    const { cellKey, onBoundingClientRectUpdate, onContainerScroll } = props;
 
     useLayoutEffect(() => {
         if (layoutRef.current) {
@@ -18,10 +18,10 @@ export function CellContainer(props) {
                 newRect.height !== layoutRect.height
             ) {
                 setLayoutRect(newRect);
-                onBoundingClientRectUpdate(newRect);
+                onBoundingClientRectUpdate(cellKey, newRect);
             }
         }
-    }, [layoutRect, onBoundingClientRectUpdate]);
+    }, [cellKey, layoutRect, onBoundingClientRectUpdate]);
 
     const handleScroll = useCallback(() => {
         if (layoutRef.current) {
@@ -29,13 +29,13 @@ export function CellContainer(props) {
             //     "handleScroll T/L: " + this.layoutRef.current.scrollTop + "/" + this.layoutRef.current.scrollLeft
             // );
             if (onContainerScroll) {
-                onContainerScroll({
+                onContainerScroll(cellKey, {
                     scrollTop: layoutRef.current.scrollTop,
                     scrollLeft: layoutRef.current.scrollLeft
                 });
             }
         }
-    }, [layoutRef, onContainerScroll]);
+    }, [cellKey, layoutRef, onContainerScroll]);
 
     const { rowNumber, columnNumber } = props;
     const className = "widget-cell widget-cell-r" + rowNumber + "-c" + columnNumber;

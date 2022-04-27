@@ -25,6 +25,8 @@ export default class MendixReactDnD extends Component {
         this.handleRotateDrop = this.handleRotateDrop.bind(this);
         this.handleDragToSelectDrop = this.handleDragToSelectDrop.bind(this);
         this.handleDragging = this.handleDragging.bind(this);
+        this.handleBoundingClientRectUpdate = this.handleBoundingClientRectUpdate.bind(this);
+        this.handleContainerScroll = this.handleContainerScroll.bind(this);
     }
 
     DROP_STATUS_NONE = "none";
@@ -566,19 +568,25 @@ export default class MendixReactDnD extends Component {
         return (
             <CellContainer
                 key={mapKey}
+                cellKey={mapKey}
                 rowNumber={rowNumber}
                 columnNumber={columnNumber}
-                onBoundingClientRectUpdate={rect => {
-                    // Store the rect in the widget data map for use while dragging
-                    this.containerCellRectMap.set(mapKey, rect);
-                }}
-                onContainerScroll={scrollInfo => {
-                    this.containerCellScrollMap.set(mapKey, scrollInfo);
-                }}
+                onBoundingClientRectUpdate={this.handleBoundingClientRectUpdate}
+                onContainerScroll={this.handleContainerScroll}
             >
                 {this.renderCell(gridMapItem)}
             </CellContainer>
         );
+    }
+
+    handleBoundingClientRectUpdate(mapKey, rect) {
+        // Store the rect in the map for use while dragging
+        this.containerCellRectMap.set(mapKey, rect);
+    }
+
+    handleContainerScroll(mapKey, scrollInfo) {
+        // Store the scroll info in the map to take scroll position into account for event data
+        this.containerCellScrollMap.set(mapKey, scrollInfo);
     }
 
     renderCell(gridMapItem) {
