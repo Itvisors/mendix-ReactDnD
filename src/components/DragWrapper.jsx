@@ -1,4 +1,4 @@
-import { createElement, useEffect, useRef, useState } from "react";
+import { createElement, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Constants } from "../utils/Constants";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
@@ -9,42 +9,45 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
 
     // Include width and height from state elementRect so drag layer can render element correctly.
     // Without these values, the dragged item would always extend to the right end of the viewport.
-    const [{ isDragging }, drag, preview] = useDrag(() => ({
-        type: item.containerID,
-        item: () => {
-            if (onDragStart) {
-                onDragStart({
+    const [{ isDragging }, drag, preview] = useDrag(
+        () => ({
+            type: item.containerID,
+            item: () => {
+                if (onDragStart) {
+                    onDragStart({
+                        containerID: item.containerID,
+                        itemID: item.id,
+                        dragType: Constants.DRAG_TYPE_NORMAL,
+                        itemOffsetX: item.hasOffset ? item.offsetX : undefined,
+                        itemOffsetY: item.hasOffset ? item.offsetY : undefined
+                    });
+                }
+                return {
+                    type: item.containerID,
+                    id: item.id,
+                    imageHeight: item.imageHeight,
+                    imageWidth: item.imageWidth,
+                    itemWidth: elementRect ? elementRect.width : undefined,
+                    itemHeight: elementRect ? elementRect.height : undefined
+                };
+            },
+            end: (draggedItem, monitor) => {
+                onDragEnd({
                     containerID: item.containerID,
                     itemID: item.id,
-                    dragType: Constants.DRAG_TYPE_NORMAL,
-                    itemOffsetX: item.hasOffset ? item.offsetX : undefined,
-                    itemOffsetY: item.hasOffset ? item.offsetY : undefined
+                    didDrop: monitor.didDrop()
                 });
-            }
-            return {
-                type: item.containerID,
-                id: item.id,
-                imageHeight: item.imageHeight,
-                imageWidth: item.imageWidth,
-                itemWidth: elementRect ? elementRect.width : undefined,
-                itemHeight: elementRect ? elementRect.height : undefined
-            };
-        },
-        end: (draggedItem, monitor) => {
-            onDragEnd({
-                containerID: item.containerID,
-                itemID: item.id,
-                didDrop: monitor.didDrop()
-            });
-        },
-        canDrag: !item.disableDrag,
-        collect: monitor => ({
-            isDragging: !!monitor.isDragging(),
-            didDrop: !!monitor.didDrop()
-        })
-    }));
+            },
+            canDrag: !item.disableDrag,
+            collect: monitor => ({
+                isDragging: !!monitor.isDragging(),
+                didDrop: !!monitor.didDrop()
+            })
+        }),
+        [item]
+    );
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (layoutRef.current) {
             const rect = layoutRef.current.getBoundingClientRect();
             setElementRect(rect);
