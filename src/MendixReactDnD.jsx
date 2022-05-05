@@ -67,7 +67,6 @@ export default class MendixReactDnD extends Component {
     previousDataChangeDateMillis = 0;
     widgetData = null;
     datasourceItemContentMap = new Map(); // Holds the widget content for each datasource item
-    cellContentMap = new Map(); // Holds the cell content (drag/drop wrappers with datasource item)
     containerCellRectMap = new Map(); // The rect for each container by rXcY
     containerCellScrollMap = new Map(); // The scroll position for each container by rXcY
     containerDatasourceItemsMap = new Map(); // The datasource item array for each container by container ID
@@ -226,7 +225,6 @@ export default class MendixReactDnD extends Component {
         newWidgetData.loadData(this.props);
         if (newWidgetData.dataStatus === this.widgetData.DATA_COMPLETE) {
             this.widgetData = newWidgetData;
-            this.cellContentMap.clear();
             this.loadDatasourceItemContent();
             this.selectedIDs = this.widgetData.selectedMarkerGuids;
             this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_LOADED);
@@ -644,17 +642,14 @@ export default class MendixReactDnD extends Component {
     }
 
     renderDropWrapper(cellContainer, item) {
-        // Return the element created earlier when drag is active or another marker is being rotated
-        const mapKey = item.containerID + "_" + item.id;
-        if (this.cellContentMap.has(mapKey)) {
-            if (this.dropStatus === this.DROP_STATUS_DRAGGING) {
-                return this.cellContentMap.get(mapKey);
-            }
-            if (this.state.rotateItemID && this.state.rotateItemID !== item.id) {
-                return this.cellContentMap.get(mapKey);
+        // While dragging, don't render any child items or additionally selected items as the custom drag layer will render these
+        if (this.dropStatus === this.DROP_STATUS_DRAGGING && item.id !== this.dropItemID) {
+            const { selectedIDs, childIDs } = this;
+            if ((childIDs && childIDs.indexOf(item.id) >= 0) || (selectedIDs && selectedIDs.indexOf(item.id) >= 0)) {
+                return null;
             }
         }
-        const dropWrapper = (
+        return (
             <DropWrapper
                 key={item.id}
                 cellContainer={cellContainer}
@@ -666,13 +661,9 @@ export default class MendixReactDnD extends Component {
                 {this.renderDatasourceItem(cellContainer, item)}
             </DropWrapper>
         );
-        this.cellContentMap.set(mapKey, dropWrapper);
-        return dropWrapper;
     }
 
     renderBothWrappers(cellContainer, item) {
-        const dropPos = this.getPendingDropPos(item);
-        const mapKey = item.containerID + "_" + item.id;
         // console.info("renderBothWrappers");
         // While dragging, don't render any child items or additionally selected items.
         // The custom drag layer will render these along with the item being dragged.
@@ -683,16 +674,7 @@ export default class MendixReactDnD extends Component {
                 return null;
             }
         }
-        // Return the element created earlier when drag is active or another marker is being rotated
-        if (this.cellContentMap.has(mapKey)) {
-            if (this.dropStatus === this.DROP_STATUS_DRAGGING && !dropPos) {
-                return this.cellContentMap.get(mapKey);
-            }
-            if (this.state.rotateItemID && this.state.rotateItemID !== item.id) {
-                return this.cellContentMap.get(mapKey);
-            }
-        }
-        const bothWrappers = (
+        return (
             <DropWrapper
                 key={item.id}
                 cellContainer={cellContainer}
@@ -704,12 +686,9 @@ export default class MendixReactDnD extends Component {
                 {this.renderDragWrapper(cellContainer, item)}
             </DropWrapper>
         );
-        this.cellContentMap.set(mapKey, bothWrappers);
-        return bothWrappers;
     }
 
     renderDragWrapper(cellContainer, item) {
-        const mapKey = item.containerID + "_" + item.id;
         // While dragging, don't render any child items or additionally selected items as the custom drag layer will render these
         if (this.dropStatus === this.DROP_STATUS_DRAGGING && item.id !== this.dropItemID) {
             const { selectedIDs, childIDs } = this;
@@ -718,16 +697,7 @@ export default class MendixReactDnD extends Component {
             }
         }
         const dropPos = this.getPendingDropPos(item);
-        // Return the element created earlier when drag is active or another marker is being rotated
-        if (this.cellContentMap.has(mapKey)) {
-            if (this.dropStatus === this.DROP_STATUS_DRAGGING && !dropPos) {
-                return this.cellContentMap.get(mapKey);
-            }
-            if (this.state.rotateItemID && this.state.rotateItemID !== item.id) {
-                return this.cellContentMap.get(mapKey);
-            }
-        }
-        const dragWrapper = (
+        return (
             <DragWrapper
                 key={item.id}
                 item={item}
@@ -739,8 +709,6 @@ export default class MendixReactDnD extends Component {
                 {this.renderDatasourceItem(cellContainer, item)}
             </DragWrapper>
         );
-        this.cellContentMap.set(mapKey, dragWrapper);
-        return dragWrapper;
     }
 
     handleDrop(droppedItem, positionData, cellContainer, item) {
@@ -864,7 +832,6 @@ export default class MendixReactDnD extends Component {
         if (this.selectedIDs) {
             if (this.selectedIDs.indexOf(itemID) === -1) {
                 this.selectedIDs = null;
-                this.cellContentMap.clear();
             }
         }
 
@@ -1046,7 +1013,6 @@ export default class MendixReactDnD extends Component {
                 if (this.selectedIDs) {
                     if (this.selectedIDs.indexOf(item.id) === -1) {
                         this.selectedIDs = null;
-                        this.cellContentMap.clear();
                     }
                 }
             } else {
