@@ -27,6 +27,7 @@ export default class MendixReactDnD extends Component {
         this.handleDragging = this.handleDragging.bind(this);
         this.handleBoundingClientRectUpdate = this.handleBoundingClientRectUpdate.bind(this);
         this.handleContainerScroll = this.handleContainerScroll.bind(this);
+        this.handleOnScrollToHandled = this.handleOnScrollToHandled.bind(this);
     }
 
     DROP_STATUS_NONE = "none";
@@ -42,7 +43,11 @@ export default class MendixReactDnD extends Component {
         originalRotation: 0,
         rotateContainerID: null,
         rotateItemID: null,
-        stateTriggerMillis: 0
+        stateTriggerMillis: 0,
+        scrollToContainerRow: 0,
+        scrollToContainerColumn: 0,
+        scrollToX: 0,
+        scrollToY: 0
     };
 
     dropStatus = this.DROP_STATUS_NONE;
@@ -102,11 +107,11 @@ export default class MendixReactDnD extends Component {
                         this.previousDataChangeDateMillis === 0 ||
                         dataChangeDateAttr.value.getTime() !== this.previousDataChangeDateMillis
                     ) {
-                        if (this.previousDataChangeDateMillis === 0) {
-                            // console.info("MendixReactDnD.render: no data changed date set yet");
-                        } else {
-                            // console.info("MendixReactDnD.render: different data changed date");
-                        }
+                        // if (this.previousDataChangeDateMillis === 0) {
+                        //     console.info("MendixReactDnD.render: no data changed date set yet");
+                        // } else {
+                        //     console.info("MendixReactDnD.render: different data changed date");
+                        // }
                         this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_PENDING);
                         // Store the date, also prevents multiple renders all triggering reload of the data.
                         this.previousDataChangeDateMillis = dataChangeDateAttr.value.getTime();
@@ -227,6 +232,7 @@ export default class MendixReactDnD extends Component {
             this.widgetData = newWidgetData;
             this.loadDatasourceItemContent();
             this.selectedIDs = this.widgetData.selectedMarkerGuids;
+            this.setScrollToValuesInState();
             this.setDatasourceUpdateStatus(this.DATASOURCE_STATUS_LOADED);
             // console.info("MendixReactDnD.render: new data loaded");
         }
@@ -247,6 +253,37 @@ export default class MendixReactDnD extends Component {
                     this.datasourceItemContentMap.set(mapItemID, itemContent);
                 }
             }
+        }
+    }
+
+    /**
+     * If scrolling a cell container is requested, put the values in state for later.
+     * Cannot be done directly as the container data may not be visible yet.
+     * Also, a change in zoom percentage must be processed first.
+     */
+    setScrollToValuesInState() {
+        const { scrollToContainerRow, scrollToContainerColumn, scrollToX, scrollToY } = this.props;
+        if (scrollToContainerRow?.value && scrollToContainerColumn?.value && scrollToX?.value && scrollToY?.value) {
+            const scrollToContainerRowValue = Number(scrollToContainerRow.value);
+            const scrollToContainerColumnValue = Number(scrollToContainerColumn.value);
+            const scrollToXValue = Number(scrollToX.value);
+            const scrollToYValue = Number(scrollToY.value);
+            // console.info(
+            //     "MendixReactDnD: Set scroll to values in state for row " +
+            //         scrollToContainerRowValue +
+            //         ", col " +
+            //         scrollToContainerColumnValue +
+            //         ", x " +
+            //         scrollToXValue +
+            //         ", y " +
+            //         scrollToYValue
+            // );
+            this.setState({
+                scrollToContainerRow: scrollToContainerRowValue,
+                scrollToContainerColumn: scrollToContainerColumnValue,
+                scrollToX: scrollToXValue,
+                scrollToY: scrollToYValue
+            });
         }
     }
 
@@ -563,14 +600,32 @@ export default class MendixReactDnD extends Component {
             return null;
         }
 
+        const { scrollToContainerRow, scrollToContainerColumn, scrollToX, scrollToY } = this.state;
+        const scrollTo = scrollToContainerRow === rowNumber && scrollToContainerColumn === columnNumber;
+        // if (scrollTo) {
+        //     console.info(
+        //         "MendixReactDnD: Scroll container r " +
+        //             rowNumber +
+        //             ", c " +
+        //             columnNumber +
+        //             " to " +
+        //             scrollToX +
+        //             "/" +
+        //             scrollToY
+        //     );
+        // }
+
         return (
             <CellContainer
                 key={mapKey}
                 cellKey={mapKey}
                 rowNumber={rowNumber}
                 columnNumber={columnNumber}
+                scrollToX={scrollTo ? scrollToX : undefined}
+                scrollToY={scrollTo ? scrollToY : undefined}
                 onBoundingClientRectUpdate={this.handleBoundingClientRectUpdate}
                 onContainerScroll={this.handleContainerScroll}
+                onScrollToHandled={this.handleOnScrollToHandled}
             >
                 {this.renderCell(gridMapItem)}
             </CellContainer>
@@ -585,6 +640,23 @@ export default class MendixReactDnD extends Component {
     handleContainerScroll(mapKey, scrollInfo) {
         // Store the scroll info in the map to take scroll position into account for event data
         this.containerCellScrollMap.set(mapKey, scrollInfo);
+    }
+
+    handleOnScrollToHandled() {
+        const { scrollToContainerRow, scrollToContainerColumn, scrollToX, scrollToY } = this.props;
+        if (scrollToContainerRow && scrollToContainerColumn && scrollToX && scrollToY) {
+            // console.info("MendixReactDnD: container onScrollTo handled");
+            this.setState({
+                scrollToContainerRow: 0,
+                scrollToContainerColumn: 0,
+                scrollToX: 0,
+                scrollToY: 0
+            });
+            scrollToContainerRow.setValue(undefined);
+            scrollToContainerColumn.setValue(undefined);
+            scrollToX.setValue(undefined);
+            scrollToY.setValue(undefined);
+        }
     }
 
     renderCell(gridMapItem) {

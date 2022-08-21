@@ -25,9 +25,7 @@ export function CellContainer(props) {
 
     const handleScroll = useCallback(() => {
         if (layoutRef.current) {
-            // console.info(
-            //     "handleScroll T/L: " + this.layoutRef.current.scrollTop + "/" + this.layoutRef.current.scrollLeft
-            // );
+            // console.info("handleScroll T/L: " + layoutRef.current.scrollTop + "/" + layoutRef.current.scrollLeft);
             if (onContainerScroll) {
                 onContainerScroll(cellKey, {
                     scrollTop: layoutRef.current.scrollTop,
@@ -37,7 +35,36 @@ export function CellContainer(props) {
         }
     }, [cellKey, layoutRef, onContainerScroll]);
 
-    const { rowNumber, columnNumber } = props;
+    const { rowNumber, columnNumber, scrollToX, scrollToY, onScrollToHandled } = props;
+    useLayoutEffect(() => {
+        if (scrollToX && scrollToY) {
+            if (layoutRef) {
+                if (layoutRef.current) {
+                    // console.info(
+                    //     "CellContainer row " +
+                    //         rowNumber +
+                    //         ", col " +
+                    //         columnNumber +
+                    //         ": scroll to " +
+                    //         scrollToX +
+                    //         "/" +
+                    //         scrollToY
+                    // );
+                    layoutRef.current.scrollTo(scrollToX, scrollToY);
+                    if (onScrollToHandled) {
+                        onScrollToHandled();
+                    }
+                    // } else {
+                    //     console.info(
+                    //         "CellContainer row " + rowNumber + ", col " + columnNumber + ": no layout ref current"
+                    //     );
+                }
+                // } else {
+                //     console.info("CellContainer row " + rowNumber + ", col " + columnNumber + ": no layout ref");
+            }
+        }
+    }, [columnNumber, layoutRect, onScrollToHandled, rowNumber, scrollToX, scrollToY]);
+
     const className = "widget-cell widget-cell-r" + rowNumber + "-c" + columnNumber;
 
     return (

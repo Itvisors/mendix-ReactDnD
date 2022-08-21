@@ -1,19 +1,22 @@
 {
   "name": "mendixreactdnd",
   "widgetName": "MendixReactDnD",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Wrapper for react-dnd",
   "copyright": "2020 ITvisors",
   "author": "Marcel Groeneweg",
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "Apache-2.0",
   "config": {
-    "widgetPath": "../test/widgets",
     "projectPath": "../test/",
     "mendixHost": "http://localhost:8080",
-    "developmentPort": "3000"
+    "developmentPort": 3000
   },
   "packagePath": "itvisors",
   "scripts": {
-    "start": "pluggable-widgets-tools start:server --open",
+    "start": "pluggable-widgets-tools start:server",
     "dev": "pluggable-widgets-tools start:web",
     "build": "pluggable-widgets-tools build:web",
     "lint": "pluggable-widgets-tools lint",
@@ -21,15 +24,10 @@
     "prerelease": "npm run lint",
     "release": "pluggable-widgets-tools release:web"
   },
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/Itvisors/mendix-ReactDnD/issues"
-  },
   "devDependencies": {
-    "@mendix/pluggable-widgets-tools": "^9.11.0"
+    "@mendix/pluggable-widgets-tools": "^9.12.3"
   },
   "dependencies": {
-    "classnames": "^2.2.6",
     "react-dnd": "^15.1.2",
     "react-dnd-html5-backend": "^15.1.3",
     "react-dnd-touch-backend": "^15.1.2"
