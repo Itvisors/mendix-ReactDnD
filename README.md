@@ -2,14 +2,15 @@
 Wrapper for [react-dnd](https://react-dnd.github.io/react-dnd/about) to provide drag/drop functionality using the pluggable widget architecture.
 
 ## Features
-- Drag items from lists and drop them on other page elements
-- Reorder items in a list by dragging them
-- Configure for each item whether it is draggable, or a drop target, or both
+- Drag items from lists and drop them on other page elements.
+- Reorder items in a list by dragging them.
+- Configure for each item whether it is draggable, or a drop target, or both.
 - For drop targets, configure which items may be dropped onto it.
-- Position images on a floorplan or other background
-- Rotate images by dragging a rotation handle
-- Default styling to indicate valid and invalid drop targets
-- Optionally apply a shadow effect to items while they are dragged 
+- Position images on a floorplan or other background.
+- Scroll the background to a giving position to move an image into view.
+- Rotate images by dragging a rotation handle.
+- Default styling to indicate valid and invalid drop targets.
+- Optionally apply a shadow effect to items while they are dragged.
 
 ## Not for the faint hearted!
 This is **not** an easy widget to work with! Take your time when you want to use it. The result is well worth the effort!
@@ -78,8 +79,12 @@ All event handling is done by setting values on the context object.
 | ctrl key                | Boolean     |      |                    | Whether the ctrl key was held during an onclick event. (Not applicable for drop events)
 | alt key                 | Boolean     |      |                    | Whether the alt key was held during an onclick event. (Not applicable for drop events)
 | Is right click          | Boolean     |      |                    | Whether the click event is a right click. (Not applicable for drop events)
-| Selected marker GUIDs   | String      |      |                    | The selected marker(s). Comma separated list of GUIDs.
-| Selected marker count   | Integer     |      |                    | Optional. Number of selected markers. Only relevant when multiselect of markers is allowed at one or more containers.
+| Selected marker GUIDs   | String      |      | Opt.               | The selected marker(s). Comma separated list of GUIDs.
+| Selected marker count   | Integer     |      | Opt.               | Optional. Number of selected markers. Only relevant when multiselect of markers is allowed at one or more containers.
+| Scroll to row           | Integer     |      | Opt.               | Set the row number of the cell to scroll. See below
+| Scroll to column        | Integer     |      | Opt.               | Set the column number of the cell to scroll
+| Scroll to X             | Integer     |      | Opt.               | The X position to scroll to
+| Scroll to Y             | Integer     |      | Opt.               | The Y position to scroll to
 
 ## Events
 
@@ -228,6 +233,9 @@ If it seems impossible to snap drop an item at the top-left corner of your backg
 
 ### Show grid
 For each datasource can be specified whether a grid should be shown. This is done at datasource level otherwise the grid would be shown across all containers where it should only be shown over the background.
+
+### Scroll to marker
+Set the zoom percentage, scroll to row/column and X/Y position to scroll one of more markers into view. 
 
 ## Styling
 The widget is easy enough to style by setting a class on it in the widget properties and then apply styling by targeting the main widget using your class and overruling defaults. Also, the classes used for each container can be changed at the container definition.
