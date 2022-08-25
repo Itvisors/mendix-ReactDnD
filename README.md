@@ -234,10 +234,10 @@ If it seems impossible to snap drop an item at the top-left corner of your backg
 ### Show grid
 For each datasource can be specified whether a grid should be shown. This is done at datasource level otherwise the grid would be shown across all containers where it should only be shown over the background.
 
-### Scroll to marker
+### Scroll/Zoom to marker
 Set the zoom percentage, scroll to row/column and X/Y position to scroll one of more markers into view. Be sure to set the values to `empty`, not zero, to prevent unwanted scroll actions from the widget. Best place to do that is when opening the page with the widget. The sample project does this.
 
-Microflow `SUB_EditFloorplan_CenterAt` in the sample project accepts a list of markers as parameter. It then calculates the zoom percentage and scroll to X/Y. You can copy this microflow to your own project and call it. Be sure to commit the context object yourself. The microflow does not commit the object in case other changes need to be made to the context object as well.
+Microflow `SUB_EditFloorplan_ZoomTo` in the sample project accepts a list of markers as parameter. It then calculates the zoom percentage and scroll to X/Y. You can copy this microflow to your own project and call it. Be sure to commit the context object yourself. The microflow does not commit the object in case other changes need to be made to the context object as well.
 
 ## Styling
 The widget is easy enough to style by setting a class on it in the widget properties and then apply styling by targeting the main widget using your class and overruling defaults. Also, the classes used for each container can be changed at the container definition.
