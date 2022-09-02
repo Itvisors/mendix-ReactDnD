@@ -298,6 +298,10 @@
                     <attributeType name="Integer" />
                 </attributeTypes>
             </property>
+            <property key="scrollToDelay" type="integer" defaultValue="0">
+                <caption>Scroll to delay (ms)</caption>
+                <description>The number of milliseconds to wait before actually scrolling. Must be zero or positive.</description>
+            </property>
         </propertyGroup>
 
         <propertyGroup caption="Event data">
@@ -424,6 +428,10 @@
             <property key="onDragToSelect" type="action" required="false">
                 <caption>On drag to select</caption>
                 <description>Optional. Called when user selects multiple markers by dragging a selection area. Required only when allowing users to do so.</description>
+            </property>
+            <property key="onScrollToHandledAction" type="action" required="false">
+                <caption>On scroll to handled action</caption>
+                <description>Optional. When using scroll to, this action can be used to commit the context. In a microflow or just use save changes.</description>
             </property>
         </propertyGroup>
 

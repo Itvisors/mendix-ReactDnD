@@ -262,28 +262,31 @@ export default class MendixReactDnD extends Component {
      * Also, a change in zoom percentage must be processed first.
      */
     setScrollToValuesInState() {
-        const { scrollToContainerRow, scrollToContainerColumn, scrollToX, scrollToY } = this.props;
+        const { scrollToContainerRow, scrollToContainerColumn, scrollToX, scrollToY, scrollToDelay } = this.props;
         if (scrollToContainerRow?.value && scrollToContainerColumn?.value && scrollToX?.value && scrollToY?.value) {
-            const scrollToContainerRowValue = Number(scrollToContainerRow.value);
-            const scrollToContainerColumnValue = Number(scrollToContainerColumn.value);
-            const scrollToXValue = Number(scrollToX.value);
-            const scrollToYValue = Number(scrollToY.value);
-            // console.info(
-            //     "MendixReactDnD: Set scroll to values in state for row " +
-            //         scrollToContainerRowValue +
-            //         ", col " +
-            //         scrollToContainerColumnValue +
-            //         ", x " +
-            //         scrollToXValue +
-            //         ", y " +
-            //         scrollToYValue
-            // );
-            this.setState({
-                scrollToContainerRow: scrollToContainerRowValue,
-                scrollToContainerColumn: scrollToContainerColumnValue,
-                scrollToX: scrollToXValue,
-                scrollToY: scrollToYValue
-            });
+            // console.info("MendixReactDnD.render: Set timeout for updating scroll to values in state");
+            setTimeout(() => {
+                const scrollToContainerRowValue = Number(scrollToContainerRow.value);
+                const scrollToContainerColumnValue = Number(scrollToContainerColumn.value);
+                const scrollToXValue = Number(scrollToX.value);
+                const scrollToYValue = Number(scrollToY.value);
+                // console.info(
+                //     "MendixReactDnD: Set scroll to values in state for row " +
+                //         scrollToContainerRowValue +
+                //         ", col " +
+                //         scrollToContainerColumnValue +
+                //         ", x " +
+                //         scrollToXValue +
+                //         ", y " +
+                //         scrollToYValue
+                // );
+                this.setState({
+                    scrollToContainerRow: scrollToContainerRowValue,
+                    scrollToContainerColumn: scrollToContainerColumnValue,
+                    scrollToX: scrollToXValue,
+                    scrollToY: scrollToYValue
+                });
+            }, scrollToDelay);
         }
     }
 
@@ -656,6 +659,10 @@ export default class MendixReactDnD extends Component {
             scrollToContainerColumn.setValue(undefined);
             scrollToX.setValue(undefined);
             scrollToY.setValue(undefined);
+            const { onScrollToHandledAction } = this.props;
+            if (onScrollToHandledAction && onScrollToHandledAction.canExecute && !onScrollToHandledAction.isExecuting) {
+                onScrollToHandledAction.execute();
+            }
         }
     }
 
