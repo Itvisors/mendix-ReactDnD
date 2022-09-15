@@ -842,13 +842,7 @@ export default class MendixReactDnD extends Component {
         let offsetX = positionData.dropOffsetX;
         let offsetY = positionData.dropOffsetY;
 
-        // Get the current scroll position of the container
-        const mapKey = "r" + cellContainer.rowNumber + "c" + cellContainer.columnNumber;
-        const containerScrollInfo = this.containerCellScrollMap.get(mapKey);
-        const containerScrollTop = containerScrollInfo ? containerScrollInfo.scrollTop : 0;
-        const containerScrollLeft = containerScrollInfo ? containerScrollInfo.scrollLeft : 0;
-        offsetX += containerScrollLeft;
-        offsetY += containerScrollTop;
+        // The react-dnd library already adjusts for scroll offset here.
 
         if (adjustOffset) {
             // Adjust offset values for zoom factor.
