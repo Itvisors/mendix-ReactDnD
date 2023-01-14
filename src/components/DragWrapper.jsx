@@ -75,7 +75,8 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
     }
 
     const { draggableClass, draggingClass } = item;
-    const className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
+    let className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
+    className += " draggableItem";
     return (
         <div ref={drag} style={style} className={className}>
             <div ref={layoutRef}>{children}</div>

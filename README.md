@@ -139,7 +139,8 @@ The widget allows you to choose where to put each container by setting a row and
 | Property            | Type        | Req. | Remarks
 |---------------------|-------------|:----:|---------
 | Data source         |             | Y    | The datasource for the item(s) in the container.
-| Content             |             | Y    | The content to render for each item. Optional! The widget can render images, see below
+| Content             |             |      | The content to render for each item. Optional! The widget can render images, see below
+| Drag handle content |             |      | Drag handle content for datasource. If used, only that part of the datasource item will be draggable. Only if content is set, ignored otherwise.
 | Disable drag        | Boolean     |      | When dragging is possible, use this to (temporarily) disable dragging of this item.
 | Name                | String      |      | Name attribute. When set, will render a data-name attribute with the value on the item element.
 | Marker class        | String      |      | Optional, value will be added to the CSS class of the marker
@@ -204,6 +205,7 @@ The sample project has an example of positioning items on a floorplan.
 Take care when creating a palette from which the user can drag items onto the floorplan or canvas. If the item on the palette has different dimensions than the item on the floorplan it might not be positioned correctly.
 
 If you allow items to be positioned on top of each other or overlapping in any way, be sure to make the items a drop target as well. Without this, items cannot be dropped close to each other or on top of each other.
+
 
 ### Prevent dropping outside the background image
 The background image will resize according to the zoom level, so it may be smaller than the available space. The drop target is just a `div` so by default it will take all available space, allowing markers to be dropped outside the backgroud image. To prevent this, put a class similar to this one on your background container:

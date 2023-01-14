@@ -19,6 +19,7 @@ export default class MendixReactDnD extends Component {
         super(props);
 
         this.getDatasourceItemContent = this.getDatasourceItemContent.bind(this);
+        this.getDatasourceItemDragHandleContent = this.getDatasourceItemDragHandleContent.bind(this);
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleDragEnd = this.handleDragEnd.bind(this);
         this.handleRotateHover = this.handleRotateHover.bind(this);
@@ -245,11 +246,14 @@ export default class MendixReactDnD extends Component {
     loadDatasourceItemContent() {
         this.datasourceItemContentMap.clear();
         for (const container of this.props.containerList) {
-            const { containerID, dsContent } = container;
+            const { containerID, dsContent, dsDragHandleContent } = container;
             if (dsContent) {
                 for (const datasourceItem of container.ds.items) {
                     const mapItemID = containerID.value + "_" + datasourceItem.id;
-                    const itemContent = dsContent.get(datasourceItem);
+                    const itemContent = {
+                        content: dsContent.get(datasourceItem),
+                        dragHandleContent: dsDragHandleContent ? dsDragHandleContent.get(datasourceItem) : undefined
+                    };
                     this.datasourceItemContentMap.set(mapItemID, itemContent);
                 }
             }
@@ -291,7 +295,13 @@ export default class MendixReactDnD extends Component {
     }
 
     getDatasourceItemContent(item) {
-        return this.datasourceItemContentMap.get(item.containerID + "_" + item.id);
+        const itemContent = this.datasourceItemContentMap.get(item.containerID + "_" + item.id);
+        return itemContent?.content;
+    }
+
+    getDatasourceItemDragHandleContent(item) {
+        const itemContent = this.datasourceItemContentMap.get(item.containerID + "_" + item.id);
+        return itemContent?.dragHandleContent;
     }
 
     /**
@@ -784,6 +794,7 @@ export default class MendixReactDnD extends Component {
                 onDragStart={this.handleDragStart}
                 onDragEnd={this.handleDragEnd}
                 zoomFactor={this.widgetData.zoomFactor}
+                renderDragHandleContent={this.getDatasourceItemDragHandleContent}
             >
                 {this.renderDatasourceItem(cellContainer, item)}
             </DragWrapper>

@@ -25,7 +25,7 @@
     "release": "pluggable-widgets-tools release:web"
   },
   "devDependencies": {
-    "@mendix/pluggable-widgets-tools": "^9.12.3"
+    "@mendix/pluggable-widgets-tools": "^9.18.0"
   },
   "dependencies": {
     "react-dnd": "^15.1.2",

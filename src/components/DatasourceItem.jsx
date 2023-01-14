@@ -39,9 +39,6 @@ export function DatasourceItem({
 
     // Set the class name(s).
     let className = "widget-cell-content-container-item";
-    if (dragDropType === "drag" || dragDropType === "both") {
-        className += " draggableItem";
-    }
     if (dragDropType === "drop" || dragDropType === "both") {
         className += " dropTarget";
     }

@@ -71,6 +71,10 @@
                             <caption>Content for datasource</caption>
                             <description></description>
                         </property>
+                        <property key="dsDragHandleContent" type="widgets" dataSource="ds" required="false">
+                            <caption>Drag handle content</caption>
+                            <description>Drag handle content for datasource. If used, only that part of the datasource item will be draggable. Only if content is set, ignored otherwise.</description>
+                        </property>
                         <property key="dsDisableDrag" type="expression" dataSource="ds" required="false">
                             <caption>Disable drag</caption>
                             <description>Optional. When dragging is possible, use this to (temporarily) disable dragging of this item.</description>
