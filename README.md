@@ -4,6 +4,7 @@ Wrapper for [react-dnd](https://react-dnd.github.io/react-dnd/about) to provide 
 ## Features
 - Drag items from lists and drop them on other page elements.
 - Reorder items in a list by dragging them.
+- Drag the entire item or only by dragging a drag handle.
 - Configure for each item whether it is draggable, or a drop target, or both.
 - For drop targets, configure which items may be dropped onto it.
 - Position images on a floorplan or other background.
@@ -140,7 +141,7 @@ The widget allows you to choose where to put each container by setting a row and
 |---------------------|-------------|:----:|---------
 | Data source         |             | Y    | The datasource for the item(s) in the container.
 | Content             |             |      | The content to render for each item. Optional! The widget can render images, see below
-| Drag handle content |             |      | Drag handle content for datasource. If used, only that part of the datasource item will be draggable. Only if content is set, ignored otherwise.
+| Drag handle content |             |      | Drag handle content for datasource. If used, only that part of the datasource item will be draggable. After you place item content, the drag handle drop zone becomes available.
 | Disable drag        | Boolean     |      | When dragging is possible, use this to (temporarily) disable dragging of this item.
 | Name                | String      |      | Name attribute. When set, will render a data-name attribute with the value on the item element.
 | Marker class        | String      |      | Optional, value will be added to the CSS class of the marker
@@ -157,7 +158,7 @@ Note that an item ID is just the GUID.
 ### Rendering items as an image
 The widget can render items as image, allowing the user to rotate the image. Optionally, the image can resize along with the zoom percentage or keep its size. Examples: A marker on a floorplan should probably not scale so it remains visible when zooming out. Furniture placed on the floorplan should scale with the zoom percentage.
 
-When X and Y offset are set, position absolute is also set on the item.
+When X and Y offset are set, position absolute is also set on the item. Note that using drag handles too may cause the image position to be incorrect. So please don't do that unless you know what you're doing and can deal with the consequences.
 
 Use CommunityCommons.GetImageDimensions to save the image dimensions on your image objects. 
 
