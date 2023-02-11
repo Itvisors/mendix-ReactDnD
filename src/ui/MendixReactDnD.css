@@ -28,6 +28,18 @@ ReactDnD widget CSS
     cursor: move;
 }
 
+.draggableItemContainer {
+    display: flex;
+}
+
+.draggableItemHandle {
+    cursor: move;
+}
+
+.draggableItemContent {
+    flex-grow: 1;
+}
+
 .clickableItem {
     cursor: pointer;
 }

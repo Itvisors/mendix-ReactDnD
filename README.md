@@ -267,8 +267,11 @@ The elements and classes involved that you can overrule to apply styling:
 | Cell content container | widget-cell-content-container | Contains the contents rendered for a container
 | Drop target container  | droptarget-container    | If container is a drop target
 | Draggable container    | draggable-container     | If container is draggable
+| Draggable item         | draggableItem           | If draggable and no drag handle is used, item container is wrapped in div with this class 
+| Draggable item         | draggableItemContainer  | If draggable and drag handle is used, drag handle and item  are wrapped in div with this class
+| Draggable item         | draggableItemHandle     | If draggable and drag handle is used, drag handle content is wrapped in div with this class
+| Draggable item         | draggableItemContent    | If draggable and drag handle is used, item container is wrapped in div with this class 
 | Item container         | widget-cell-content-container-item | Contains rendered content for one datasource item
-|                        | draggableItem           | Added if draggable
 |                        | dropTarget              | Added if drop target
 
 ### Additional marker classes

@@ -3,7 +3,7 @@ import { Constants } from "../utils/Constants";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { useDrag } from "react-dnd";
 
-export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd, children }) {
+export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd, renderDragHandleContent, children }) {
     const layoutRef = useRef(null);
     const [elementRect, setElementRect] = useState(null);
 
@@ -44,7 +44,7 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
                 didDrop: !!monitor.didDrop()
             })
         }),
-        [item]
+        [item, elementRect]
     );
 
     useLayoutEffect(() => {
@@ -52,7 +52,7 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
             const rect = layoutRef.current.getBoundingClientRect();
             setElementRect(rect);
         }
-    }, []);
+    }, [item]);
 
     // Turn off the default drag preview that the browser renders as we render our own in CustomDragLayer.
     useEffect(() => {
@@ -74,12 +74,27 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
         style.position = "relative";
     }
 
+    const dragHandle = renderDragHandleContent(item);
     const { draggableClass, draggingClass } = item;
-    let className = isDragging ? draggableClass + " " + draggingClass : draggableClass;
-    className += " draggableItem";
-    return (
-        <div ref={drag} style={style} className={className}>
-            <div ref={layoutRef}>{children}</div>
-        </div>
-    );
+    let contentClassName = isDragging ? draggableClass + " " + draggingClass : draggableClass;
+    if (dragHandle) {
+        contentClassName += " draggableItemContent";
+        return (
+            <div ref={preview} style={style} className="draggableItemContainer">
+                <div ref={drag} className="draggableItemHandle">
+                    {dragHandle}
+                </div>
+                <div ref={layoutRef} className={contentClassName}>
+                    {children}
+                </div>
+            </div>
+        );
+    } else {
+        contentClassName += " draggableItem";
+        return (
+            <div ref={drag} style={style} className={contentClassName}>
+                <div ref={layoutRef}>{children}</div>
+            </div>
+        );
+    }
 }
