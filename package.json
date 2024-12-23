@@ -1,7 +1,7 @@
 {
   "name": "mendixreactdnd",
   "widgetName": "MendixReactDnD",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Wrapper for react-dnd",
   "copyright": "2020 ITvisors",
   "author": "Marcel Groeneweg",
@@ -25,7 +25,7 @@
     "release": "pluggable-widgets-tools release:web"
   },
   "devDependencies": {
-    "@mendix/pluggable-widgets-tools": "^10.12.1"
+    "@mendix/pluggable-widgets-tools": "10.18.0"
   },
   "dependencies": {
     "react-dnd": "^16.0.1",
