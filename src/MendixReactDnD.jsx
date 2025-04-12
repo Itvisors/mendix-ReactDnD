@@ -1,4 +1,5 @@
 import { Component, createElement } from "react";
+import Big from "big.js";
 import { CellContainer } from "./components/CellContainer";
 import { CustomDragLayer } from "./components/CustomDragLayer";
 import { DatasourceItem } from "./components/DatasourceItem";
@@ -327,7 +328,7 @@ export default class MendixReactDnD extends Component {
      * @param {*} positionData The position of the drop
      */
     handleRotateDrop(droppedItem, positionData) {
-        const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
+        const { onRotateAction } = this.props;
         // Return the new rotation value, need to add current value to the dragged angle.
         // User might drag beyond full circle, prevent values beyond 360
         const rotationDegree =
@@ -342,19 +343,13 @@ export default class MendixReactDnD extends Component {
         //         ", original rotation: " +
         //         droppedItem.originalRotation
         // );
-        if (newRotation) {
-            if (
-                !this.isAttributeReadOnly("eventContainerID", eventContainerID) &&
-                !this.isAttributeReadOnly("eventGuid", eventGuid) &&
-                !this.isAttributeReadOnly("newRotation", newRotation)
-            ) {
-                newRotation.setTextValue("" + rotationDegree);
-                eventContainerID.setValue(droppedItem.originalType);
-                eventGuid.setValue(droppedItem.originalId);
-                if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
-                    onRotateAction.execute();
-                }
-            }
+        const actionParameters = {
+            containerID: droppedItem.originalType,
+            eventGuid: droppedItem.originalId,
+            newRotation: new Big(Math.round(rotationDegree))
+        };
+        if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
+            onRotateAction.execute(actionParameters);
         }
     }
 
@@ -449,11 +444,15 @@ export default class MendixReactDnD extends Component {
                 }
             }
         }
-        this.updateSelectionInContext();
+
+        const actionParameters = {
+            selectedMarkerGuids: this.selectedIDs ? this.selectedIDs : undefined,
+            selectedMarkerCount: new Big(this.getSelectedMarkerCount())
+        };
 
         const { onDragToSelect } = this.props;
         if (onDragToSelect && onDragToSelect.canExecute && !onDragToSelect.isExecuting) {
-            onDragToSelect.execute();
+            onDragToSelect.execute(actionParameters);
         }
     }
 
@@ -815,40 +814,16 @@ export default class MendixReactDnD extends Component {
         const { adjustOffset, zoomFactor } = this.widgetData;
         const { containerID } = cellContainer;
 
-        const {
-            eventContainerID,
-            eventGuid,
-            eventClientX,
-            eventClientY,
-            eventOffsetX,
-            eventOffsetY,
-            dropTargetContainerID,
-            dropTargetGuid
-        } = this.props;
-        if (
-            this.isAttributeReadOnly("eventContainerID", eventContainerID) ||
-            this.isAttributeReadOnly("eventClientX", eventClientX) ||
-            this.isAttributeReadOnly("eventClientY", eventClientY) ||
-            this.isAttributeReadOnly("eventOffsetX", eventOffsetX) ||
-            this.isAttributeReadOnly("eventOffsetY", eventOffsetY) ||
-            this.isAttributeReadOnly("eventGuid", eventGuid) ||
-            this.isAttributeReadOnly("dropTargetContainerID", dropTargetContainerID) ||
-            this.isAttributeReadOnly("dropTargetGuid", dropTargetGuid)
-        ) {
-            return;
-        }
-
-        eventContainerID.setValue(droppedItem.type);
-        eventGuid.setTextValue(droppedItem.id);
-        dropTargetContainerID.setValue(containerID);
-        dropTargetGuid.setTextValue(item.id);
-
-        if (eventClientX) {
-            eventClientX.setTextValue("" + positionData.dropClientX);
-        }
-        if (eventClientY) {
-            eventClientY.setTextValue("" + positionData.dropClientY);
-        }
+        const actionParameters = {
+            containerID: droppedItem.type,
+            eventGuid: droppedItem.id,
+            clientX: new Big(positionData.dropClientX),
+            clientY: new Big(positionData.dropClientY),
+            selectedMarkerGuids: this.selectedIDs ? this.selectedIDs : undefined,
+            selectedMarkerCount: new Big(this.getSelectedMarkerCount()),
+            dropTargetContainerID: containerID,
+            dropTargetGuid: item.id
+        };
 
         let offsetX = positionData.dropOffsetX;
         let offsetY = positionData.dropOffsetY;
@@ -868,12 +843,8 @@ export default class MendixReactDnD extends Component {
             this.dropClientY = offsetY;
         }
 
-        if (eventOffsetX) {
-            eventOffsetX.setTextValue("" + offsetX);
-        }
-        if (eventOffsetY) {
-            eventOffsetY.setTextValue("" + offsetY);
-        }
+        actionParameters.offsetX = new Big(offsetX);
+        actionParameters.offsetY = new Big(offsetY);
 
         // console.info(
         //     "handleDrop dragged difference this X/Y " +
@@ -883,19 +854,12 @@ export default class MendixReactDnD extends Component {
         //         ", position data: " +
         //         JSON.stringify(positionData)
         // );
-        const { draggedDifferenceX, draggedDifferenceY } = this.props;
-        if (draggedDifferenceX) {
-            draggedDifferenceX.setTextValue("" + this.draggedDifferenceX);
-        }
-        if (draggedDifferenceY) {
-            draggedDifferenceY.setTextValue("" + this.draggedDifferenceY);
-        }
-
-        this.updateSelectionInContext();
+        actionParameters.draggedDifferenceX = new Big(this.draggedDifferenceX);
+        actionParameters.draggedDifferenceY = new Big(this.draggedDifferenceY);
 
         const { onDropAction } = this.props;
         if (onDropAction && onDropAction.canExecute && !onDropAction.isExecuting) {
-            onDropAction.execute();
+            onDropAction.execute(actionParameters);
         }
     }
 
@@ -1061,36 +1025,13 @@ export default class MendixReactDnD extends Component {
 
     handleClick(container, item, evt, offsetX, offsetY) {
         const { containerID, allowSelection, returnOnClick } = container;
-        const {
-            eventContainerID,
-            eventClientX,
-            eventClientY,
-            eventOffsetX,
-            eventOffsetY,
-            shiftKeyHeld,
-            ctrlKeyHeld,
-            altKeyHeld,
-            isRightClickEvent,
-            eventGuid
-        } = this.props;
-        if (
-            this.isAttributeReadOnly("eventContainerID", eventContainerID) ||
-            this.isAttributeReadOnly("eventGuid", eventGuid) ||
-            this.isAttributeReadOnly("eventClientX", eventClientX) ||
-            this.isAttributeReadOnly("eventClientY", eventClientY) ||
-            this.isAttributeReadOnly("eventOffsetX", eventOffsetX) ||
-            this.isAttributeReadOnly("eventOffsetY", eventOffsetY) ||
-            this.isAttributeReadOnly("shiftKeyHeld", shiftKeyHeld) ||
-            this.isAttributeReadOnly("ctrlKeyHeld", ctrlKeyHeld) ||
-            this.isAttributeReadOnly("altKeyHeld", altKeyHeld) ||
-            this.isAttributeReadOnly("isRightClickEvent", isRightClickEvent)
-        ) {
-            return;
-        }
         if (returnOnClick) {
+            // Detect whether this is a right click event. The button value is zero for normal click.
             const isRightClick = evt.button !== 0;
+
             // console.info("MendixReactDnD onClick on " + containerID + " offset X/Y: " + offsetX + "/" + offsetY);
             // console.dir(evt);
+
             // Only select marker if not right-click event
             if (isRightClick) {
                 // Reset the selected IDs if user ctrl-clicks markers and then right-clicks another marker
@@ -1139,92 +1080,50 @@ export default class MendixReactDnD extends Component {
                 });
             }
 
-            this.updateSelectionInContext();
-
-            eventContainerID.setValue(containerID);
-            eventGuid.setTextValue(item.id);
-
-            // Client position
-            if (eventClientX) {
-                eventClientX.setTextValue("" + Math.round(evt.clientX));
-            }
-            if (eventClientY) {
-                eventClientY.setTextValue("" + Math.round(evt.clientY));
-            }
+            const actionParameters = {
+                containerID,
+                eventGuid: item.id,
+                clientX: new Big(Math.round(evt.clientX)),
+                clientY: new Big(Math.round(evt.clientY)),
+                selectedMarkerGuids: this.selectedIDs ? this.selectedIDs : undefined,
+                selectedMarkerCount: new Big(this.getSelectedMarkerCount()),
+                shiftKeyHeld: !!evt.shiftKey,
+                ctrlKeyHeld: !!evt.ctrlKey,
+                altKeyHeld: !!evt.altKey,
+                isRightClickEvent: isRightClick
+            };
 
             // Offset
             const { adjustOffset, zoomFactor } = this.widgetData;
             if (adjustOffset) {
                 // Adjust offset values for zoom factor.
-                if (eventOffsetX) {
-                    eventOffsetX.setTextValue("" + Math.round(offsetX / zoomFactor));
-                }
-                if (eventOffsetY) {
-                    eventOffsetY.setTextValue("" + Math.round(offsetY / zoomFactor));
-                }
+                actionParameters.offsetX = new Big(Math.round(offsetX / zoomFactor));
+                actionParameters.offsetY = new Big(Math.round(offsetY / zoomFactor));
             } else {
-                if (eventOffsetX) {
-                    eventOffsetX.setTextValue("" + offsetX);
-                }
-                if (eventOffsetY) {
-                    eventOffsetY.setTextValue("" + offsetY);
-                }
-            }
-
-            // Pass the state of the shift, ctrl and alt keys, if requested
-            if (shiftKeyHeld) {
-                shiftKeyHeld.setValue(evt.shiftKey);
-            }
-            if (ctrlKeyHeld) {
-                ctrlKeyHeld.setValue(evt.ctrlKey);
-            }
-            if (altKeyHeld) {
-                altKeyHeld.setValue(evt.altKey);
-            }
-
-            // Indicate whether this is a right click event. The button value is zero for normal click.
-            if (isRightClickEvent) {
-                isRightClickEvent.setValue(isRightClick);
+                actionParameters.offsetX = new Big(offsetX);
+                actionParameters.offsetY = new Big(offsetY);
             }
 
             // Call the action
             const { onClickAction } = this.props;
             if (onClickAction && onClickAction.canExecute && !onClickAction.isExecuting) {
-                onClickAction.execute();
+                onClickAction.execute(actionParameters);
             }
         } else {
             // console.info("MendixReactDnD Ignored onClick on " + containerID);
         }
     }
 
-    updateSelectionInContext() {
-        const { selectedMarkerGuids } = this.props;
-        if (selectedMarkerGuids) {
-            selectedMarkerGuids.setTextValue(this.selectedIDs);
-        }
-
-        const { selectedMarkerCount } = this.props;
-        if (selectedMarkerCount) {
-            if (this.selectedIDs) {
-                selectedMarkerCount.setTextValue("" + this.selectedIDs.split(",").length);
-            } else {
-                selectedMarkerCount.setTextValue("0");
-            }
-        }
+    getSelectedMarkerCount() {
+        const selectedMarkerCount = this.selectedIDs ? this.selectedIDs.split(",").length : 0;
+        return selectedMarkerCount;
     }
 
     handleRotateClick(rotatedForward, container, item) {
         const { containerID } = container;
-        const { eventContainerID, eventGuid, newRotation, onRotateAction } = this.props;
-        if (
-            this.isAttributeReadOnly("eventContainerID", eventContainerID) ||
-            this.isAttributeReadOnly("eventGuid", eventGuid) ||
-            this.isAttributeReadOnly("newRotation", newRotation)
-        ) {
-            return;
-        }
+        const { onRotateAction } = this.props;
         const { rotationButtonDegrees, addToCurrentRotation } = this.widgetData;
-        if (newRotation && rotationButtonDegrees > 0) {
+        if (rotationButtonDegrees > 0) {
             // Get current rotation
             let newRotationDegree = item.imageRotation;
             // Get value for click
@@ -1262,27 +1161,14 @@ export default class MendixReactDnD extends Component {
                     }
                 }
             }
-            newRotation.setTextValue("" + newRotationDegree);
-            eventContainerID.setValue(containerID);
-            eventGuid.setTextValue(item.id);
+            const actionParameters = {
+                containerID,
+                eventGuid: item.id,
+                newRotation: new Big(Math.round(newRotationDegree))
+            };
             if (onRotateAction && onRotateAction.canExecute && !onRotateAction.isExecuting) {
-                onRotateAction.execute();
+                onRotateAction.execute(actionParameters);
             }
         }
-    }
-
-    isAttributeReadOnly(propName, prop) {
-        // Check whether event properties are writable. Common mistake to place the widget in a readonly dataview.
-        // Entity access issues are also hard to spot as the property update is ignored without error.
-        if (!prop) {
-            return false;
-        }
-        if (prop.status !== "available") {
-            return false;
-        }
-        if (prop.readOnly) {
-            console.warn("MendixReactDnD: Property " + propName + " is readonly");
-        }
-        return prop.readOnly;
     }
 }

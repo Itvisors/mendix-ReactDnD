@@ -308,130 +308,59 @@
             </property>
         </propertyGroup>
 
-        <propertyGroup caption="Event data">
-            <property key="eventContainerID" type="attribute">
-                <caption>Container ID</caption>
-                <description>Container ID of the dragged item</description>
-                <attributeTypes>
-                    <attributeType name="Enum" />
-                </attributeTypes>
-            </property>
-            <property key="eventClientX" type="attribute" required="false">
-                <caption>Client X</caption>
-                <description>Optional. Client X position for the event.</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="eventClientY" type="attribute" required="false">
-                <caption>Client Y</caption>
-                <description>Optional. Client Y position for the event.</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="eventOffsetX" type="attribute" required="false">
-                <caption>Offset X</caption>
-                <description>Optional. Offset X position for the event. Relative from the element</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="eventOffsetY" type="attribute" required="false">
-                <caption>Offset Y</caption>
-                <description>Optional. Offset Y position for the event. Relative from the element</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="draggedDifferenceX" type="attribute" required="false">
-                <caption>Dragged difference X</caption>
-                <description>Optional. Dragged difference for the X offset.</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="draggedDifferenceY" type="attribute" required="false">
-                <caption>Dragged difference Y</caption>
-                <description>Optional. Dragged difference for the Y offset.</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="eventGuid" type="attribute">
-                <caption>Object GUID</caption>
-                <description>When an object was clicked or dragged, contains the GUID of the dragged object</description>
-                <attributeTypes>
-                    <attributeType name="String" />
-                </attributeTypes>
-            </property>
-            <property key="dropTargetContainerID" type="attribute">
-                <caption>Drop target ID</caption>
-                <description>When an object was dragged onto another object, contains the container ID of the drop target</description>
-                <attributeTypes>
-                    <attributeType name="Enum" />
-                </attributeTypes>
-            </property>
-            <property key="dropTargetGuid" type="attribute">
-                <caption>GUID of drop target</caption>
-                <description>When an object was dragged onto another object, contains the GUID of the drop target</description>
-                <attributeTypes>
-                    <attributeType name="String" />
-                </attributeTypes>
-            </property>
-            <property key="newRotation" type="attribute" required="false">
-                <caption>New rotation</caption>
-                <description>Optional. New rotation for the object. Required when allowing users to rotate items.</description>
-                <attributeTypes>
-                    <attributeType name="Integer" />
-                </attributeTypes>
-            </property>
-            <property key="shiftKeyHeld" type="attribute" required="false">
-                <caption>shift key</caption>
-                <description>Optional. Whether the shift key was held during the click.</description>
-                <attributeTypes>
-                    <attributeType name="Boolean" />
-                </attributeTypes>
-            </property>
-            <property key="ctrlKeyHeld" type="attribute" required="false">
-                <caption>ctrl key</caption>
-                <description>Optional. Whether the ctrl key was held during the click.</description>
-                <attributeTypes>
-                    <attributeType name="Boolean" />
-                </attributeTypes>
-            </property>
-            <property key="altKeyHeld" type="attribute" required="false">
-                <caption>alt key</caption>
-                <description>Optional. Whether the alt key was held during the click.</description>
-                <attributeTypes>
-                    <attributeType name="Boolean" />
-                </attributeTypes>
-            </property>
-            <property key="isRightClickEvent" type="attribute" required="false">
-                <caption>Is right click</caption>
-                <description>Optional. Whether the user used the right mouse button for the click.</description>
-                <attributeTypes>
-                    <attributeType name="Boolean" />
-                </attributeTypes>
-            </property>
-        </propertyGroup>
-
         <propertyGroup caption="Events">
             <property key="onClickAction" type="action" required="false">
                 <caption>On click action</caption>
                 <description></description>
+                <actionVariables>
+                    <actionVariable key="containerID" type="String" caption="container ID of the clicked item" />
+                    <actionVariable key="clientX" type="Integer" caption="client (mouse) X position for the event" />
+                    <actionVariable key="clientY" type="Integer" caption="client (mouse) Y position for the event" />
+                    <actionVariable key="offsetX" type="Integer" caption="offset X position for the event, relative from the element" />
+                    <actionVariable key="offsetY" type="Integer" caption="offset Y position for the event, relative from the element" />
+                    <actionVariable key="eventGuid" type="String" caption="guid of the clicked item" />
+                    <actionVariable key="selectedMarkerGuids" type="String" caption="the selected marker(s), comma separated list of GUIDs." />
+                    <actionVariable key="selectedMarkerCount" type="Integer" caption="number of selected markers, only relevant when multiselect of markers is allowed at one or more containers" />
+                    <actionVariable key="shiftKeyHeld" type="Boolean" caption="whether the shift key was held" />
+                    <actionVariable key="ctrlKeyHeld" type="Boolean" caption="whether the ctrl key was held" />
+                    <actionVariable key="altKeyHeld" type="Boolean" caption="whether the alt key was held" />
+                    <actionVariable key="isRightClickEvent" type="Boolean" caption="whether the click event is a right click" />
+                </actionVariables>
             </property>
             <property key="onDropAction" type="action">
                 <caption>On drop action</caption>
                 <description></description>
+                <actionVariables>
+                    <actionVariable key="containerID" type="String" caption="container ID of the clicked item" />
+                    <actionVariable key="clientX" type="Integer" caption="client (mouse) X position for the event" />
+                    <actionVariable key="clientY" type="Integer" caption="client (mouse) Y position for the event" />
+                    <actionVariable key="offsetX" type="Integer" caption="offset X position for the event, relative from the element" />
+                    <actionVariable key="offsetY" type="Integer" caption="offset Y position for the event, relative from the element" />
+                    <actionVariable key="eventGuid" type="String" caption="guid of the clicked item" />
+                    <actionVariable key="selectedMarkerGuids" type="String" caption="the selected marker(s), comma separated list of GUIDs." />
+                    <actionVariable key="selectedMarkerCount" type="Integer" caption="number of selected markers, only relevant when multiselect of markers is allowed at one or more containers" />
+                    <actionVariable key="draggedDifferenceX" type="Integer" caption="dragged difference for the X offset" />
+                    <actionVariable key="draggedDifferenceY" type="Integer" caption="dragged difference for the Y offset" />
+                    <actionVariable key="dropTargetContainerID" type="String" caption="container ID of the drop target" />
+                    <actionVariable key="dropTargetGuid" type="String" caption="guid of the drop target" />
+                </actionVariables>
             </property>
             <property key="onRotateAction" type="action" required="false">
                 <caption>On rotate action</caption>
                 <description>Optional. On rotate action. Required when allowing users to rotate items.</description>
+                <actionVariables>
+                    <actionVariable key="containerID" type="String" caption="container ID of the clicked item" />
+                    <actionVariable key="eventGuid" type="String" caption="guid of the clicked item" />
+                    <actionVariable key="newRotation" type="Integer" caption="new rotation for the object" />
+                </actionVariables>
             </property>
             <property key="onDragToSelect" type="action" required="false">
                 <caption>On drag to select</caption>
                 <description>Optional. Called when user selects multiple markers by dragging a selection area. Required only when allowing users to do so.</description>
+                <actionVariables>
+                    <actionVariable key="selectedMarkerGuids" type="String" caption="the selected marker(s), comma separated list of GUIDs" />
+                    <actionVariable key="selectedMarkerCount" type="Integer" caption="number of selected markers, only relevant when multiselect of markers is allowed at one or more containers" />
+                </actionVariables>
             </property>
             <property key="onScrollToHandledAction" type="action" required="false">
                 <caption>On scroll to handled action</caption>
