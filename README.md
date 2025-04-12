@@ -124,7 +124,7 @@ Returning on click events from the widget only makes sense when positioning item
 
 ### On drop action, without position
 
-The parent child basic demo uses this type, you only need to know which object was dragged, where it came from and where was dropped on.
+The parent child basic demo uses this type, you only need to know which object was dragged, where it came from and where was dropped.
 
 | Variable               | Type     | Description                                                                                 |
 |------------------------|----------|---------------------------------------------------------------------------------------------|
@@ -135,7 +135,7 @@ The parent child basic demo uses this type, you only need to know which object w
 
 ### On drop action, with position
 
-When dragging images over a floorplan or map, you can use these parameters for updating your markers
+When dragging images over a floorplan or map, you can use these parameters for updating your markers.
 
 | Variable               | Type     | Description                                                                                 |
 |------------------------|----------|---------------------------------------------------------------------------------------------|
