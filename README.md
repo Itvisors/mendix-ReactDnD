@@ -97,8 +97,7 @@ All event handling is done with action variables. However, as the logic can get 
 | On drag to select       |      | Opt.               | Action to call after user selects multiple markers by dragging a selection area. Use this to update the list of selected markers.
 
 ### Action variables
-The actions use variables, so it is best to configure a microflow or nanoflow to get these values
-Reasons for using variables:
+The actions use variables, so it is best to configure a microflow or nanoflow to get these values. Reasons for using variables:
 - For simple use cases, no context attributes required
 - Makes it more clear which values are available for each action
 - Reduces pages renders, noticable on complex pages or many markers on a floorplan
@@ -124,6 +123,8 @@ Returning on click events from the widget only makes sense when positioning item
 | isRightClickEvent      | Boolean  | whether the click event is a right click                                                    |
 
 ### On drop action, without position
+
+The parent child basic demo uses this type, you only need to know which object was dragged, where it came from and where was dropped on.
 
 | Variable               | Type     | Description                                                                                 |
 |------------------------|----------|---------------------------------------------------------------------------------------------|
