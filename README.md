@@ -51,7 +51,7 @@ The widget makes no attempt to guess the device type. It is up to you to choose 
 Be sure to test this with the actual devices! 
 
 ## The context object
-All event handling is done by setting values on the context object.
+All event handling is done with action variables. However, as the logic can get complex it helps setting values on the context object or a helper object. This reduces the number of parameters that need to be passed to sub flows. However, that is not a requirement, you could use the action variables directly in your logic
 
 | Attribute               | Type        | Drop | Drop with position | Remarks
 |-------------------------|-------------|:----:|:------------------:|---------
@@ -96,6 +96,80 @@ All event handling is done by setting values on the context object.
 | On rotate action        |      | Opt.               | On rotate action. Required when allowing users to rotate items.
 | On drag to select       |      | Opt.               | Action to call after user selects multiple markers by dragging a selection area. Use this to update the list of selected markers.
 
+### Action variables
+The actions use variables, so it is best to configure a microflow or nanoflow to get these values
+Reasons for using variables:
+- For simple use cases, no context attributes required
+- Makes it more clear which values are available for each action
+- Reduces pages renders, noticable on complex pages or many markers on a floorplan
+
+### Return on click events?
+Returning on click events from the widget only makes sense when positioning items on a background. When dropping without position, a container with an onClick action is easier. The on click event of the widget allows you to capture the exact click coordinate on the container.
+
+### On click action
+
+| Variable               | Type     | Description                                                                                 |
+|------------------------|----------|---------------------------------------------------------------------------------------------|
+| containerID            | String   | container ID of the clicked item                                                            |
+| clientX                | Integer  | client (mouse) X position for the event                                                     |
+| clientY                | Integer  | client (mouse) Y position for the event                                                     |
+| offsetX                | Integer  | offset X position for the event, relative from the element                                  |
+| offsetY                | Integer  | offset Y position for the event, relative from the element                                  |
+| eventGuid              | String   | guid of the clicked item                                                                    |
+| selectedMarkerGuids    | String   | the selected marker(s), comma separated list of GUIDs.                                      |
+| selectedMarkerCount    | Integer  | number of selected markers, only relevant when multiselect of markers is allowed at one or more containers |
+| shiftKeyHeld           | Boolean  | whether the shift key was held                                                              |
+| ctrlKeyHeld            | Boolean  | whether the ctrl key was held                                                               |
+| altKeyHeld             | Boolean  | whether the alt key was held                                                                |
+| isRightClickEvent      | Boolean  | whether the click event is a right click                                                    |
+
+### On drop action, without position
+
+| Variable               | Type     | Description                                                                                 |
+|------------------------|----------|---------------------------------------------------------------------------------------------|
+| containerID            | String   | container ID of the clicked item                                                            |
+| eventGuid              | String   | guid of the clicked item                                                                    |
+| dropTargetContainerID  | String   | container ID of the drop target                                                             |
+| dropTargetGuid         | String   | guid of the drop target                                                                     |
+
+### On drop action, with position
+
+When dragging images over a floorplan or map, you can use these parameters for updating your markers
+
+| Variable               | Type     | Description                                                                                 |
+|------------------------|----------|---------------------------------------------------------------------------------------------|
+| containerID            | String   | container ID of the clicked item                                                            |
+| clientX                | Integer  | client (mouse) X position for the event                                                     |
+| clientY                | Integer  | client (mouse) Y position for the event                                                     |
+| offsetX                | Integer  | offset X position for the event, relative from the element                                  |
+| offsetY                | Integer  | offset Y position for the event, relative from the element                                  |
+| eventGuid              | String   | guid of the clicked item                                                                    |
+| selectedMarkerGuids    | String   | the selected marker(s), comma separated list of GUIDs.                                      |
+| selectedMarkerCount    | Integer  | number of selected markers, only relevant when multiselect of markers is allowed at one or more containers |
+| draggedDifferenceX     | Integer  | dragged difference for the X offset                                                         |
+| draggedDifferenceY     | Integer  | dragged difference for the Y offset                                                         |
+| dropTargetContainerID  | String   | container ID of the drop target                                                             |
+| dropTargetGuid         | String   | guid of the drop target                                                                     |
+
+### On rotate
+
+| Variable     | Type     | Description                      |
+|--------------|----------|----------------------------------|
+| containerID  | String   | container ID of the clicked item |
+| eventGuid    | String   | guid of the clicked item         |
+| newRotation  | Integer  | new rotation for the object      |
+
+### On drag to select
+
+| Variable             | Type     | Description                                                                                 |
+|----------------------|----------|---------------------------------------------------------------------------------------------|
+| selectedMarkerGuids  | String   | the selected marker(s), comma separated list of GUIDs                                       |
+| selectedMarkerCount  | Integer  | number of selected markers, only relevant when multiselect of markers is allowed at one or more containers |
+
+### On scroll to handled
+
+This action has no variables
+
 ### The Data changed date attribute
 Pluggable widgets are rendered **really** often due to the way React and Mendix work. Clicking buttons, conditional visibility elsewhere on the page, changing the context object or opening a popup are examples. 
 
@@ -107,9 +181,6 @@ Be sure to only commit the context object with the data changed date with refres
 When dragging a parent marker, you will need to adjust any related markers as well if you want to keep them together. The widget will do this while dragging the parent around but you will need to persist the new position for the child markers yourself.
 
 The same applies to multi selection. When multiple markers are selected, the widget will report the new position for the marker that was dragged. The GUIDs of the other selected markers are passed in the selection context attribute.
-
-## Return on click events?
-Returning on click events from the widget only makes sense when positioning items on a background. When dropping without position, a container with an onClick action is easier. The on click event of the widget allows you to capture the exact click coordinate on the container.
 
 ## Inspecting the contents
 Because the widget captures right-click events, inspecting an element by right-clicking it no longer works. The browser inspector can also directly inspect elements. The example is for Chrome. The little arrow icon in the top left of the inspector pane allows you to target elements on the page.
