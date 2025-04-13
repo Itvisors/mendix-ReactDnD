@@ -156,8 +156,8 @@ When dragging images over a floorplan or map, you can use these parameters for u
 
 | Variable     | Type     | Description                      |
 |--------------|----------|----------------------------------|
-| containerID  | String   | container ID of the clicked item |
-| eventGuid    | String   | guid of the clicked item         |
+| containerID  | String   | container ID of the rotated item |
+| eventGuid    | String   | guid of the rotated item         |
 | newRotation  | Integer  | new rotation for the object      |
 
 ### On drag to select

@@ -349,8 +349,8 @@
                 <caption>On rotate action</caption>
                 <description>Optional. On rotate action. Required when allowing users to rotate items.</description>
                 <actionVariables>
-                    <actionVariable key="containerID" type="String" caption="container ID of the clicked item" />
-                    <actionVariable key="eventGuid" type="String" caption="guid of the clicked item" />
+                    <actionVariable key="containerID" type="String" caption="container ID of the rotated item" />
+                    <actionVariable key="eventGuid" type="String" caption="guid of the rotated item" />
                     <actionVariable key="newRotation" type="Integer" caption="new rotation for the object" />
                 </actionVariables>
             </property>
