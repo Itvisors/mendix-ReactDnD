@@ -1,12 +1,12 @@
 {
   "name": "mendixreactdnd",
   "widgetName": "MendixReactDnD",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "description": "Wrapper for react-dnd",
   "copyright": "2020 ITvisors",
   "author": "Marcel Groeneweg",
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "license": "Apache-2.0",
   "config": {
@@ -25,7 +25,7 @@
     "release": "pluggable-widgets-tools release:web"
   },
   "devDependencies": {
-    "@mendix/pluggable-widgets-tools": "10.21.2",
+    "@mendix/pluggable-widgets-tools": "11.3.0",
     "big.js": "^5.2.2"
   },
   "dependencies": {
