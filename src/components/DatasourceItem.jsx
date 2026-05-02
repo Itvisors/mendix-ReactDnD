@@ -66,7 +66,7 @@ export function DatasourceItem({
             style = {
                 position: "absolute",
                 transform: transform,
-                webkitTransform: transform
+                WebkitTransform: transform
             };
         }
     }
@@ -79,7 +79,7 @@ export function DatasourceItem({
             style={style}
             onClick={onClickHandler}
             onContextMenu={onClickHandler}
-            data-Name={item.nameAttributeValue}
+            data-name={item.nameAttributeValue}
         >
             <DatasourceItemImage
                 item={item}

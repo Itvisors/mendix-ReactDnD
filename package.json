@@ -1,7 +1,7 @@
 {
   "name": "mendixreactdnd",
   "widgetName": "MendixReactDnD",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Wrapper for react-dnd",
   "copyright": "2020 ITvisors",
   "author": "Marcel Groeneweg",

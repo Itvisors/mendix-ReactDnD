@@ -69,7 +69,7 @@ export function DragWrapper({ item, dropPos, zoomFactor, onDragStart, onDragEnd,
         const transform = "translate(" + left + "px, " + top + "px)";
         style.position = "absolute";
         style.transform = transform;
-        style.webkitTransform = transform;
+        style.WebkitTransform = transform;
     } else {
         style.position = "relative";
     }

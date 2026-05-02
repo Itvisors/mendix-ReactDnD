@@ -118,8 +118,8 @@ function renderImage(imageUrl, imageHeight, imageWidth, imageRotation, isSelecte
     }
     if (isSelected) {
         imageContainerStyle.margin = "-" + selectedMarkerBorderSize + "px";
-        imageContainerStyle["border-width"] = selectedMarkerBorderSize + "px";
-        imageContainerStyle["border-radius"] = selectedMarkerBorderSize + "px";
+        imageContainerStyle.borderWidth = selectedMarkerBorderSize + "px";
+        imageContainerStyle.borderRadius = selectedMarkerBorderSize + "px";
     }
 
     return (

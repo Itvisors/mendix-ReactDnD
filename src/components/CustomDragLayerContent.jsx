@@ -41,9 +41,8 @@ export function CustomDragLayerContent(props) {
 
             // Create the item
             const additionalItem = (
-                <div className="custom-draglayer-item" style={style}>
+                <div key={item.id} className="custom-draglayer-item" style={style}>
                     <DatasourceItem
-                        key={item.id}
                         cellContainer={container}
                         item={item}
                         draggedRotationDegree={0}
