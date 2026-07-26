@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 export function Grid({ gridSize, gridWidth, gridHeight }) {
     const largeSize = gridSize * 10;
     const smallPath = "M " + gridSize + " 0 L 0 0 0 " + gridSize + "";

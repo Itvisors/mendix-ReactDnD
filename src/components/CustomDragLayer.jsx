@@ -1,7 +1,6 @@
 import { Constants } from "../utils/Constants";
 import { CustomDragLayerContent } from "./CustomDragLayerContent";
 import { CustomDragLayerDragToSelect } from "./CustomDragLayerDragToSelect";
-import { createElement } from "react";
 import { useDragLayer } from "react-dnd";
 
 export function CustomDragLayer({

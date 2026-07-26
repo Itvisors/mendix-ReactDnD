@@ -1,5 +1,3 @@
-import { createElement } from "react";
-
 export function CustomDragLayerDragToSelect({
     item,
     containerCellRectMap,

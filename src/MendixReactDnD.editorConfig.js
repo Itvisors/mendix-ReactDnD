@@ -8,10 +8,10 @@ export function getProperties(values, defaultProperties) {
     return defaultProperties;
 }
 
-export function check(values) {
-    const errors = [];
-    // Add errors to the above array to throw errors in Studio and Studio Pro.
-    /* Example
+// export function check(values) {
+//    const errors = [];
+// Add errors to the above array to throw errors in Studio and Studio Pro.
+/* Example
     if (values.myProperty !== "custom") {
         errors.push({
             property: `myProperty`,
@@ -20,5 +20,5 @@ export function check(values) {
         });
     }
     */
-    return errors;
-}
+//    return errors;
+// }

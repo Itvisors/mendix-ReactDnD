@@ -1,5 +1,4 @@
 import { Constants } from "../utils/Constants";
-import { createElement } from "react";
 import { useDrop } from "react-dnd";
 
 export function GlobalDropWrapper({ containerList, onRotateHover, onRotateDrop, onDragToSelectDrop, children }) {

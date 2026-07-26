@@ -1,4 +1,4 @@
-import { createElement, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { DatasourceItemImage } from "./DatasourceItemImage";
 import { calculateZoomFactor } from "../utils/Utils";
 

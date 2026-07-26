@@ -3,7 +3,6 @@ import { DragToSelect } from "./DragToSelect";
 import { Grid } from "./Grid";
 import { RotationHandle } from "./RotationHandle";
 import { calculateZoomFactor } from "../utils/Utils";
-import { createElement } from "react";
 
 export function DatasourceItemImage({
     item,

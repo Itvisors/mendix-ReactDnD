@@ -1,4 +1,4 @@
-import { createElement, useRef } from "react";
+import { useRef } from "react";
 import { snapOffsetToGrid } from "../utils/Utils";
 import { useDrop } from "react-dnd";
 

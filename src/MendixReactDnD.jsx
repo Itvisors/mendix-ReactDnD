@@ -1,4 +1,4 @@
-import { Component, createElement } from "react";
+import { Component } from "react";
 import Big from "big.js";
 import { CellContainer } from "./components/CellContainer";
 import { CustomDragLayer } from "./components/CustomDragLayer";

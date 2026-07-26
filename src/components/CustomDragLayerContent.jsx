@@ -1,4 +1,4 @@
-import { createElement, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { DatasourceItem } from "./DatasourceItem";
 import { snapOffsetToGrid } from "../utils/Utils";
 
